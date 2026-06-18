@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build/test output
+dist/
+coverage/
+
+# TenderBoard generated/local artifacts
+tenderboard/outputs/
+tenderboard/data/
+
+# local env/secrets
+.env
+.env.*
+!.env.example
+tenderboard/.env
+tenderboard/.env.*
+!tenderboard/.env.example
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
