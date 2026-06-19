@@ -130,20 +130,29 @@ export function renderScoutReport(report: ScoutReport): string {
 
 export function extractScoutQuery(taskText: string): string {
   const normalized = taskText
+    .replace(/^\s*Max payment:.*$/gim, ' ')
+    .replace(/^\s*Checker pack:.*$/gim, ' ')
+    .replace(/^\s*Acceptance criteria:.*$/gim, ' ')
+    .replace(/^\s*Do not (ask for|request).*$/gim, ' ')
     .replace(/Task:/gi, ' ')
     .replace(/Instructions:/gi, ' ')
-    .replace(/Max payment:.*/gi, ' ')
-    .replace(/Do not ask for.*/gi, ' ')
     .replace(/[^a-zA-Z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
+  const seen = new Set<string>();
   const words = normalized
     .split(' ')
+    .map((word) => word.toLowerCase())
     .filter((word) => word.length > 2)
-    .filter((word) => !STOP_WORDS.has(word.toLowerCase()));
+    .filter((word) => !STOP_WORDS.has(word))
+    .filter((word) => {
+      if (seen.has(word)) return false;
+      seen.add(word);
+      return true;
+    });
 
-  const query = words.slice(0, 8).join(' ').trim();
+  const query = words.slice(0, 4).join(' ').trim();
   return query || 'AI agent hackathon opportunities';
 }
 
@@ -319,6 +328,28 @@ const STOP_WORDS = new Set([
   'short',
   'useful',
   'practical',
+  'public',
+  'active',
   'payment',
+  'sui',
   'usdc',
+  'checker',
+  'pack',
+  'research',
+  'code',
+  'commerce',
+  'acceptance',
+  'criteria',
+  'return',
+  'links',
+  'link',
+  'include',
+  'sources',
+  'source',
+  'real',
+  'material',
+  'request',
+  'worker',
+  'private',
+  'buyer-private',
 ]);

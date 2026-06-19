@@ -7,6 +7,23 @@ describe('opportunity scout', () => {
     expect(extractScoutQuery('Task: Find AI agent hackathons and grants for web3 builders')).toContain('agent');
   });
 
+  it('keeps receipt metadata out of the live scout query', () => {
+    const receiptShapedTask = `Task: Find AI agent hackathons
+Max payment: 0.04 SUI
+Checker pack: research
+
+Instructions:
+Find AI agent hackathons and builder opportunities
+
+Acceptance criteria:
+- Return real links
+- Include sources
+
+Do not request buyer-private material.`;
+
+    expect(extractScoutQuery(receiptShapedTask)).toBe('agent hackathons builder opportunities');
+  });
+
   it('fetches real-source shaped results and renders links', async () => {
     const fetchImpl = async (url: string | URL | Request) => {
       const text = String(url);

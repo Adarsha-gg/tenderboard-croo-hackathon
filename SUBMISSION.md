@@ -133,7 +133,7 @@ SuiProof Market matches the judging criteria directly:
 
 1. Open SuiProof Market.
 2. Show Sui readiness and SUI payment cap.
-3. Enter a task like `Find Sui agent grants and useful builder opportunities`.
+3. Enter a task like `Find AI agent hackathons and useful builder opportunities`.
 4. Enter acceptance criteria.
 5. Pick the `research` checker pack.
 6. Enter private notes.
@@ -152,4 +152,4 @@ SuiProof Market matches the judging criteria directly:
 
 ## Repository
 
-https://github.com/Adarsha-gg/tenderboard-sui-overflow
+https://github.com/Adarsha-gg/tenderboard-croo-hackathon

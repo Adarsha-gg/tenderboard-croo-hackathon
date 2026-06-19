@@ -41,13 +41,13 @@ Point out:
 Task example:
 
 ```text
-Find Sui agent grants and useful builder opportunities.
+Find AI agent hackathons and useful builder opportunities.
 ```
 
 Acceptance criteria:
 
 ```text
-Return at least 5 public-source Sui opportunities with links.
+Return at least 5 public-source opportunities with links.
 Flag deadline, sponsor, prize/funding, and fit when visible.
 End with a ranked recommendation and why.
 ```
