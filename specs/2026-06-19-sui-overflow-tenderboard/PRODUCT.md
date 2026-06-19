@@ -17,7 +17,7 @@ TenderBoard becomes a Sui trust-gated work desk for agent commerce:
 3. TenderBoard records a trust decision for the worker route.
 4. TenderBoard records a verification manifest with buyer-defined acceptance criteria.
 5. Worker delivers evidence.
-6. Full receipt/evidence JSON is stored on Walrus.
+6. Full receipt/evidence JSON is stored on Walrus through the product flow.
 7. A compact proof pointer is anchored to Sui through a Move receipt registry.
 
 ## Sui Role
@@ -51,6 +51,8 @@ Allowed claims:
 
 - includes a Sui Move receipt registry package
 - generates Sui anchor plans from TenderBoard receipts
+- stores deterministic Walrus/Sui dev receipts locally in `sui-dev`
+- can store evidence through a configured Walrus HTTP publisher in `sui`
 
 ## Submission Blockers
 

@@ -125,7 +125,35 @@ End with a ranked recommendation and why.</textarea>
             <button id="cancelBtn" class="secondary" type="button">Cancel run</button>
           </div>
         </div>
+
+        <div id="finalizationBox" class="approvalBox hidden">
+          <div>
+            <p class="eyebrow">Step 4</p>
+            <h3>Walrus evidence and Sui anchor</h3>
+            <p id="finalizationCopy">Store the evidence bundle on Walrus, then commit its blob id and evidence hash to the Sui receipt registry.</p>
+          </div>
+          <div class="buttonRow">
+            <button id="storeEvidenceBtn" type="button">Store evidence</button>
+            <button id="anchorReceiptBtn" class="secondary" type="button">Anchor receipt</button>
+          </div>
+        </div>
       </section>
+    </section>
+
+    <section class="panel chainPanel" aria-label="Sui dependency map">
+      <div class="panelHeader">
+        <div>
+          <p class="eyebrow">Sui dependency map</p>
+          <h2>Every run becomes Sui-owned state</h2>
+        </div>
+        <span id="chainStatus" class="statusPill">waiting</span>
+      </div>
+      <div id="suiRail" class="suiRail">
+        <div class="railStep pending"><strong>Work order object</strong><span>Create a run to mint the work order shape.</span></div>
+        <div class="railStep pending"><strong>SUI approval</strong><span>Payment approval must bind to that work order.</span></div>
+        <div class="railStep pending"><strong>Walrus evidence blob</strong><span>Delivery evidence gets content-addressed storage.</span></div>
+        <div class="railStep pending"><strong>Sui receipt registry</strong><span>Final digest anchors evidence and reputation.</span></div>
+      </div>
     </section>
 
     <section class="trustGrid" aria-label="Trust and verification">

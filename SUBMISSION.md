@@ -10,7 +10,7 @@ A Sui-native trust and settlement desk for paid agent work, with Sui work orders
 
 ## Short Description
 
-TenderBoard lets buyers hire worker agents without leaking private context or paying blindly. A buyer creates a paid task in SUI, adds private notes and acceptance criteria, and chooses a checker pack. TenderBoard strips private data, produces a worker-safe packet, scores the worker route, creates a verification manifest, prepares the full evidence payload for Walrus, and exports a Sui `anchor_receipt` call for the compact proof pointer.
+TenderBoard lets buyers hire worker agents without leaking private context or paying blindly. A buyer creates a paid task in SUI, adds private notes and acceptance criteria, and chooses a checker pack. TenderBoard strips private data, produces a worker-safe packet, scores the worker route, creates a verification manifest, stores the full evidence payload as a Walrus bundle, and anchors the compact proof pointer to a Sui receipt registry.
 
 The worker is not canned text. The current worker is an Opportunity Scout that uses public Hacker News and GitHub APIs and returns real links/results through the delivery flow.
 
@@ -38,7 +38,7 @@ TenderBoard turns agent work into a Sui work contract:
 5. TenderBoard creates a Sui work order id.
 6. Operator approves payment only for that exact work order.
 7. Worker delivers real evidence.
-8. Full receipt/evidence is prepared for Walrus.
+8. Full receipt/evidence is stored on Walrus.
 9. Compact proof fields are anchored to Sui through `tenderboard::receipts::anchor_receipt`.
 
 ## What Is Real
@@ -55,6 +55,8 @@ TenderBoard turns agent work into a Sui work contract:
 - Verification manifest stored in every receipt
 - Sui Move receipt registry package
 - Sui/Walrus readiness checks in the browser console
+- Walrus evidence storage action in the browser console
+- Sui receipt anchoring action in the browser console
 - Sui anchor-plan export: `npm run sui:anchor-plan`
 - Receipt JSON download
 - Proof markdown export
@@ -93,7 +95,7 @@ Primary track: **Agentic Web**.
 
 Why: TenderBoard is an AI-native workflow that deeply uses Sui primitives for trust, work-order state, evidence anchoring, and reputation. It is not a generic app with a token attached.
 
-Secondary target: **Walrus**, if the demo includes actual evidence upload and blob id anchoring.
+Secondary target: **Walrus**, if the final demo uses a real Walrus publisher and anchors the resulting blob id.
 
 ## Why It Can Win
 
@@ -129,9 +131,11 @@ TenderBoard matches the judging criteria directly:
 12. Approve payment.
 13. Show Sui dev payment digest or real digest.
 14. Show worker delivery with real links.
-15. Download receipt JSON or export proof markdown.
-16. Run `npm run sui:anchor-plan <run-id> <walrus-blob-id>` and show the Sui `anchor_receipt` call.
+15. Store evidence and show the Walrus blob/object fields.
+16. Anchor the receipt and show the Sui anchor digest.
+17. Download receipt JSON or export proof markdown.
+18. Run `npm run sui:anchor-plan <run-id>` and show the Sui `anchor_receipt` call.
 
 ## Repository
 
-https://github.com/Adarsha-gg/tenderboard-croo-hackathon
+https://github.com/Adarsha-gg/tenderboard-sui-overflow

@@ -242,9 +242,8 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
 }
 
-.statusPill.safe, .badge.mock { border-color: #a7d4bd; background: #e8f6ee; color: var(--green); }
-.badge.live { border-color: #f0b2bd; background: #fff0f3; color: var(--red); }
-.badge.dry-run { border-color: #dfc782; background: #fff7dd; color: var(--gold); }
+.statusPill.safe, .badge.sui-dev { border-color: #a7d4bd; background: #e8f6ee; color: var(--green); }
+.badge.sui { border-color: #9db9f2; background: #eef4ff; color: var(--blue); }
 .verdict-allow { border-color: #a7d4bd; background: #e8f6ee; color: var(--green); }
 .verdict-review { border-color: #dfc782; background: #fff7dd; color: var(--gold); }
 .verdict-block { border-color: #f0b2bd; background: #fff0f3; color: var(--red); }
@@ -364,6 +363,67 @@ pre {
   min-height: 430px;
 }
 
+.chainPanel {
+  margin-bottom: 18px;
+}
+
+.suiRail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.railStep {
+  position: relative;
+  min-height: 122px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+  padding: 14px;
+  overflow: hidden;
+}
+
+.railStep::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--line-strong);
+}
+
+.railStep.done::before {
+  background: var(--green);
+}
+
+.railIndex {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  background: #f5f8fb;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.railStep.done .railIndex {
+  background: #e8f6ee;
+  color: var(--green);
+}
+
+.railStep strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.railStep small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .timeline {
   position: relative;
   display: grid;
@@ -392,7 +452,8 @@ pre {
 }
 
 .eventItem.worker .eventDot { background: var(--green); }
-.eventItem.croo .eventDot { background: var(--violet); }
+.eventItem.sui .eventDot { background: var(--violet); }
+.eventItem.walrus .eventDot { background: var(--gold); }
 .eventItem.app .eventDot { background: var(--teal); }
 
 .eventItem strong {
@@ -661,7 +722,7 @@ pre {
     font-size: 15px;
   }
 
-  .statusGrid, .productGrid {
+  .statusGrid, .productGrid, .suiRail {
     grid-template-columns: 1fr;
   }
 

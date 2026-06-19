@@ -76,7 +76,7 @@ describe('TenderBoard Sui product server', () => {
     }
   });
 
-  it('requires approval before delivery and records a Sui dev digest', async () => {
+  it('requires approval, stores Walrus evidence, and anchors a Sui dev receipt', async () => {
     const { baseUrl, close } = await startTestServer({
       TENDERBOARD_MODE: 'sui-dev',
       TENDERBOARD_RECEIPTS_DIR: tempDir,
@@ -98,6 +98,17 @@ describe('TenderBoard Sui product server', () => {
       expect(after.suiPaymentDigest).toContain('sui_dev_payment_');
       expect(after.deliveryText).toContain('Opportunity Scout Report');
       expect(JSON.stringify(after.events)).toContain('walrus_upload_pending');
+
+      const withEvidence = await postJson(`${baseUrl}/api/runs/${created.runId}/store-evidence`, {});
+      expect(withEvidence.status).toBe('anchoring');
+      expect(withEvidence.walrusBlobId).toContain('walrus_dev_blob_');
+      expect(withEvidence.walrusBlobObjectId).toMatch(/^0x/);
+      expect(withEvidence.verificationManifest.evidenceHash).toMatch(/^sha256:/);
+
+      const anchored = await postJson(`${baseUrl}/api/runs/${created.runId}/anchor-receipt`, {});
+      expect(anchored.status).toBe('anchored');
+      expect(anchored.suiAnchorDigest).toContain('sui_dev_anchor_');
+      expect(JSON.stringify(anchored.events)).toContain('sui_dev_receipt_anchored');
     } finally {
       await close();
     }

@@ -32,6 +32,19 @@ Added safe config fields and UI status for:
 - Walrus aggregator configured
 - missing Sui settings
 
+## 2026-06-19 - Walrus and Sui finalization flow added
+
+Added first-class product actions after worker delivery:
+
+- store the full receipt/evidence bundle through Walrus
+- record Walrus blob id, blob object id, read URL, and epoch metadata
+- move the run into `anchoring`
+- anchor the final receipt to the Sui receipt registry
+- record a Sui anchor digest and move the run into `anchored`
+- show the four-step Sui dependency map in the UI
+
+In `sui-dev`, the flow produces deterministic dev blob/object ids and dev Sui digests for local demo. In `sui`, the Walrus step uses the configured HTTP publisher and the anchor step requires the real Sui receipt-registry transaction digest.
+
 ## Next
 
 Install/configure Sui CLI, publish the package, capture object ids, upload evidence to Walrus, and run the generated `sui client call`.

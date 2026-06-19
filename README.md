@@ -12,7 +12,7 @@ It turns an agent job into a Sui work contract: sanitized task packet, trust dec
 4. TenderBoard creates a verification manifest with spec hash, checker pack, acceptance criteria, required checks, settlement rule, and reputation write-back note.
 5. TenderBoard creates a Sui-shaped work order and requires explicit payment approval.
 6. The worker delivers evidence.
-7. The full receipt/evidence payload is prepared for Walrus.
+7. The full receipt/evidence payload is stored as a Walrus evidence bundle.
 8. The compact proof pointer is anchored to the Sui receipt registry.
 
 The wedge is simple: agents can do paid work, but buyers need proof of what was sent, why the worker was trusted, what "done" meant, where evidence lives, and why payment should count as reputation.
@@ -30,6 +30,8 @@ The wedge is simple: agents can do paid work, but buyers need proof of what was 
 - verification manifest in each receipt
 - Sui Move receipt registry package
 - Sui/Walrus readiness checks
+- Walrus evidence-bundle storage flow
+- Sui receipt-anchor flow
 - Sui anchor-plan export
 - receipt JSON downloads
 - proof markdown export
@@ -80,5 +82,5 @@ Before claiming deployed Sui integration:
 - set `SUI_PACKAGE_ID`
 - set `SUI_RECEIPT_REGISTRY_ID`
 - configure `WALRUS_PUBLISHER_URL` and `WALRUS_AGGREGATOR_URL`
-- upload receipt/evidence JSON to Walrus
-- pass the Walrus blob id to `npm run sui:anchor-plan <run-id> <walrus-blob-id>`
+- store the receipt/evidence bundle on Walrus
+- run the generated Sui anchor call from `npm run sui:anchor-plan <run-id>`

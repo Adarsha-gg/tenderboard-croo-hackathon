@@ -1,11 +1,13 @@
 let currentRunId = null;
 let eventSource = null;
 let timelineEvents = 0;
+let currentConfig = null;
 
 const el = (id) => document.getElementById(id);
 
 async function boot() {
   const config = await request('/api/config');
+  currentConfig = config;
   renderConfig(config);
   await loadRunHistory();
 }
@@ -74,13 +76,53 @@ el('approveBtn').addEventListener('click', async () => {
   if (!currentRunId) return;
   el('approveBtn').disabled = true;
   try {
-    await request(`/api/runs/${currentRunId}/approve-payment`, { method: 'POST' });
+    const body = {};
+    if (currentConfig?.mode === 'sui') {
+      const digest = window.prompt('Paste the Sui payment approval transaction digest');
+      if (!digest) return;
+      body.suiPaymentDigest = digest;
+    }
+    await request(`/api/runs/${currentRunId}/approve-payment`, { method: 'POST', body });
     await refreshReceipt();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
   } finally {
     el('approveBtn').disabled = false;
+  }
+});
+
+el('storeEvidenceBtn').addEventListener('click', async () => {
+  if (!currentRunId) return;
+  el('storeEvidenceBtn').disabled = true;
+  try {
+    await request(`/api/runs/${currentRunId}/store-evidence`, { method: 'POST' });
+    await refreshReceipt();
+    await loadRunHistory();
+  } catch (error) {
+    setReceiptText(error.message, true);
+  } finally {
+    el('storeEvidenceBtn').disabled = false;
+  }
+});
+
+el('anchorReceiptBtn').addEventListener('click', async () => {
+  if (!currentRunId) return;
+  el('anchorReceiptBtn').disabled = true;
+  try {
+    const body = {};
+    if (currentConfig?.mode === 'sui') {
+      const digest = window.prompt('Paste the Sui receipt-registry transaction digest');
+      if (!digest) return;
+      body.suiAnchorDigest = digest;
+    }
+    await request(`/api/runs/${currentRunId}/anchor-receipt`, { method: 'POST', body });
+    await refreshReceipt();
+    await loadRunHistory();
+  } catch (error) {
+    setReceiptText(error.message, true);
+  } finally {
+    el('anchorReceiptBtn').disabled = false;
   }
 });
 
@@ -160,8 +202,13 @@ async function loadRunHistory() {
 
 function renderReceipt(receipt) {
   el('receiptStatus').textContent = receipt.status;
-  el('paymentBox').classList.toggle('hidden', receipt.status === 'delivered' || receipt.status === 'cancelled' || receipt.status === 'failed');
+  el('paymentBox').classList.toggle('hidden', receipt.status !== 'awaiting_payment_approval');
+  const canFinalize = ['delivered', 'anchoring', 'anchored'].includes(receipt.status);
+  el('finalizationBox').classList.toggle('hidden', !canFinalize);
+  el('storeEvidenceBtn').disabled = receipt.status !== 'delivered';
+  el('anchorReceiptBtn').disabled = receipt.status !== 'anchoring' || !receipt.walrusBlobId;
   renderTrustProof(receipt);
+  renderSuiRail(receipt);
 
   const rows = [
     ['Run id', receipt.runId],
@@ -171,13 +218,18 @@ function renderReceipt(receipt) {
     ['Sui network', receipt.suiNetwork || 'not configured'],
     ['Sui package', receipt.suiPackageId || 'not configured'],
     ['Receipt registry', receipt.suiReceiptRegistryId || 'not configured'],
+    ['Work order object', receipt.suiWorkOrderObjectId || 'pending real Sui tx'],
+    ['Escrow object', receipt.suiEscrowObjectId || 'pending real Sui tx'],
     ['Trust tier', receipt.trustDecision ? `${receipt.trustDecision.tier} / ${receipt.trustDecision.score}` : 'not evaluated'],
     ['Spec hash', receipt.verificationManifest?.specHash || 'not anchored'],
     ['Evidence hash', receipt.verificationManifest?.evidenceHash || 'not finalized'],
-    ['Sui anchor plan', receipt.verificationManifest?.evidenceHash ? `npm run sui:anchor-plan ${receipt.runId} <walrus_blob_id>` : 'finalize delivery first'],
+    ['Sui anchor plan', receipt.verificationManifest?.evidenceHash && receipt.walrusBlobId ? `npm run sui:anchor-plan ${receipt.runId}` : 'store Walrus evidence first'],
     ['Sui work order', receipt.workOrderId || 'not created yet'],
     ['Sui payment digest', receipt.suiPaymentDigest || 'not paid yet'],
     ['Walrus blob', receipt.walrusBlobId || 'not uploaded yet'],
+    ['Walrus blob object', receipt.walrusBlobObjectId || 'not uploaded yet'],
+    ['Walrus read URL', receipt.walrusReadUrl || 'not uploaded yet'],
+    ['Walrus end epoch', receipt.walrusEndEpoch ?? 'not uploaded yet'],
     ['Sui anchor digest', receipt.suiAnchorDigest || 'not anchored yet'],
     ['Delivery', receipt.deliveryText || 'not delivered yet'],
   ];
@@ -186,6 +238,43 @@ function renderReceipt(receipt) {
   el('receipt').innerHTML =
     rows.map(([label, value]) => `<div class="receiptRow"><strong>${escapeHtml(label)}</strong><span>${formatReceiptValue(value)}</span></div>`).join('') +
     receiptLink;
+}
+
+function renderSuiRail(receipt) {
+  const steps = [
+    {
+      label: 'Work order object',
+      done: Boolean(receipt.workOrderId),
+      detail: receipt.suiWorkOrderObjectId || receipt.workOrderId || 'pending',
+    },
+    {
+      label: 'SUI approval',
+      done: Boolean(receipt.suiPaymentDigest),
+      detail: receipt.suiPaymentDigest || 'waiting for operator approval',
+    },
+    {
+      label: 'Walrus evidence blob',
+      done: Boolean(receipt.walrusBlobId),
+      detail: receipt.walrusBlobId || 'waiting for evidence storage',
+    },
+    {
+      label: 'Sui receipt registry',
+      done: Boolean(receipt.suiAnchorDigest),
+      detail: receipt.suiAnchorDigest || 'waiting for anchor transaction',
+    },
+  ];
+
+  const doneCount = steps.filter((step) => step.done).length;
+  el('chainStatus').textContent = `${doneCount}/4 bound`;
+  el('suiRail').innerHTML = steps
+    .map(
+      (step, index) => `<div class="railStep ${step.done ? 'done' : 'pending'}">
+        <span class="railIndex">${index + 1}</span>
+        <strong>${escapeHtml(step.label)}</strong>
+        <small>${escapeHtml(step.detail)}</small>
+      </div>`,
+    )
+    .join('');
 }
 
 function renderTrustProof(receipt) {
@@ -218,7 +307,7 @@ function renderTrustProof(receipt) {
     </div>`;
 
   const manifest = receipt.verificationManifest;
-  el('manifestHash').textContent = manifest.evidenceHash ? 'finalized' : 'anchored';
+  el('manifestHash').textContent = manifest.evidenceHash ? 'finalized' : 'pending';
   el('manifestChecks').innerHTML = `
     <div class="hashLine"><strong>Checker pack</strong><span>${escapeHtml(manifest.checkerPack || 'research')}</span></div>
     <div class="hashLine"><strong>Spec</strong><span>${escapeHtml(manifest.specHash)}</span></div>

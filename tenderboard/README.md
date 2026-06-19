@@ -11,8 +11,8 @@ TenderBoard is a Sui-native operator console for hiring worker agents safely. It
 5. TenderBoard creates a verification manifest and Sui work order id.
 6. Operator approves payment for that exact work order.
 7. Worker delivers public-source evidence.
-8. Full receipt/evidence is prepared for Walrus.
-9. Compact proof fields are exported as a Sui `anchor_receipt` call.
+8. Full receipt/evidence is stored as a Walrus bundle.
+9. Compact proof fields are committed to the Sui receipt registry.
 
 ## Sui Proof Layer
 
@@ -38,10 +38,12 @@ WALRUS_AGGREGATOR_URL=...
 Export a call plan:
 
 ```bash
-npm run sui:anchor-plan <run-id> <walrus-blob-id>
+npm run sui:anchor-plan <run-id>
 ```
 
 Do not claim deployed Sui anchoring until the package is published and at least one receipt is anchored on testnet or mainnet.
+
+In `sui-dev` mode the app records deterministic Sui dev digests and Walrus dev blob/object ids so the full product loop can be demoed locally. In `sui` mode payment approval requires a real Sui payment transaction digest, the Walrus evidence step uses the configured HTTP publisher, and the Sui anchor step records the real receipt-registry transaction digest.
 
 ## Run
 
@@ -72,6 +74,7 @@ src/server/httpServer.ts       product API server
 src/client/                    browser UI
 src/agents/opportunityScout.ts public-source worker task
 src/live/suiRuntime.ts         Sui-shaped local execution helpers
+src/live/walrusRuntime.ts      Walrus evidence bundle storage
 src/live/proof.ts              receipt-to-markdown proof renderer
 src/sui/anchorPlan.ts          receipt-to-Sui call plan renderer
 sui/                           Sui Move receipt registry package

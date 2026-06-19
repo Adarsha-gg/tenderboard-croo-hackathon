@@ -7,8 +7,9 @@ import { loadDotEnvFile } from '../live/dotenv.js';
 import { RunEventBus, formatSseEvent } from '../live/eventBus.js';
 import { makeEvent, makeRunId, RunStore } from '../live/runStore.js';
 import { sanitizeTaskForWorker } from '../live/sanitizeTask.js';
-import { buildWorkerDelivery, makeSuiDevDigest } from '../live/suiRuntime.js';
+import { buildWorkerDelivery, makeSuiDevDigest, makeSuiDevObjectId } from '../live/suiRuntime.js';
 import { buildTrustProof, finalizeVerificationManifest } from '../live/trustProof.js';
+import { storeEvidenceOnWalrus } from '../live/walrusRuntime.js';
 import type { CreateRunRequest, LiveRunReceipt, TenderBoardConfig } from '../live/types.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -109,7 +110,23 @@ async function route(
 
   const approveMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/approve-payment$/);
   if (method === 'POST' && approveMatch) {
-    const receipt = await approvePayment(approveMatch[1]!, config, store, bus, scoutFetch);
+    const body = await readJson<{ suiPaymentDigest?: string }>(req);
+    const receipt = await approvePayment(approveMatch[1]!, body, config, store, bus, scoutFetch);
+    sendJson(res, 200, receipt);
+    return;
+  }
+
+  const walrusMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/store-evidence$/);
+  if (method === 'POST' && walrusMatch) {
+    const receipt = await storeEvidence(walrusMatch[1]!, config, store, bus);
+    sendJson(res, 200, receipt);
+    return;
+  }
+
+  const anchorMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/anchor-receipt$/);
+  if (method === 'POST' && anchorMatch) {
+    const body = await readJson<{ suiAnchorDigest?: string }>(req);
+    const receipt = await anchorReceipt(anchorMatch[1]!, body, config, store, bus);
     sendJson(res, 200, receipt);
     return;
   }
@@ -168,9 +185,15 @@ async function createRun(
     suiNetwork: config.suiNetwork,
     suiPackageId: config.suiPackageId,
     suiReceiptRegistryId: config.suiReceiptRegistryId,
+    suiWorkOrderObjectId: config.mode === 'sui-dev' ? makeSuiDevObjectId('work_order', runId) : undefined,
+    suiEscrowObjectId: config.mode === 'sui-dev' ? makeSuiDevObjectId('escrow', runId) : undefined,
     suiPaymentDigest: undefined,
     suiAnchorDigest: undefined,
     walrusBlobId: undefined,
+    walrusBlobObjectId: undefined,
+    walrusCertifiedEpoch: undefined,
+    walrusEndEpoch: undefined,
+    walrusReadUrl: undefined,
     deliveryText: undefined,
     error: undefined,
     events: [
@@ -201,6 +224,7 @@ async function createRun(
 
 async function approvePayment(
   runId: string,
+  body: { suiPaymentDigest?: string },
   config: TenderBoardConfig,
   store: RunStore,
   bus: RunEventBus,
@@ -212,7 +236,10 @@ async function approvePayment(
   }
 
   const now = new Date().toISOString();
-  const suiPaymentDigest = config.mode === 'sui-dev' ? makeSuiDevDigest('payment', runId) : undefined;
+  const suiPaymentDigest = config.mode === 'sui-dev' ? makeSuiDevDigest('payment', runId) : body.suiPaymentDigest?.trim();
+  if (!suiPaymentDigest) {
+    throw httpError(400, 'Sui mode requires suiPaymentDigest from the payment approval transaction.');
+  }
   const delivery = scoutFetch
     ? await buildWorkerDelivery(receipt, { fetchImpl: scoutFetch })
     : await buildWorkerDelivery(receipt);
@@ -241,6 +268,117 @@ async function approvePayment(
   await store.update(runId, {
     verificationManifest: finalizeVerificationManifest(latest, delivery),
   });
+
+  return store.require(runId);
+}
+
+async function storeEvidence(
+  runId: string,
+  config: TenderBoardConfig,
+  store: RunStore,
+  bus: RunEventBus,
+): Promise<LiveRunReceipt> {
+  const receipt = await store.require(runId);
+  if (!receipt.deliveryText) {
+    throw httpError(409, 'Run needs worker delivery before Walrus evidence storage.');
+  }
+  if (receipt.status !== 'delivered' && receipt.status !== 'anchoring') {
+    throw httpError(409, `Run cannot store evidence from status: ${receipt.status}`);
+  }
+
+  const now = new Date().toISOString();
+  const result = await storeEvidenceOnWalrus(receipt, config);
+  const updatedForManifest: LiveRunReceipt = {
+    ...receipt,
+    walrusBlobId: result.blobId,
+    walrusBlobObjectId: result.blobObjectId,
+    walrusCertifiedEpoch: result.certifiedEpoch,
+    walrusEndEpoch: result.endEpoch,
+    walrusReadUrl: result.readUrl,
+  };
+
+  await store.update(runId, {
+    status: 'anchoring',
+    updatedAt: now,
+    walrusBlobId: result.blobId,
+    walrusBlobObjectId: result.blobObjectId,
+    walrusCertifiedEpoch: result.certifiedEpoch,
+    walrusEndEpoch: result.endEpoch,
+    walrusReadUrl: result.readUrl,
+    verificationManifest: finalizeVerificationManifest(updatedForManifest, receipt.deliveryText),
+  });
+
+  const events = [
+    makeEvent({
+      at: now,
+      source: 'walrus',
+      type: config.mode === 'sui-dev' ? 'walrus_dev_blob_recorded' : 'walrus_blob_stored',
+      message: 'Evidence bundle stored for Sui receipt anchoring.',
+      data: {
+        blobId: result.blobId,
+        blobObjectId: result.blobObjectId,
+        endEpoch: result.endEpoch,
+        readUrl: result.readUrl,
+      },
+    }),
+    makeEvent({
+      at: now,
+      source: 'sui',
+      type: 'sui_anchor_ready',
+      message: 'Walrus evidence id is ready to be committed to the Sui receipt registry.',
+      data: { registry: config.suiReceiptRegistryId, packageId: config.suiPackageId },
+    }),
+  ];
+
+  for (const event of events) {
+    await store.appendEvent(runId, event);
+    bus.publish(runId, event);
+  }
+
+  return store.require(runId);
+}
+
+async function anchorReceipt(
+  runId: string,
+  body: { suiAnchorDigest?: string },
+  config: TenderBoardConfig,
+  store: RunStore,
+  bus: RunEventBus,
+): Promise<LiveRunReceipt> {
+  const receipt = await store.require(runId);
+  if (!receipt.walrusBlobId) {
+    throw httpError(409, 'Run needs a Walrus blob id before Sui anchoring.');
+  }
+  if (receipt.status !== 'anchoring' && receipt.status !== 'anchored') {
+    throw httpError(409, `Run cannot be anchored from status: ${receipt.status}`);
+  }
+
+  const suiAnchorDigest = config.mode === 'sui-dev' ? makeSuiDevDigest('anchor', runId) : body.suiAnchorDigest?.trim();
+  if (!suiAnchorDigest) {
+    throw httpError(400, 'Sui mode requires suiAnchorDigest from the receipt registry transaction.');
+  }
+
+  const now = new Date().toISOString();
+  await store.update(runId, {
+    status: 'anchored',
+    updatedAt: now,
+    suiAnchorDigest,
+  });
+
+  const event = makeEvent({
+    at: now,
+    source: 'sui',
+    type: config.mode === 'sui-dev' ? 'sui_dev_receipt_anchored' : 'sui_receipt_anchored',
+    message: 'Final receipt committed to the Sui receipt registry.',
+    data: {
+      digest: suiAnchorDigest,
+      registry: receipt.suiReceiptRegistryId,
+      walrusBlobId: receipt.walrusBlobId,
+      evidenceHash: receipt.verificationManifest.evidenceHash,
+    },
+  });
+  await store.appendEvent(runId, event);
+  bus.publish(runId, event);
 
   return store.require(runId);
 }

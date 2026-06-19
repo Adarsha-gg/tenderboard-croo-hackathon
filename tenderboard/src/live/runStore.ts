@@ -56,6 +56,7 @@ export class RunStore {
         workOrderId: receipt.workOrderId,
         suiPaymentDigest: receipt.suiPaymentDigest,
         suiAnchorDigest: receipt.suiAnchorDigest,
+        walrusBlobId: receipt.walrusBlobId,
       }))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }

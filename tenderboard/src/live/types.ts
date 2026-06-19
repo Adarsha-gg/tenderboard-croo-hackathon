@@ -79,6 +79,7 @@ export interface LiveRunSummary {
   workOrderId: string | undefined;
   suiPaymentDigest: string | undefined;
   suiAnchorDigest: string | undefined;
+  walrusBlobId: string | undefined;
 }
 
 export interface LiveRunReceipt {
@@ -97,9 +98,15 @@ export interface LiveRunReceipt {
   suiNetwork: string;
   suiPackageId: string | undefined;
   suiReceiptRegistryId: string | undefined;
+  suiWorkOrderObjectId: string | undefined;
+  suiEscrowObjectId: string | undefined;
   suiPaymentDigest: string | undefined;
   suiAnchorDigest: string | undefined;
   walrusBlobId: string | undefined;
+  walrusBlobObjectId: string | undefined;
+  walrusCertifiedEpoch: number | undefined;
+  walrusEndEpoch: number | undefined;
+  walrusReadUrl: string | undefined;
   deliveryText: string | undefined;
   events: LiveRunEvent[];
   error: string | undefined;

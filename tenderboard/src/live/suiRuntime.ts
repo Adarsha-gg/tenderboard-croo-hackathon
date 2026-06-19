@@ -5,6 +5,11 @@ export function makeSuiDevDigest(prefix: string, runId: string): string {
   return `sui_dev_${prefix}_${runId}`;
 }
 
+export function makeSuiDevObjectId(prefix: string, runId: string): string {
+  const hex = Buffer.from(`${prefix}:${runId}`).toString('hex').padEnd(64, '0').slice(0, 64);
+  return `0x${hex}`;
+}
+
 export async function buildWorkerDelivery(
   receipt: LiveRunReceipt,
   options: { fetchImpl?: typeof fetch; now?: Date } = {},

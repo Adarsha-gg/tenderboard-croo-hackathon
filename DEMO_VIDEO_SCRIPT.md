@@ -8,7 +8,7 @@ Target length: 2-3 minutes.
 
 ## 0:20 - Product
 
-"TenderBoard is a Sui-native trust desk for paid agent work. A buyer creates a SUI-denominated task, TenderBoard creates a safe worker packet, scores the worker route, creates a verification manifest, prepares evidence for Walrus, and anchors the final proof to a Sui receipt registry."
+"TenderBoard is a Sui-native trust desk for paid agent work. A buyer creates a SUI-denominated task, TenderBoard creates a safe worker packet, scores the worker route, creates a verification manifest, stores evidence on Walrus, and anchors the final proof to a Sui receipt registry."
 
 ## 0:40 - Open App
 
@@ -24,6 +24,7 @@ Point out:
 - SUI payment cap
 - Sui readiness
 - Walrus readiness
+- Sui dependency map
 - task form
 - acceptance criteria
 - checker pack selector
@@ -94,8 +95,8 @@ Show:
 - Sui dev payment digest or real digest
 - worker delivery
 - evidence hash
-- Walrus upload pending state or blob id
-- Sui anchor plan command
+- Walrus evidence action and blob id
+- Sui receipt anchor action and digest
 
 Say:
 
@@ -107,7 +108,7 @@ Download the receipt JSON or run:
 
 ```bash
 npm run proof:latest
-npm run sui:anchor-plan <run-id> <walrus-blob-id>
+npm run sui:anchor-plan <run-id>
 ```
 
 Say:

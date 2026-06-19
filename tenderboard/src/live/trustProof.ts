@@ -152,9 +152,9 @@ export function finalizeVerificationManifest(receipt: LiveRunReceipt, deliveryTe
   const evidenceHash = stableHash({
     runId: receipt.runId,
     workOrderId: receipt.workOrderId,
+    suiWorkOrderObjectId: receipt.suiWorkOrderObjectId,
+    suiEscrowObjectId: receipt.suiEscrowObjectId,
     suiPaymentDigest: receipt.suiPaymentDigest,
-    suiAnchorDigest: receipt.suiAnchorDigest,
-    walrusBlobId: receipt.walrusBlobId,
     deliveryText,
     eventCount: receipt.events.length,
   });
