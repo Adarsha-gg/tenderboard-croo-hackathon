@@ -53,15 +53,15 @@ Everything in this doc serves one sentence the judges should be able to repeat:
 | Rubric ask | Our answer | State |
 | --- | --- | --- |
 | Verifiable long-term memory | `agent_memory_record.v1` + `agent_memory_passport.v1` per worker | **built** |
-| Persistent data/file access on Walrus | `storeEvidenceOnWalrus` → blob id + read URL | **built (HTTP publisher path); needs real testnet round-trip** |
+| Persistent data/file access on Walrus | `storeEvidenceOnWalrus` → blob id + read URL | **built; real testnet round-trip proven** |
 | Inspect/debug/manage agent memory on Walrus | global memory index + per-agent passport endpoints | **built (API); UI later** |
 | Multi-agent coordination / task delegation | hirer agent ↔ worker bids ↔ award (`preferredBidId`) ↔ delivery | **built** |
 | Artifact-driven workflows | evidence bundles generated, stored, **reused in next trust gate** | **built** |
 | Long-running state over time | passports accrue track record across jobs | **built** |
-| Tooling to help devs adopt Walrus / MemWal | `MemoryStore` interface + MemWal adapter | **planned (Section 8)** |
+| Tooling to help devs adopt Walrus / MemWal | `MemoryStore` interface + MemWal adapter | **interface built; MemWal backend remains** |
 
-**Gap to close:** real testnet blobs + one anchored receipt + MemWal adapter + a visible
-inspector UI. Everything else exists.
+**Gap to close:** MemWal adapter + visible inspector UI + deterministic seed data. Real testnet
+blob readback, Sui receipt anchor, and the first stake/slash primitive are now proven.
 
 ---
 
@@ -104,15 +104,13 @@ pattern in `TenderBoardServerOptions`).
 - 36/36 tests pass; typecheck clean.
 
 ### NOT real yet (must fix before submission)
-- **No real Walrus blob.** `sui-dev` makes `walrus_dev_blob_*` ids; nothing is readable
-  from a public aggregator. **#1 risk for this track.**
-- **Move package never published.** No package id, no `Registry` object id, no on-chain
-  `ReceiptAnchored` event on an explorer.
+- **No MemWal integration.** `MemoryStore` exists, but the backend is still raw Walrus.
+- **No inspector UI** (passport directory / blob viewer / hash-match).
 - **Demo data depends on live HN/GitHub luck** — rapid seed runs return thin results, so
   some workers show `undefined` claim support / 0 anchored. Looks broken.
-- **No MemWal integration.**
-- **No inspector UI** (passport directory / blob viewer / hash-match).
 - **Identity is inconsistent** across files (see Section 12).
+- **Stake/slash challenge admission is manual.** The live Move primitive exists, but challenge
+  success still needs to be wired to the verifier/oracle rather than accepted as a demo call.
 
 ---
 
@@ -172,12 +170,18 @@ WalrusProof
      hash matches.
 2. **Publish Move package to testnet.** Install Sui CLI, `sui client publish`, capture
    `SUI_PACKAGE_ID` + `Registry` object id; anchor one real receipt via `sui:anchor-plan`.
-   - **Done:** package upgraded to v2 `0xe87a8b5c87cfbf8e3251bed02f0be8a45220512f3f17e341f2c677a0154d4a47`;
+   - **Done:** package upgraded to v3 `0x2aaaa1b3e8700ef4ef6313833a7f20d475c01fc6d933fbb052a2dc88f8c77320`;
+     registry `0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb`;
      full proof anchor `Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP` emitted `ReceiptAnchored`.
 3. **Wire `sui` mode env** end to end so one full run produces a real blob **and** a real
    anchor digest.
-   - *Done when:* one passport record has both a real `walrusBlobId` and real
-     `suiAnchorDigest`.
+   - **Done:** run `run_20260619170152_fh8zk6` produced real Walrus blob
+     `lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw` and real anchor
+     `Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP`.
+4. **Live economic security smoke.** Open a worker stake position and slash it with a challenge.
+   - **Done:** stake object `0xe2e9685140a9d2658f45757b24d2cf26701b18bafa07aa5019ef20e55ff4a18d`;
+     open tx `5tyKBFnaH8FWcGRp1rwwyVpoe8yLkFPZihL7mzzwh7Wh`; slash tx
+     `79FCRoGKzdKuqzE9zUXbmSAkHmrYtASpkMbuCNSJBgXS`.
 
 ### Milestone B — Credible, deterministic demo data
 4. **Deterministic seed.** Inject a well-formed `workerEvidence: ScoutEvidence` (claims
@@ -268,8 +272,9 @@ Then: publish package → set ids → run one job in `sui` mode → confirm real
 
 ## 11. Submission checklist
 
-- [ ] One real Walrus blob id + working aggregator read-back link in the submission.
-- [ ] Published Move package id + `Registry` id + explorer link to a `ReceiptAnchored` event.
+- [x] One real Walrus blob id + working aggregator read-back link in the submission.
+- [x] Published Move package id + `Registry` id + explorer link to a `ReceiptAnchored` event.
+- [x] One live stake/slash smoke transaction pair.
 - [ ] MemWal adapter merged (or documented + demoed) — the adoption/tooling story.
 - [ ] Passport directory + Verify-on-Walrus UI.
 - [ ] Demo video following Section 10.
@@ -311,3 +316,5 @@ Actions:
 - Added `npm run seed:memory` (drives the real loop over HTTP).
 - Verified: 3 workers / 6 records / 6 Walrus(-dev) blobs / 2 anchored; 36 tests green.
 - Open follow-up: deterministic seed (Milestone B #4) so all workers anchor reliably.
+- Published package v3 with `reputation_stake`; ran live stake/slash smoke on Sui testnet.
+- Current checks: 49 tests green; typecheck clean.

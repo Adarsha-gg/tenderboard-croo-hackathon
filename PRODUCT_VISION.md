@@ -98,7 +98,14 @@ staking makes a *false* record **expensive**. If a delivered job is later shown 
 (evidence hash mismatch, contradicted claims, non-existent Walrus blob), anyone can submit a
 **challenge**; a successful challenge **slashes** the worker's stake and rewards the challenger.
 This is the difference between "verifiable" and "trustworthy," and **no competitor has it.**
-Net-new: a Move `reputation_stake` module on top of the existing receipts registry.
+
+**Update:** the first live primitive is now deployed on Sui testnet in Move module
+`reputation_stake`: open a worker stake position, add SUI stake, challenge a record by evidence
+hash/reason, slash the position, and reward the challenger. Live smoke:
+package `0x2aaaa1b3e8700ef4ef6313833a7f20d475c01fc6d933fbb052a2dc88f8c77320`,
+stake object `0xe2e9685140a9d2658f45757b24d2cf26701b18bafa07aa5019ef20e55ff4a18d`,
+open tx `5tyKBFnaH8FWcGRp1rwwyVpoe8yLkFPZihL7mzzwh7Wh`, slash tx
+`79FCRoGKzdKuqzE9zUXbmSAkHmrYtASpkMbuCNSJBgXS`.
 
 ### Layer 5 — Reputation Oracle + SDK  ✅ API/SDK started
 The adoption surface. Any marketplace/agent/buyer calls:
@@ -153,11 +160,11 @@ escrow → reputation becomes a **yield-bearing economic asset**, not a vanity s
 | Paid work-order loop (sourcing→pay→deliver→verify) | ✅ built | `httpServer.ts`, `bidBoard.ts`, `x402.ts` |
 | Source-claim verification + admission gate | ✅ built | `trustProof.ts`, `clearingObjects.ts` |
 | PoWM record + passport + global index | ✅ built | `agentMemory.ts` |
-| Walrus evidence storage | ⚠️ dev-only | `walrusRuntime.ts` → make real via **Harbor** |
-| Sui receipt anchor (Move pkg) | ⚠️ unpublished | `sui/` → publish to testnet |
+| Walrus evidence storage | ✅ live round-trip proven | real blob `lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw`; `walrusRuntime.ts` |
+| Sui receipt anchor (Move pkg) | ✅ deployed + anchored | package v3 `0x2aaaa1b3e8700ef4ef6313833a7f20d475c01fc6d933fbb052a2dc88f8c77320`; receipt anchor `Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP` |
 | Multi-worker award | ✅ built (this week) | `preferredBidId` |
 | **Passport bound to Sui address** | ✅ API-level built / on-chain object pending | `AgentMemoryPassport.ownerAddress`, owner oracle route; Move `passport` object remains |
-| **Stake + slash** | 🆕 | new Move `reputation_stake` module |
+| **Stake + slash** | ✅ live primitive | Move `reputation_stake`; open tx `5tyKBFnaH8FWcGRp1rwwyVpoe8yLkFPZihL7mzzwh7Wh`, slash tx `79FCRoGKzdKuqzE9zUXbmSAkHmrYtASpkMbuCNSJBgXS` |
 | **Reputation Oracle SDK / MCP / LangGraph** | ✅ REST + TS client started | `src/oracle`; MCP/LangGraph remains |
 | **Explorer UI (verify-on-Walrus)** | 🆕 | new web surface on existing APIs |
 | **Seal-gated deep-memory sharing** | 🆕 | Seal + Harbor |
@@ -200,7 +207,8 @@ are not in the conversation.* (= `WALRUS_TRACK_PLAN.md` Milestone A + B.)
 re-verification from Walrus blobs + Sui events. The protocol moment.
 
 **Phase 3 — Economic security.** Move `reputation_stake` module: stake on a passport, challenge a
-record, slash on proof. Demo a **faked record getting slashed** — unforgettable.
+record, slash on proof. **First live smoke is complete**; remaining work is tying challenge
+admissibility directly to the verifier/oracle so slashing is not just a manual demo path.
 
 **Phase 4 — Portability proof.** A second, differently-branded "marketplace" frontend reading the
 **same** passport via the oracle — visually proving the reputation is portable, not ours. This is

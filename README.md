@@ -1,15 +1,15 @@
-# SuiProof Market
+# WalrusProof
 
-SuiProof Market is a Sui-native trust-gated work desk for agent commerce.
+WalrusProof is a Walrus-native reputation layer for AI agent work.
 
-It turns an agent job into a Sui work contract: sanitized task packet, trust decision, acceptance criteria, SUI-denominated payment cap, Walrus evidence pointer, and an on-chain Sui receipt anchor.
+It turns every paid agent job into a verifiable proof-of-work memory: sanitized task packet, worker bid, SUI payment intent, source-checked evidence, Walrus evidence blob, Sui receipt anchor, and an owner-bound agent passport that other products can verify.
 
 ## What It Does
 
 1. A buyer writes a paid task, private notes, acceptance criteria, and a checker pack.
-2. SuiProof Market removes private/secret-looking content before anything reaches the worker.
-3. SuiProof Market creates a trust decision: score, tier, verdict, reasons, controls, and risk multiplier.
-4. SuiProof Market creates a verification manifest with spec hash, checker pack, acceptance criteria, required checks, settlement rule, and reputation write-back note.
+2. WalrusProof removes private/secret-looking content before anything reaches the worker.
+3. WalrusProof creates a trust decision: score, tier, verdict, reasons, controls, and risk multiplier.
+4. WalrusProof creates a verification manifest with spec hash, checker pack, acceptance criteria, required checks, settlement rule, and reputation write-back note.
 5. SuiProof Market creates a Sui-shaped work order and requires explicit payment approval.
 6. The worker delivers evidence.
 7. The full receipt/evidence payload is stored as a Walrus evidence bundle.
@@ -17,7 +17,7 @@ It turns an agent job into a Sui work contract: sanitized task packet, trust dec
 
 The wedge is simple: agents can do paid work, but buyers need proof of what was sent, why the worker was trusted, what "done" meant, where evidence lives, and why payment should count as reputation.
 
-The longer-term product is agent-native sourcing on Sui: safe task intake, privacy labels, worker-agent bids, budget/risk filtering, award to a Sui work order, Walrus evidence, and Sui receipt-backed reputation.
+The longer-term product is portable agent reputation: safe task intake, privacy labels, worker-agent bids, budget/risk filtering, Walrus evidence, Sui receipt-backed reputation, and SUI stake that can be slashed for provably fraudulent records.
 
 ## What Is Implemented
 
@@ -34,7 +34,15 @@ The longer-term product is agent-native sourcing on Sui: safe task intake, priva
 - Sui/Walrus readiness checks
 - Walrus evidence-bundle storage flow
 - Sui receipt-anchor flow
+- owner-bound agent memory passports
+- Sui `reputation_stake` module for worker stake, challenge, and slash
 - Sui anchor-plan export
+- live Sui testnet proof:
+  - package v3: `0x2aaaa1b3e8700ef4ef6313833a7f20d475c01fc6d933fbb052a2dc88f8c77320`
+  - receipt registry: `0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb`
+  - real Walrus blob: `lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw`
+  - receipt anchor tx: `Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP`
+  - stake/slash txs: `5tyKBFnaH8FWcGRp1rwwyVpoe8yLkFPZihL7mzzwh7Wh`, `79FCRoGKzdKuqzE9zUXbmSAkHmrYtASpkMbuCNSJBgXS`
 - receipt JSON downloads
 - proof markdown export
 - run history
@@ -55,7 +63,7 @@ SuiProof Market should not become a generic marketplace or payment wrapper. The 
 
 ```text
 tenderboard/                                      main TypeScript app
-tenderboard/sui                                  Sui Move receipt registry package
+tenderboard/sui                                  Sui Move receipt + reputation stake package
 specs/2026-06-19-sui-overflow-tenderboard         Sui Overflow product spec
 SUBMISSION.md                                     submission copy
 DEMO_VIDEO_SCRIPT.md                              demo script
@@ -83,16 +91,15 @@ npm test
 npm run typecheck
 npm run proof:latest
 npm run sui:anchor-plan
+npm run smoke:stake-live
 ```
 
 ## Sui Setup
 
-Before claiming deployed Sui integration:
+Current testnet deployment:
 
-- publish `tenderboard/sui` to Sui testnet or mainnet
-- set `SUI_OPERATOR_ADDRESS`
-- set `SUI_PACKAGE_ID`
-- set `SUI_RECEIPT_REGISTRY_ID`
-- configure `WALRUS_PUBLISHER_URL` and `WALRUS_AGGREGATOR_URL`
-- store the receipt/evidence bundle on Walrus
-- run the generated Sui anchor call from `npm run sui:anchor-plan <run-id>`
+- package v3: `0x2aaaa1b3e8700ef4ef6313833a7f20d475c01fc6d933fbb052a2dc88f8c77320`
+- receipt registry: `0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb`
+- upgrade cap: `0xc50924def84e7bcadb6aaaea58f887017903102ace49363f82b9e18bad698b7d`
+
+To run live mode locally, set `SUI_OPERATOR_ADDRESS`, `SUI_PACKAGE_ID`, `SUI_RECEIPT_REGISTRY_ID`, `SUI_CLI_PATH`, `SUI_CLIENT_CONFIG`, `WALRUS_PUBLISHER_URL`, and `WALRUS_AGGREGATOR_URL`.
