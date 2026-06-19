@@ -52,6 +52,15 @@ cd sui
 sui client publish
 ```
 
+Current testnet deployment:
+
+```text
+Package:  0x87a14a921a1ced0d2fd410ed0d6285d1722efabaf304d6a169971b902f6152c9
+Registry: 0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb
+Deployer: 0xb401ec7dde816354d0745fbba538674c51e5f7bcbb3816305df538f32d9c7727
+Smoke anchor tx: 3Yr14XHTAGLvHVa6RABeFsPXbxe2DRhhW5qZjRmhgmz8
+```
+
 After publishing, configure:
 
 ```env
@@ -59,8 +68,8 @@ TENDERBOARD_MODE=sui
 SUI_NETWORK=testnet
 SUI_RPC_URL=https://fullnode.testnet.sui.io:443
 SUI_OPERATOR_ADDRESS=...
-SUI_PACKAGE_ID=...
-SUI_RECEIPT_REGISTRY_ID=...
+SUI_PACKAGE_ID=0x87a14a921a1ced0d2fd410ed0d6285d1722efabaf304d6a169971b902f6152c9
+SUI_RECEIPT_REGISTRY_ID=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb
 WALRUS_PUBLISHER_URL=...
 WALRUS_AGGREGATOR_URL=...
 ```
@@ -77,7 +86,7 @@ In `sui-dev` mode the app records deterministic Sui dev digests and Walrus dev b
 
 WalrusProof Market generates Payment Kit-compatible URI metadata for SUI payment approval planning. Worker task access is exposed as an x402 paid API: unpaid worker requests receive HTTP `402` with Sui payment instructions, and paid requests receive the task packet with an `X-Payment-Response` header bound to the recorded Sui transaction digest.
 
-The app includes its own Sui-native x402 facilitator. In `sui-dev` it verifies deterministic local Sui dev digests for demoability. In `sui` mode it calls `SUI_RPC_URL` with `sui_getTransactionBlock` and verifies successful execution, receiver balance change, Payment Kit nonce binding, request/resource binding, amount, receiver, coin type, worker id, and replay protection before unlocking the worker task. This is not the Coinbase-hosted facilitator; it is the missing Sui-specific facilitator path for WalrusProof Market. In this environment the Move package is source-level because the Sui CLI is not installed.
+The app includes its own Sui-native x402 facilitator. In `sui-dev` it verifies deterministic local Sui dev digests for demoability. In `sui` mode it calls `SUI_RPC_URL` with `sui_getTransactionBlock` and verifies successful execution, receiver balance change, Payment Kit nonce binding, request/resource binding, amount, receiver, coin type, worker id, and replay protection before unlocking the worker task. This is not the Coinbase-hosted facilitator; it is the missing Sui-specific facilitator path for WalrusProof Market.
 
 ## Verification Layer
 

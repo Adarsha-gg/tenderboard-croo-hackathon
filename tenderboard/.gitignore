@@ -4,6 +4,7 @@ coverage/
 /outputs/
 /data/
 /proof/
+sui/build/
 .env
 .env.*
 !.env.example
