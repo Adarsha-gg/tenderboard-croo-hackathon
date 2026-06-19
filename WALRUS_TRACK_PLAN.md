@@ -60,9 +60,9 @@ Everything in this doc serves one sentence the judges should be able to repeat:
 | Long-running state over time | passports accrue track record across jobs | **built** |
 | Tooling to help devs adopt Walrus / MemWal | `MemoryStore` interface + MemWal adapter + `smoke:memwal-live` | **backend built; live credentials/package install remain** |
 
-**Gap to close:** visible inspector UI + live MemWal credential smoke. Real testnet blob readback,
-Sui receipt anchor, deterministic seed data, MemWal backend shape, and oracle-gated stake/slash
-are now proven.
+**Gap to close:** credentialed live MemWal write + demo video. Real testnet blob readback,
+Sui receipt anchor, deterministic seed data, MemWal backend shape, oracle-gated stake/slash,
+and the visible passport inspector are now proven.
 
 ---
 
@@ -108,7 +108,8 @@ pattern in `TenderBoardServerOptions`).
 - **No credentialed live MemWal write yet.** `MemWalMemoryStore` exists as a raw-Walrus + MemWal
   semantic overlay, and `npm run smoke:memwal-live` is now the live harness, but the environment
   still needs `@mysten-incubation/memwal`, delegate key, account id, and server URL for a real write.
-- **No inspector UI** (passport directory / blob viewer / hash-match).
+- **Inspector UI is built.** The front end now has an Agent Passport directory, per-record
+  Walrus links, and record-level verify actions.
 - **Identity is now aligned in public submission docs.** Some internal package/module/schema names
   keep legacy `tenderboard` / `suiproof` prefixes as stable protocol identifiers.
 - **Stake/slash registry governance remains a future governance task.** The backend executor is
@@ -212,10 +213,13 @@ WalrusProof
 ### Milestone D — Visible product surface (UI, after the above)
 9. **Agent Passport directory** page (reads `/api/walrus/memory`): cards per worker
    (jobs, avg support, SUI earned, walrus/anchored counts).
+   - **Done:** `passportDirectoryPanel` renders worker cards and memory index rollups.
 10. **Passport detail / Memory Inspector**: per-job timeline; each record shows Walrus blob
     id + **"Open on Walrus"** (aggregator link) + **"Verify"** (re-fetch blob, recompute
     `memoryHash`, show match).
+    - **Done:** inspector lists records, raw Walrus links, memory JSON, and verify actions.
 11. Make the directory the front door; demote the operator console to "create a job".
+    - **Done:** passport directory now sits above the job-creation workspace.
 
 ### Milestone E — Submission polish
 12. Identity cleanup (Section 12), demo video, README/SUBMISSION aligned, blob id + package
@@ -286,7 +290,7 @@ Then: publish package → set ids → run one job in `sui` mode → confirm real
 - [x] Published Move package id + `Registry` id + explorer link to a `ReceiptAnchored` event.
 - [x] One oracle-gated live stake/slash smoke transaction pair.
 - [x] MemWal adapter and live smoke harness merged (fake-client tested); credentialed live MemWal run remains.
-- [ ] Passport directory + Verify-on-Walrus UI.
+- [x] Passport directory + Verify-on-Walrus UI.
 - [ ] Demo video following Section 10.
 - [x] README + SUBMISSION aligned to one product name.
 - [x] Tests green; typecheck clean.

@@ -206,6 +206,226 @@ a:hover { text-decoration: underline; }
   margin-bottom: 18px;
 }
 
+.passportDirectoryPanel {
+  margin-bottom: 18px;
+}
+
+.memoryIndexStats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.memoryIndexStats > div {
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+  padding: 12px;
+}
+
+.memoryIndexStats strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.memoryIndexStats span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.memoryExplorer {
+  display: grid;
+  grid-template-columns: minmax(240px, .36fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.passportDirectory {
+  display: grid;
+  gap: 8px;
+}
+
+.passportDirectoryCard {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-height: 94px;
+  border: 1px solid var(--line);
+  background: #fbfcfe;
+  color: var(--ink);
+  text-align: left;
+}
+
+.passportDirectoryCard.selected,
+.passportDirectoryCard:focus {
+  border-color: #9db9f2;
+  background: #eef4ff;
+}
+
+.passportDirectoryCard span,
+.passportDirectoryCard small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.passportDirectoryCard span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.passportInspector {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.passportInspectorHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 180px);
+  gap: 12px;
+  align-items: end;
+  border: 1px solid #26394f;
+  border-radius: 8px;
+  background: #111923;
+  color: #dce9f7;
+  padding: 16px;
+}
+
+.passportInspectorHeader strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.passportInspectorHeader small {
+  display: block;
+  margin-top: 4px;
+  color: #aabbd0;
+  overflow-wrap: anywhere;
+}
+
+.passportInspectorHeader > div:last-child {
+  text-align: right;
+}
+
+.passportRecordList {
+  display: grid;
+  gap: 10px;
+}
+
+.passportRecord {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+  padding: 12px;
+}
+
+.passportRecordTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.passportRecordTop strong,
+.passportRecordTop small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.passportRecordTop small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.passportRecordGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.passportRecordGrid > div {
+  min-height: 78px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+}
+
+.passportRecordGrid strong {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.passportRecordGrid span {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
+.passportRecordActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.recordVerification {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f5f8fb;
+  padding: 10px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.verificationSummary {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.verificationSummary.passed strong { color: var(--green); }
+.verificationSummary.failed strong { color: var(--red); }
+
+.verificationChecks {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.verificationChecks span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.verificationChecks .passed { color: var(--green); }
+.verificationChecks .failed { color: var(--red); }
+.verificationChecks .skipped { color: var(--gold); }
+
 .panel {
   padding: 18px;
 }
@@ -1008,7 +1228,7 @@ pre {
     font-size: 15px;
   }
 
-  .statusGrid, .productGrid, .suiRail {
+  .statusGrid, .productGrid, .suiRail, .memoryIndexStats {
     grid-template-columns: 1fr;
   }
 
@@ -1016,11 +1236,11 @@ pre {
     grid-template-columns: 1fr;
   }
 
-  .proofColumns, .checkRow, .bidSummary, .bidRow, .passportHero, .passportGrid, .agentPairGrid, .agentControls {
+  .proofColumns, .checkRow, .bidSummary, .bidRow, .passportHero, .passportGrid, .agentPairGrid, .agentControls, .memoryExplorer, .passportInspectorHeader, .passportRecordGrid {
     grid-template-columns: 1fr;
   }
 
-  .passportHero > div:last-child {
+  .passportHero > div:last-child, .passportInspectorHeader > div:last-child {
     text-align: left;
   }
 

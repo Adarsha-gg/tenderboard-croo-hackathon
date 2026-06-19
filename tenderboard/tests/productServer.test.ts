@@ -20,7 +20,7 @@ afterEach(async () => {
   await rm(tempDir, { recursive: true, force: true });
 });
 
-describe('WalrusProof Market product server', () => {
+describe('WalrusProof product server', () => {
   it('serves Sui readiness without exposing private env values', async () => {
     const { baseUrl, close } = await startTestServer({
       TENDERBOARD_MODE: 'sui',
@@ -86,8 +86,8 @@ describe('WalrusProof Market product server', () => {
       expect(receipt.paymentIntentPlan.paymentUri).toContain('amountMist=35000000');
       expect(receipt.paymentIntentPlan.paymentUri).toContain('coinType=0x2%3A%3Asui%3A%3ASUI');
       expect(receipt.paymentIntentPlan.paymentUri).toContain(`nonce=${receipt.paymentIntentPlan.paymentNonce}`);
-      expect(receipt.paymentIntentPlan.paymentUri).toContain('label=WalrusProof+Market');
-      expect(receipt.paymentIntentPlan.paymentUri).toContain('message=WalrusProof+Market+agent+memory+payment');
+      expect(receipt.paymentIntentPlan.paymentUri).toContain('label=WalrusProof');
+      expect(receipt.paymentIntentPlan.paymentUri).toContain('message=WalrusProof+agent+memory+payment');
       expect(receipt.paymentIntentPlan.paymentUri).toContain(`runId=${created.runId}`);
       expect(receipt.paymentIntentPlan.paymentUri).toContain('selectedBidId=public_scout_standard');
       expect(receipt.paymentIntentPlan.paymentUri).not.toContain('Make%20it%20useful');

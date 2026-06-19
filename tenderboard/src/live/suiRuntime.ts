@@ -16,7 +16,7 @@ export async function buildWorkerDelivery(
 ): Promise<{ deliveryText: string; workerEvidence: ScoutEvidence }> {
   const report = await scoutOpportunities(`${receipt.taskTitle}\n${receipt.sanitizedTask}`, options);
   const deliveryText = [
-    `WalrusProof Market worker completed: ${receipt.taskTitle}`,
+    `WalrusProof worker completed: ${receipt.taskTitle}`,
     '',
     'What I did:',
     '- Received only the Sui-bound safe task text.',

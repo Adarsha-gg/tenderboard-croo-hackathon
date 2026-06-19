@@ -22,6 +22,8 @@ The longer-term product is portable agent reputation: safe task intake, privacy 
 ## What Is Implemented
 
 - API-backed browser operator console
+- Agent Passport directory and Memory Inspector
+- Verify-on-Walrus record actions
 - safe worker packet preview
 - private-note exclusion
 - env-style secret detection

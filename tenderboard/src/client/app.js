@@ -2,6 +2,7 @@ let currentRunId = null;
 let eventSource = null;
 let timelineEvents = 0;
 let currentConfig = null;
+let selectedPassportWorkerId = null;
 
 const el = (id) => document.getElementById(id);
 
@@ -10,6 +11,7 @@ async function boot() {
   const config = await request('/api/config');
   currentConfig = config;
   renderConfig(config);
+  await loadMemoryDirectory();
   await loadRunHistory();
 }
 
@@ -68,6 +70,7 @@ el('taskForm').addEventListener('submit', async (event) => {
     el('paymentBox').classList.remove('hidden');
     openEvents(created.runId);
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -86,6 +89,7 @@ el('approveBtn').addEventListener('click', async () => {
     }
     await request(`/api/runs/${currentRunId}/approve-payment`, { method: 'POST', body });
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -100,6 +104,7 @@ el('submitDeliveryBtn').addEventListener('click', async () => {
   try {
     await request(`/api/runs/${currentRunId}/worker-delivery`, { method: 'POST', body: {} });
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -114,6 +119,7 @@ el('storeEvidenceBtn').addEventListener('click', async () => {
   try {
     await request(`/api/runs/${currentRunId}/store-evidence`, { method: 'POST' });
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -134,6 +140,7 @@ el('anchorReceiptBtn').addEventListener('click', async () => {
     }
     await request(`/api/runs/${currentRunId}/anchor-receipt`, { method: 'POST', body });
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -147,6 +154,7 @@ el('cancelBtn').addEventListener('click', async () => {
   try {
     await request(`/api/runs/${currentRunId}/cancel`, { method: 'POST' });
     await refreshReceipt();
+    await loadMemoryDirectory();
     await loadRunHistory();
   } catch (error) {
     setReceiptText(error.message, true);
@@ -157,6 +165,10 @@ el('refreshRunsBtn').addEventListener('click', () => {
   loadRunHistory().catch((error) => setReceiptText(error.message, true));
 });
 
+el('refreshMemoryBtn').addEventListener('click', () => {
+  loadMemoryDirectory().catch((error) => setPassportError(error.message));
+});
+
 el('runHistory').addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-run]');
   if (!button) return;
@@ -164,6 +176,30 @@ el('runHistory').addEventListener('click', async (event) => {
   clearTimeline();
   openEvents(currentRunId);
   await refreshReceipt();
+});
+
+el('passportDirectory').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-worker]');
+  if (!button) return;
+  selectedPassportWorkerId = button.dataset.worker;
+  await openPassport(selectedPassportWorkerId);
+});
+
+el('passportInspector').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-verify-run]');
+  if (!button) return;
+  const runId = button.dataset.verifyRun;
+  button.disabled = true;
+  button.textContent = 'Verifying';
+  try {
+    const result = await request(`/api/oracle/records/${encodeURIComponent(runId)}/verify`);
+    renderRecordVerification(runId, result);
+  } catch (error) {
+    renderRecordVerification(runId, { verified: false, error: error.message, checks: [] });
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Verify';
+  }
 });
 
 function openEvents(runId) {
@@ -214,6 +250,120 @@ async function loadRunHistory() {
         </div>`,
     )
     .join('');
+}
+
+async function loadMemoryDirectory() {
+  const index = await request('/api/walrus/memory');
+  const nextWorkerId = selectedPassportWorkerId || index.passports?.[0]?.workerAgentId;
+  selectedPassportWorkerId = nextWorkerId || null;
+  renderMemoryIndex(index);
+  if (nextWorkerId) {
+    await openPassport(nextWorkerId);
+  } else {
+    el('passportInspector').textContent = 'No memory records yet. Create and anchor a run to populate worker passports.';
+  }
+}
+
+function renderMemoryIndex(index) {
+  el('memoryIndexStats').innerHTML = `
+    <div><strong>${escapeHtml(index.workerCount)}</strong><span>workers</span></div>
+    <div><strong>${escapeHtml(index.totalMemoryRecords)}</strong><span>records</span></div>
+    <div><strong>${escapeHtml(index.walrusBackedRecords)}</strong><span>Walrus-backed</span></div>
+    <div><strong>${escapeHtml(index.suiAnchoredRecords)}</strong><span>Sui-anchored</span></div>
+    <div><strong>${escapeHtml(index.averageClaimSupport ?? 'none')}</strong><span>avg support</span></div>`;
+
+  const passports = index.passports || [];
+  if (!passports.length) {
+    el('passportDirectory').textContent = 'No worker passports yet.';
+    return;
+  }
+
+  el('passportDirectory').innerHTML = passports
+    .map(
+      (passport) => `<button class="passportDirectoryCard ${passport.workerAgentId === selectedPassportWorkerId ? 'selected' : ''}" type="button" data-worker="${escapeHtml(passport.workerAgentId)}">
+        <span>${escapeHtml(passport.workerAgentId)}</span>
+        <strong>${escapeHtml(passport.memoryCount)} records</strong>
+        <small>${escapeHtml(passport.walrusMemoryCount)} Walrus / ${escapeHtml(passport.anchoredMemoryCount)} Sui / ${escapeHtml(passport.averageClaimSupport ?? 'no score')} support</small>
+      </button>`,
+    )
+    .join('');
+}
+
+async function openPassport(workerAgentId) {
+  const passport = await request(`/api/walrus/memory/${encodeURIComponent(workerAgentId)}`);
+  renderPassportInspector(passport);
+}
+
+function renderPassportInspector(passport) {
+  const records = passport.records || [];
+  el('passportInspector').innerHTML = `
+    <div class="passportInspectorHeader">
+      <div>
+        <strong>${escapeHtml(passport.workerAgentId)}</strong>
+        <small>${escapeHtml(passport.ownerAddress || 'unbound owner')} / ${escapeHtml(passport.ownership?.proof || 'unbound')}</small>
+      </div>
+      <div>
+        <strong>${escapeHtml(passport.averageClaimSupport ?? 'none')}</strong>
+        <small>average claim support</small>
+      </div>
+    </div>
+    <div class="passportRecordList">
+      ${
+        records.length
+          ? records.map((record) => renderPassportRecord(record)).join('')
+          : '<div class="passportRecord">This worker has no records yet.</div>'
+      }
+    </div>`;
+}
+
+function renderPassportRecord(record) {
+  const walrusLink = record.walrusReadUrl
+    ? `<a href="${escapeHtml(record.walrusReadUrl)}" target="_blank" rel="noreferrer">Open on Walrus</a>`
+    : '<span>Walrus link pending</span>';
+  return `<article class="passportRecord" data-record-run="${escapeHtml(record.runId)}">
+    <div class="passportRecordTop">
+      <div>
+        <strong>${escapeHtml(record.taskTitle)}</strong>
+        <small>${escapeHtml(record.runId)} / ${escapeHtml(record.memoryId)}</small>
+      </div>
+      <span class="rowBadge">${escapeHtml(record.evidenceStrength)}</span>
+    </div>
+    <div class="passportRecordGrid">
+      <div><strong>Claim support</strong><span>${escapeHtml(record.averageClaimSupport ?? 'none')}</span></div>
+      <div><strong>Supported</strong><span>${escapeHtml(record.supportedClaimCount)}/${escapeHtml(record.claimCount)}</span></div>
+      <div><strong>Walrus blob</strong><span>${escapeHtml(record.walrusBlobId || 'pending')}</span></div>
+      <div><strong>Sui anchor</strong><span>${escapeHtml(record.suiAnchorDigest || 'pending')}</span></div>
+      <div><strong>Memory hash</strong><span>${escapeHtml(record.memoryHash)}</span></div>
+    </div>
+    <div class="passportRecordActions">
+      ${walrusLink}
+      <a href="/api/runs/${encodeURIComponent(record.runId)}/memory">Memory JSON</a>
+      <button class="secondary compact" type="button" data-verify-run="${escapeHtml(record.runId)}">Verify</button>
+    </div>
+    <div id="verify-${escapeHtml(record.runId)}" class="recordVerification">Not verified in this browser session.</div>
+  </article>`;
+}
+
+function renderRecordVerification(runId, result) {
+  const target = el(`verify-${runId}`);
+  if (!target) return;
+  const checks = result.checks || [];
+  target.innerHTML = `
+    <div class="verificationSummary ${result.verified ? 'passed' : 'failed'}">
+      <strong>${result.verified ? 'Verified' : 'Not verified'}</strong>
+      <span>${escapeHtml(result.error || result.memoryHash || 'record verification complete')}</span>
+    </div>
+    ${
+      checks.length
+        ? `<div class="verificationChecks">${checks
+            .map((check) => `<span class="${escapeHtml(check.status)}">${escapeHtml(check.id)}: ${escapeHtml(check.status)}</span>`)
+            .join('')}</div>`
+        : ''
+    }`;
+}
+
+function setPassportError(message) {
+  el('passportInspector').innerHTML = `<div class="receiptRow error">${escapeHtml(message)}</div>`;
 }
 
 function renderReceipt(receipt) {

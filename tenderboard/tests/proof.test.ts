@@ -10,7 +10,7 @@ describe('renderReceiptProof', () => {
   it('renders a judge-readable Sui proof without private notes', () => {
     const proof = renderReceiptProof(sampleReceipt());
 
-    expect(proof).toContain('# WalrusProof Market Memory Proof: run_proof');
+    expect(proof).toContain('# WalrusProof Memory Proof: run_proof');
     expect(proof).toContain('Sui payment digest: 0xsui');
     expect(proof).toContain('Walrus blob id: walrus_blob_1');
     expect(proof).toContain('Payment nonce: payment_nonce_proof');

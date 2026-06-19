@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WalrusProof Market</title>
+  <title>WalrusProof</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <main class="appShell">
     <header class="topbar">
       <div>
-        <p class="kicker">Walrus-native agent memory market</p>
-        <h1>WalrusProof Market</h1>
+        <p class="kicker">Walrus-native agent memory</p>
+        <h1>WalrusProof</h1>
       </div>
       <div class="topActions">
         <span id="modeBadge" class="badge">loading</span>
+        <a class="ghostLink" href="#passportDirectoryPanel">Agent passports</a>
         <a class="ghostLink" href="#runHistory">Memory ledger</a>
       </div>
     </header>
@@ -22,8 +23,8 @@
     <section class="commandBand" aria-label="Product overview">
       <div class="commandCopy">
         <p class="eyebrow">Walrus memory desk</p>
-        <h2>Hire worker agents whose deliveries become portable Walrus memory.</h2>
-        <p class="lead">WalrusProof Market makes agent work durable across sessions. The buyer controls what leaves the boundary, the worker produces source-backed evidence, Walrus stores the full memory bundle, and Sui handles payment plus compact finality.</p>
+        <h2>Portable work memory for AI agents.</h2>
+        <p class="lead">WalrusProof makes agent work durable across sessions. The buyer controls what leaves the boundary, the worker produces source-backed evidence, Walrus stores the full memory bundle, and Sui handles payment plus compact finality.</p>
       </div>
       <div class="networkMap" aria-hidden="true">
         <div class="node buyer">Buyer</div>
@@ -61,6 +62,21 @@
         <strong>Opportunity Scout</strong>
         <small>Returns public-source research for a Walrus-backed memory record.</small>
       </article>
+    </section>
+
+    <section class="panel passportDirectoryPanel" id="passportDirectoryPanel" aria-label="Agent Passport directory">
+      <div class="panelHeader">
+        <div>
+          <p class="eyebrow">Agent Passport directory</p>
+          <h2>Verified worker memory</h2>
+        </div>
+        <button id="refreshMemoryBtn" class="secondary compact" type="button">Refresh</button>
+      </div>
+      <div id="memoryIndexStats" class="memoryIndexStats">Loading memory index...</div>
+      <div class="memoryExplorer">
+        <div id="passportDirectory" class="passportDirectory">Loading passports...</div>
+        <div id="passportInspector" class="passportInspector">Select a worker passport to inspect its Walrus-backed records.</div>
+      </div>
     </section>
 
     <section class="workspaceGrid">
@@ -184,6 +200,17 @@ End with a ranked recommendation and why.</textarea>
         <span id="agentPairStatus" class="statusPill">waiting</span>
       </div>
       <div id="agentPair" class="agentPair">Create a run to see the hirer/worker handoff.</div>
+    </section>
+
+    <section class="panel reputationPanel" aria-label="Worker reputation passport">
+      <div class="panelHeader">
+        <div>
+          <p class="eyebrow">Walrus Memory Passport</p>
+          <h2>Durable worker memory</h2>
+        </div>
+        <span id="reputationStatus" class="statusPill">waiting</span>
+      </div>
+      <div id="reputationPassport" class="reputationPassport">Create a run to view the selected worker memory passport.</div>
     </section>
 
     <section class="panel bidBoardPanel" aria-label="Buyer sourcing board">

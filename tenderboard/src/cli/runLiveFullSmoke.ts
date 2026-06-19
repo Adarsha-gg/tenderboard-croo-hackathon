@@ -174,7 +174,7 @@ function buildDeterministicSourceEvidence(runId: string, now = new Date()): Scou
 function renderDeterministicDelivery(receipt: LiveRunReceipt, evidence: ScoutEvidence): string {
   const links = evidence.sourceReceipt.observations.map((observation, index) => `${index + 1}. ${observation.title}\n   Link: ${observation.url}`);
   return [
-    `WalrusProof Market worker completed: ${receipt.taskTitle}`,
+    `WalrusProof worker completed: ${receipt.taskTitle}`,
     '',
     'What I did:',
     '- Received only the Sui-bound safe task text.',

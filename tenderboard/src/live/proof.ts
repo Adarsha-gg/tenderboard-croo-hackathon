@@ -2,7 +2,7 @@ import type { LiveRunReceipt } from './types.js';
 
 export function renderReceiptProof(receipt: LiveRunReceipt): string {
   const lines = [
-    `# WalrusProof Market Memory Proof: ${receipt.runId}`,
+    `# WalrusProof Memory Proof: ${receipt.runId}`,
     '',
     `- Mode: ${receipt.mode}`,
     `- Status: ${receipt.status}`,

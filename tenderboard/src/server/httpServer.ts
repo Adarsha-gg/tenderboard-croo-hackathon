@@ -1133,7 +1133,7 @@ export function startTenderBoardServer(): void {
   const config = loadTenderBoardConfig();
   const server = createTenderBoardServer({ config });
   server.listen(config.port, () => {
-    console.log(`WalrusProof Market server running at http://127.0.0.1:${config.port}`);
+    console.log(`WalrusProof server running at http://127.0.0.1:${config.port}`);
     console.log(`Mode: ${config.mode}`);
   });
 }

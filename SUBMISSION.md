@@ -60,6 +60,7 @@ Move package and schema names retain some internal `tenderboard` and `suiproof` 
 
 - API-backed product server
 - browser operator console
+- Agent Passport directory and Memory Inspector with record-level verify actions
 - safe worker packet preview
 - private-note exclusion and secret-pattern filtering
 - worker bid board and award flow
