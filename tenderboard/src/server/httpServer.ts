@@ -16,7 +16,7 @@ import { sanitizeTaskForWorker } from '../live/sanitizeTask.js';
 import { buildWorkerDelivery, makeSuiDevDigest, makeSuiDevObjectId } from '../live/suiRuntime.js';
 import { buildTrustProof, finalizeVerificationManifest } from '../live/trustProof.js';
 import { verifyMemoryRecord, verifyPassport } from '../live/memoryVerifier.js';
-import { storeEvidenceOnWalrus } from '../live/walrusRuntime.js';
+import { createMemoryStore, type MemoryStore } from '../live/memoryStore.js';
 import { buildX402SuiPaymentChallenge, buildX402SuiPaymentResponse } from '../live/x402.js';
 import { parseX402PaymentHeader, parseX402PaymentPayload, verifySuiX402Payment } from '../sui/facilitator.js';
 import { executeSuiAnchorReceipt } from '../sui/anchorExecutor.js';
@@ -46,6 +46,7 @@ export interface TenderBoardServerOptions {
   bus?: RunEventBus;
   scoutFetch?: typeof fetch;
   suiRpcFetch?: typeof fetch;
+  memoryStore?: MemoryStore;
 }
 
 export function createTenderBoardServer(options: TenderBoardServerOptions = {}) {
@@ -54,10 +55,11 @@ export function createTenderBoardServer(options: TenderBoardServerOptions = {}) 
   const bus = options.bus ?? new RunEventBus();
   const scoutFetch = options.scoutFetch;
   const suiRpcFetch = options.suiRpcFetch;
+  const memoryStore = options.memoryStore ?? createMemoryStore(config);
 
   return createServer(async (req, res) => {
     try {
-      await route(req, res, config, store, bus, scoutFetch, suiRpcFetch);
+      await route(req, res, config, store, bus, scoutFetch, suiRpcFetch, memoryStore);
     } catch (error) {
       if (isHttpError(error)) {
         sendJson(res, error.status, { error: error.message });
@@ -77,6 +79,7 @@ async function route(
   bus: RunEventBus,
   scoutFetch: typeof fetch | undefined,
   suiRpcFetch: typeof fetch | undefined,
+  memoryStore: MemoryStore,
 ): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const method = req.method ?? 'GET';
@@ -276,7 +279,7 @@ async function route(
 
   const walrusMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/store-evidence$/);
   if (method === 'POST' && walrusMatch) {
-    const receipt = await storeEvidence(walrusMatch[1]!, config, store, bus);
+    const receipt = await storeEvidence(walrusMatch[1]!, config, store, bus, memoryStore);
     sendJson(res, 200, receipt);
     return;
   }
@@ -677,6 +680,7 @@ async function storeEvidence(
   config: TenderBoardConfig,
   store: RunStore,
   bus: RunEventBus,
+  memoryStore: MemoryStore,
 ): Promise<LiveRunReceipt> {
   const receipt = await store.require(runId);
   if (!receipt.deliveryText) {
@@ -689,7 +693,7 @@ async function storeEvidence(
   const now = new Date().toISOString();
   const baseReceiptPlan = requireReceiptPlan(receipt);
   const paymentIntentPlan = requirePaymentIntentPlan(receipt);
-  const result = await storeEvidenceOnWalrus(receipt, config);
+  const result = await memoryStore.putEvidenceBundle(receipt);
   const receiptPlan = bindWalrusEvidence(
     baseReceiptPlan,
     {

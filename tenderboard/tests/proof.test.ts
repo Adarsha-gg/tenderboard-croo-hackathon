@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildClearingObjects } from '../src/live/clearingObjects.js';
+import { WalrusMemoryStore } from '../src/live/memoryStore.js';
 import { renderReceiptProof } from '../src/live/proof.js';
 import { makeEvent } from '../src/live/runStore.js';
 import { buildEvidenceBundle, storeEvidenceOnWalrus } from '../src/live/walrusRuntime.js';
@@ -221,6 +222,64 @@ describe('renderReceiptProof', () => {
       certifiedEpoch: undefined,
       endEpoch: undefined,
       readUrl: 'https://aggregator.walrus-testnet.walrus.space/v1/blobs/walrus_blob_existing',
+    });
+  });
+
+  it('stores evidence through the injectable Walrus memory store wrapper', async () => {
+    const fetchImpl = async (): Promise<Response> =>
+      new Response(
+        JSON.stringify({
+          alreadyCertified: {
+            blobId: 'walrus_blob_from_store',
+            endEpoch: 500,
+          },
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    const store = new WalrusMemoryStore(
+      {
+        mode: 'sui',
+        suiNetwork: 'testnet',
+        suiRpcUrl: 'https://fullnode.testnet.sui.io:443',
+        suiPackageId: '0xpackage',
+        suiReceiptRegistryId: '0xregistry',
+        suiOperatorAddress: undefined,
+        walrusPublisherUrl: 'https://publisher.walrus-testnet.walrus.space',
+        walrusAggregatorUrl: 'https://aggregator.walrus-testnet.walrus.space',
+        suiCliPath: undefined,
+        suiClientConfig: undefined,
+        missingSuiSettings: [],
+        port: 0,
+        maxPaymentSui: '0.050',
+        receiptsDir: 'memory',
+        workerAgentId: 'sui_worker',
+        safe: {
+          mode: 'sui',
+          port: 0,
+          maxPaymentSui: '0.050',
+          receiptsDir: 'memory',
+          workerAgentId: 'sui_worker',
+          sui: {
+            network: 'testnet',
+            rpcUrlConfigured: true,
+            packageIdConfigured: true,
+            receiptRegistryIdConfigured: true,
+            operatorAddressConfigured: false,
+            walrusPublisherConfigured: true,
+            walrusAggregatorConfigured: true,
+            suiCliConfigured: false,
+            readyForSui: true,
+            missingSuiSettings: [],
+          },
+        },
+      },
+      fetchImpl,
+    );
+
+    await expect(store.putEvidenceBundle(sampleReceipt())).resolves.toMatchObject({
+      blobId: 'walrus_blob_from_store',
+      endEpoch: 500,
+      readUrl: 'https://aggregator.walrus-testnet.walrus.space/v1/blobs/walrus_blob_from_store',
     });
   });
 });

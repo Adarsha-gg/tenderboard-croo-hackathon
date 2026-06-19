@@ -27,6 +27,8 @@ The core product is the Walrus memory layer. Sui is still meaningful, but it sup
 
 Walrus is the durable memory substrate, not a side upload. Every delivered run produces a `suiproof.agent_memory_record.v1` with task summary, claim counts, average claim support, evidence strength, settlement action, Walrus blob id, Sui anchor digest, and a stable memory hash. Records roll up into a `suiproof.agent_memory_passport.v1` per worker and into a global `walrusproof.memory_index.v1`.
 
+The backend writes memory through an injectable `MemoryStore` interface. The default `WalrusMemoryStore` wraps the raw Walrus HTTP publisher/aggregator path used in live testnet runs, while keeping the server ready for a future `MemWalMemoryStore` without changing the product API.
+
 The memory layer gives the app its loop:
 
 - workers remember across jobs through portable Walrus records
@@ -219,6 +221,7 @@ src/client/                    browser UI
 src/agents/opportunityScout.ts public-source worker task
 src/live/suiRuntime.ts         Sui-shaped local execution helpers
 src/live/walrusRuntime.ts      Walrus evidence bundle storage
+src/live/memoryStore.ts        injectable memory backend interface
 src/live/agentMemory.ts        Walrus-backed worker memory records/passports
 src/live/proof.ts              receipt-to-markdown proof renderer
 src/sui/anchorPlan.ts          receipt-to-Sui call plan renderer
