@@ -34,6 +34,22 @@ const BID_TEMPLATES: BidTemplate[] = [
     requestedDataLabel: 'buyer_private',
     baseRiskFlags: ['requests_buyer_private_data'],
   },
+  {
+    bidId: 'public_scout_lite',
+    workerAgentId: 'opportunity_scout.public.lite',
+    priceSui: '0.020',
+    sla: '36h',
+    requestedDataLabel: 'public',
+    baseRiskFlags: ['budget_tier'],
+  },
+  {
+    bidId: 'public_scout_deep',
+    workerAgentId: 'opportunity_scout.public.deep',
+    priceSui: '0.045',
+    sla: '48h',
+    requestedDataLabel: 'public',
+    baseRiskFlags: [],
+  },
 ];
 
 export function buildPrivacyLabeledTask(request: CreateRunRequest): {
@@ -56,7 +72,10 @@ export function buildWorkerBidBoard(request: CreateRunRequest, config: TenderBoa
   const requestedDataLabel = normalizeTaskDataLabel(request.requestedDataLabel);
   const maxPayment = Number(request.maxPayment.amount);
   const bids = BID_TEMPLATES.map((template) => evaluateBid(template, requestedDataLabel, maxPayment, config));
-  const selectedBid = bids.find((bid) => bid.verdict === 'available');
+  const preferred = request.preferredBidId
+    ? bids.find((bid) => bid.bidId === request.preferredBidId && bid.verdict === 'available')
+    : undefined;
+  const selectedBid = preferred ?? bids.find((bid) => bid.verdict === 'available');
 
   return {
     buyerMaxPayment: request.maxPayment,

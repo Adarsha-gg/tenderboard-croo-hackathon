@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "start": "tsx src/server/httpServer.ts",
     "proof:latest": "tsx src/cli/exportProof.ts",
+    "seed:memory": "tsx src/cli/seedMemory.ts",
     "sui:anchor-plan": "tsx src/cli/exportSuiAnchorPlan.ts"
   },
   "devDependencies": {

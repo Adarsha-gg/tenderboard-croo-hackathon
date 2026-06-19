@@ -43,6 +43,8 @@ export interface CreateRunRequest {
   checkerPack?: CheckerPackId;
   requestedDataLabel?: TaskDataLabel;
   maxPayment: MoneyInput;
+  /** Optional bid the buyer awards. When omitted, the first safe bid is selected. */
+  preferredBidId?: string;
 }
 
 export type TrustTier = 'AAA' | 'AA' | 'A' | 'B' | 'C';
