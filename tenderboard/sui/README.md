@@ -26,6 +26,7 @@ Deployer:        0xb401ec7dde816354d0745fbba538674c51e5f7bcbb3816305df538f32d9c7
 V2 upgrade tx:   GRN22WmqYbZrM9kjgsZLw9wrvxZUixsh3AZ6YQXvZzo7
 Smoke anchor tx: 3Yr14XHTAGLvHVa6RABeFsPXbxe2DRhhW5qZjRmhgmz8
 Live x402 tx:    7rQS8zmCkjJkxu469UbVSQsjxwD88eVNpkaB2VAZoaYN
+Full proof tx:   Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP
 ```
 
 ## Anchor

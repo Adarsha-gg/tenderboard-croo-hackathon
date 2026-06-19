@@ -85,6 +85,18 @@ Event:     PaymentIntentRecorded
 Verifier:  requestBound, nonceBound, amountBound, receiverBound, workerBound, suiSettlementVerified, replayProtected
 ```
 
+Current full live product proof:
+
+```text
+Run:        run_20260619170152_fh8zk6
+Payment:    Es2rZN4rvyhJ4GHTS4Cmcvi9JDsqj77UEZr5RNqNFMSU
+Walrus:     lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw
+Walrus URL: https://aggregator.walrus-testnet.walrus.space/v1/blobs/lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw
+Sui anchor: Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP
+Memory:     memory_1cd5c44288de305a
+Verifier:   memory_hash, source_receipt_hash, worker_evidence_hash, walrus_binding, sui_anchor_binding, walrus_readback all passed
+```
+
 After publishing, configure:
 
 ```env
@@ -175,6 +187,7 @@ npm run proof:latest
 npm run sui:anchor-plan
 npm run sui:x402-pay -- <run-id>
 npm run smoke:x402-live
+npm run smoke:full-live
 ```
 
 ## Agent API

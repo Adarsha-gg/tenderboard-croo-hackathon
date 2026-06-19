@@ -12,7 +12,8 @@
     "seed:memory": "tsx src/cli/seedMemory.ts",
     "sui:anchor-plan": "tsx src/cli/exportSuiAnchorPlan.ts",
     "sui:x402-pay": "tsx src/cli/paySuiX402.ts",
-    "smoke:x402-live": "tsx src/cli/runLiveX402Smoke.ts"
+    "smoke:x402-live": "tsx src/cli/runLiveX402Smoke.ts",
+    "smoke:full-live": "tsx src/cli/runLiveFullSmoke.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.3",
