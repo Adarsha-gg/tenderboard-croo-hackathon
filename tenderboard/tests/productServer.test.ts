@@ -500,6 +500,13 @@ describe('SuiProof Market product server', () => {
         walrusReady: false,
       });
       expect(delivered.settlementInstruction.action).toBe('store_walrus_evidence');
+      expect(delivered.memoryRecord).toMatchObject({
+        objectType: 'suiproof.agent_memory_record.v1',
+        workerAgentId: 'sui_opportunity_scout',
+        runId: created.runId,
+        evidenceStrength: 'source_receipt',
+        settlementAction: 'store_walrus_evidence',
+      });
       expect(JSON.stringify(delivered.events)).toContain('walrus_upload_pending');
 
       const withEvidence = await postJson(`${baseUrl}/api/runs/${created.runId}/store-evidence`, {});
@@ -525,6 +532,12 @@ describe('SuiProof Market product server', () => {
         walrusReady: true,
       });
       expect(withEvidence.settlementInstruction.action).toBe('anchor_sui_receipt');
+      expect(withEvidence.memoryRecord).toMatchObject({
+        walrusBlobId: withEvidence.walrusBlobId,
+        evidenceStrength: 'walrus_backed',
+        settlementAction: 'anchor_sui_receipt',
+      });
+      expect(withEvidence.memoryRecord.memoryHash).toMatch(/^sha256:/);
 
       const anchored = await postJson(`${baseUrl}/api/runs/${created.runId}/anchor-receipt`, {});
       expect(anchored.status).toBe('anchored');
@@ -537,9 +550,17 @@ describe('SuiProof Market product server', () => {
         walrusEvidenceCount: 1,
         sourceEvidenceCount: expect.any(Number),
         totalMistEarned: '35000000',
+        memoryCount: 1,
+        averageClaimSupport: 100,
         lastAnchoredRunId: created.runId,
         lastWalrusBlobId: anchored.walrusBlobId,
+        lastMemoryId: anchored.memoryRecord.memoryId,
         lastEvidenceHash: anchored.verificationManifest.evidenceHash,
+      });
+      expect(anchored.memoryRecord).toMatchObject({
+        suiAnchorDigest: anchored.suiAnchorDigest,
+        evidenceStrength: 'sui_anchored',
+        settlementAction: 'record_settlement',
       });
       expect(anchored.verificationManifest.requiredChecks.find((check: any) => check.id === 'reputation_signal')).toMatchObject({
         status: 'passed',
@@ -552,6 +573,22 @@ describe('SuiProof Market product server', () => {
       expect(JSON.stringify(anchored.events)).toContain('sui_dev_receipt_anchored');
       expect(JSON.stringify(anchored.events)).toContain('worker_reputation_updated');
 
+      const memoryPassport = await (await fetch(`${baseUrl}/api/agents/sui_opportunity_scout/memory`)).json();
+      expect(memoryPassport).toMatchObject({
+        objectType: 'suiproof.agent_memory_passport.v1',
+        workerAgentId: 'sui_opportunity_scout',
+        memoryCount: 1,
+        walrusMemoryCount: 1,
+        anchoredMemoryCount: 1,
+        averageClaimSupport: 100,
+        latestMemoryId: anchored.memoryRecord.memoryId,
+      });
+      expect(memoryPassport.records[0]).toMatchObject({
+        runId: created.runId,
+        walrusBlobId: anchored.walrusBlobId,
+        suiAnchorDigest: anchored.suiAnchorDigest,
+      });
+
       const second = await postJson(`${baseUrl}/api/runs`, {
         title: 'Find another Sui ecosystem opportunity',
         instructions: 'Use public sources only.',
@@ -562,7 +599,20 @@ describe('SuiProof Market product server', () => {
         workerAgentId: 'sui_opportunity_scout',
         anchoredRunCount: 1,
         walrusEvidenceCount: 1,
+        memoryCount: 1,
+        averageClaimSupport: 100,
         lastAnchoredRunId: created.runId,
+      });
+      expect(secondReceipt.trustDecision.reasons).toContain(
+        'Worker Walrus memory passport has 1 prior record(s), 1 Walrus-backed, and 1 Sui-anchored.',
+      );
+      expect(secondReceipt.verificationManifest.workerMemory).toMatchObject({
+        workerAgentId: 'sui_opportunity_scout',
+        memoryCount: 1,
+        walrusMemoryCount: 1,
+        anchoredMemoryCount: 1,
+        averageClaimSupport: 100,
+        latestMemoryId: anchored.memoryRecord.memoryId,
       });
 
       const runs = await (await fetch(`${baseUrl}/api/runs`)).json();

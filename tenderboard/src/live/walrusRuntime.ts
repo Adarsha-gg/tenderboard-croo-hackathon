@@ -1,4 +1,5 @@
 import { stableHash } from './hash.js';
+import { buildAgentMemoryRecord } from './agentMemory.js';
 import type { LiveRunReceipt, TenderBoardConfig } from './types.js';
 
 export interface WalrusStoreResult {
@@ -36,6 +37,7 @@ export interface EvidenceBundle {
     agentHandoff: LiveRunReceipt['agentHandoff'];
   };
   reputationSnapshot: LiveRunReceipt['reputationSnapshot'];
+  memoryRecord: LiveRunReceipt['memoryRecord'];
   privacy: LiveRunReceipt['privacy'];
   workerBidBoard: LiveRunReceipt['workerBidBoard'];
   trust: LiveRunReceipt['trustDecision'];
@@ -79,6 +81,7 @@ export function buildEvidenceBundle(receipt: LiveRunReceipt): EvidenceBundle {
       agentHandoff: receipt.agentHandoff,
     },
     reputationSnapshot: receipt.reputationSnapshot,
+    memoryRecord: receipt.memoryRecord ?? buildAgentMemoryRecord(receipt),
     privacy: receipt.privacy,
     workerBidBoard: receipt.workerBidBoard,
     trust: receipt.trustDecision,

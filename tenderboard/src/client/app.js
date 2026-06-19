@@ -255,6 +255,9 @@ function renderReceipt(receipt) {
     ['Walrus blob object', receipt.walrusBlobObjectId || 'not uploaded yet'],
     ['Walrus read URL', receipt.walrusReadUrl || 'not uploaded yet'],
     ['Walrus end epoch', receipt.walrusEndEpoch ?? 'not uploaded yet'],
+    ['Agent memory', receipt.memoryRecord?.memoryId || 'not recorded yet'],
+    ['Memory evidence strength', receipt.memoryRecord?.evidenceStrength || 'not recorded yet'],
+    ['Memory settlement action', receipt.memoryRecord?.settlementAction || 'not recorded yet'],
     ['Sui anchor digest', receipt.suiAnchorDigest || 'not anchored yet'],
     ['Delivery', receipt.deliveryText || 'not delivered yet'],
   ];
@@ -448,9 +451,12 @@ function renderReputationPassport(receipt) {
     </div>
     <div class="passportGrid">
       <div><strong>Walrus proofs</strong><span>${escapeHtml(snapshot.walrusEvidenceCount)}</span></div>
+      <div><strong>Memory records</strong><span>${escapeHtml(snapshot.memoryCount ?? 0)}</span></div>
+      <div><strong>Claim support</strong><span>${escapeHtml(snapshot.averageClaimSupport ?? 'none')}</span></div>
       <div><strong>Source observations</strong><span>${escapeHtml(snapshot.sourceEvidenceCount)}</span></div>
       <div><strong>Tier counts</strong><span>AAA ${escapeHtml(snapshot.tierCounts.AAA)} / AA ${escapeHtml(snapshot.tierCounts.AA)} / A ${escapeHtml(snapshot.tierCounts.A)}</span></div>
       <div><strong>Last run</strong><span>${escapeHtml(snapshot.lastAnchoredRunId || 'none')}</span></div>
+      <div><strong>Last memory</strong><span>${escapeHtml(snapshot.lastMemoryId || 'none')}</span></div>
       <div><strong>Last blob</strong><span>${escapeHtml(snapshot.lastWalrusBlobId || 'none')}</span></div>
       <div><strong>Last evidence hash</strong><span>${escapeHtml(snapshot.lastEvidenceHash || 'none')}</span></div>
     </div>`;
@@ -486,11 +492,16 @@ function renderTrustProof(receipt) {
     </div>`;
 
   const manifest = receipt.verificationManifest;
+  const memory = manifest.workerMemory;
+  const memoryBlock = memory
+    ? `<div class="hashLine"><strong>Worker memory</strong><span>${escapeHtml(memory.memoryCount)} records / ${escapeHtml(memory.walrusMemoryCount)} Walrus / ${escapeHtml(memory.anchoredMemoryCount)} Sui anchored / ${escapeHtml(memory.averageClaimSupport ?? 'no claim score')} avg claim support</span></div>`
+    : '';
   el('manifestHash').textContent = manifest.evidenceHash ? 'finalized' : 'pending';
   el('manifestChecks').innerHTML = `
     <div class="hashLine"><strong>Checker pack</strong><span>${escapeHtml(manifest.checkerPack || 'research')}</span></div>
     <div class="hashLine"><strong>Spec</strong><span>${escapeHtml(manifest.specHash)}</span></div>
     <div class="hashLine"><strong>Evidence</strong><span>${escapeHtml(manifest.evidenceHash || 'waiting for delivery')}</span></div>
+    ${memoryBlock}
     <div class="criteriaList">
       <strong>Acceptance criteria</strong>
       <ol>${(manifest.acceptanceCriteria || []).map((criterion) => `<li>${escapeHtml(criterion)}</li>`).join('')}</ol>

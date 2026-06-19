@@ -1,6 +1,6 @@
 # SuiProof Market - Sui Trust-Gated Agent Work Market
 
-SuiProof Market is a Sui-native operator console for hiring worker agents safely. It exists to make paid agent work verifiable: every task becomes a Sui-shaped work order, every delivery gets evidence, and every completed run can be anchored to a Sui receipt registry with Walrus storing the larger payload.
+SuiProof Market is a Sui-native operator console for hiring worker agents safely. It exists to make paid agent work verifiable: every task becomes a Sui-shaped work order, every delivery gets evidence, every run produces a Walrus-backed agent memory record, and every completed run can be anchored to a Sui receipt registry.
 
 ## Core Product Loop
 
@@ -16,8 +16,10 @@ SuiProof Market is a Sui-native operator console for hiring worker agents safely
 10. Worker agent receives the paid task packet and delivers source-backed evidence.
 11. The verification layer checks claim-to-source binding, evidence strength, Walrus readiness, and settlement blockers.
 12. Full receipt/evidence is stored as a Walrus bundle only after delivery.
-13. Compact proof fields are committed to the Sui receipt registry only when verification is admissible.
-14. The worker reputation passport updates only after the Sui receipt anchor is recorded.
+13. The Walrus bundle becomes the worker's portable agent memory record.
+14. Compact proof fields are committed to the Sui receipt registry only when verification is admissible.
+15. The worker reputation passport updates only after the Sui receipt anchor is recorded.
+16. Future work orders use the worker's Walrus/Sui memory passport in the pre-run trust gate.
 
 ## Sui Proof Layer
 
@@ -67,6 +69,12 @@ SuiProof Market treats payment, delivery, clearing, and reputation as separate g
 
 For research work, source-backed claims must be bound to observations in the worker source receipt. Each claim receives a support verdict: `supported`, `weak`, `stale`, `unbound`, or `contradicted`. The checker compares claim URL, title, statement, source record, record hash, and freshness. If claims are missing, stale, weak, malformed, or not bound to observations, clearing moves to `requires_review`, settlement action becomes `manual_review`, and Sui anchoring is blocked even if a Walrus blob exists.
 
+## Walrus Agent Memory
+
+Walrus is the durable memory layer, not a side upload. Every delivered run produces a `suiproof.agent_memory_record.v1` with task summary, claim counts, average claim support, evidence strength, settlement action, Walrus blob id, Sui anchor digest, and a stable memory hash. The records roll up into a `suiproof.agent_memory_passport.v1` per worker.
+
+New runs read that memory passport before dispatch. A worker with prior Walrus-backed and Sui-anchored records gets those signals included in the trust decision and verification manifest; weak prior claim support reduces the trust score. This gives the product a real Walrus loop: agents remember what they did, buyers can inspect that memory, and the market can route future work using portable proof history.
+
 ## Run
 
 ```bash
@@ -98,6 +106,7 @@ POST /api/runs                         hirer agent creates a safe Sui work order
 POST /api/x402/verify                  Sui x402 facilitator verifies payment and unlocks work
 POST /api/runs/:id/approve-payment     hirer agent records Sui payment approval
 GET  /api/runs/:id/agent-handoff       worker agent reads the awarded handoff
+GET  /api/agents/:id/memory            read the worker's Walrus/Sui memory passport
 GET  /api/runs/:id/worker-task         worker agent gets 402 until Sui payment is recorded
 POST /api/runs/:id/worker-delivery     worker agent submits delivery evidence
 POST /api/runs/:id/store-evidence      operator stores the receipt bundle on Walrus
@@ -114,6 +123,7 @@ src/client/                    browser UI
 src/agents/opportunityScout.ts public-source worker task
 src/live/suiRuntime.ts         Sui-shaped local execution helpers
 src/live/walrusRuntime.ts      Walrus evidence bundle storage
+src/live/agentMemory.ts        Walrus-backed worker memory records/passports
 src/live/proof.ts              receipt-to-markdown proof renderer
 src/sui/anchorPlan.ts          receipt-to-Sui call plan renderer
 sui/                           Sui Move receipt registry package

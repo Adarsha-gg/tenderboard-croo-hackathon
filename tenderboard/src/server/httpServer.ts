@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildAgentPair, handoffStatusForRun } from '../live/agentPair.js';
+import { buildAgentMemoryPassport, buildAgentMemoryRecord } from '../live/agentMemory.js';
 import { buildPrivacyLabeledTask, buildWorkerBidBoard, availableWorkerBids } from '../live/bidBoard.js';
 import { buildClearingObjects } from '../live/clearingObjects.js';
 import { loadTenderBoardConfig } from '../live/config.js';
@@ -94,6 +95,13 @@ async function route(
 
   if (method === 'GET' && url.pathname === '/api/runs') {
     sendJson(res, 200, await listRunsWithReputation(store));
+    return;
+  }
+
+  const agentMemoryMatch = url.pathname.match(/^\/api\/agents\/([^/]+)\/memory$/);
+  if (method === 'GET' && agentMemoryMatch) {
+    const workerAgentId = decodeURIComponent(agentMemoryMatch[1]!);
+    sendJson(res, 200, buildAgentMemoryPassport(workerAgentId, await loadAllReceipts(store)));
     return;
   }
 
@@ -253,6 +261,9 @@ async function createRun(
   const privacy = buildPrivacyLabeledTask(body);
   const workerBidBoard = buildWorkerBidBoard(body, config);
   const selectedBid = workerBidBoard.bids.find((bid) => bid.bidId === workerBidBoard.selectedBidId);
+  const workerAgentId = selectedBid?.workerAgentId ?? config.workerAgentId;
+  const historicalReceipts = await loadAllReceipts(store);
+  const workerMemoryPassport = buildAgentMemoryPassport(workerAgentId, historicalReceipts, now);
   const trustProof = buildTrustProof({
     request: body,
     sanitizedTask: sanitized.sanitizedTask,
@@ -260,6 +271,7 @@ async function createRun(
     privateNotesProvided: sanitized.privateNotesProvided,
     config,
     workerBidBoard,
+    workerMemoryPassport,
   });
 
   if (availableWorkerBids(workerBidBoard).length === 0) {
@@ -288,8 +300,8 @@ async function createRun(
     paymentIntentId: paymentIntentPlan.intentId,
   });
   const reputationSnapshot = buildWorkerReputationCard(
-    selectedBid?.workerAgentId ?? config.workerAgentId,
-    await loadAllReceipts(store),
+    workerAgentId,
+    historicalReceipts,
     now,
   );
   const receipt: LiveRunReceipt = {
@@ -311,7 +323,7 @@ async function createRun(
     paymentIntentPlan,
     receiptPlan,
     reputationSnapshot,
-    workerAgentId: selectedBid?.workerAgentId ?? config.workerAgentId,
+    workerAgentId,
     workOrderId,
     suiNetwork: config.suiNetwork,
     suiPackageId: config.suiPackageId,
@@ -370,6 +382,9 @@ async function createRun(
           workerAgentId: reputationSnapshot.workerAgentId,
           anchoredRunCount: reputationSnapshot.anchoredRunCount,
           walrusEvidenceCount: reputationSnapshot.walrusEvidenceCount,
+          memoryCount: reputationSnapshot.memoryCount,
+          averageClaimSupport: reputationSnapshot.averageClaimSupport,
+          lastMemoryId: reputationSnapshot.lastMemoryId,
           averageTrustScore: reputationSnapshot.averageTrustScore,
         },
       }),
@@ -590,9 +605,12 @@ async function submitWorkerDelivery(
     deliveryText: delivery.deliveryText,
     workerEvidence: delivery.workerEvidence,
   };
+  const clearingObjects = buildClearingObjects(finalizedReceipt);
+  const memoryRecord = buildAgentMemoryRecord({ ...finalizedReceipt, ...clearingObjects });
   await store.update(runId, {
     verificationManifest,
-    ...buildClearingObjects(finalizedReceipt),
+    memoryRecord,
+    ...clearingObjects,
   });
 
   return store.require(runId);
@@ -645,6 +663,7 @@ async function storeEvidence(
   };
   const clearingObjects = buildClearingObjects(updatedForClearing);
   const nextStatus = clearingObjects.clearingDecision.verdict === 'ready_to_anchor' ? 'anchoring' : 'delivered';
+  const memoryRecord = buildAgentMemoryRecord({ ...updatedForClearing, status: nextStatus, ...clearingObjects });
 
   await store.update(runId, {
     status: nextStatus,
@@ -656,6 +675,7 @@ async function storeEvidence(
     walrusReadUrl: result.readUrl,
     receiptPlan,
     verificationManifest,
+    memoryRecord,
     ...(clearingObjects.clearingDecision.verdict === 'requires_review'
       ? agentHandoffReviewUpdate(receipt)
       : agentHandoffUpdate(receipt, nextStatus)),
@@ -673,6 +693,8 @@ async function storeEvidence(
         blobObjectId: result.blobObjectId,
         endEpoch: result.endEpoch,
         readUrl: result.readUrl,
+        memoryId: memoryRecord.memoryId,
+        memoryHash: memoryRecord.memoryHash,
         intentId: paymentIntentPlan.intentId,
         paymentNonce: paymentIntentPlan.paymentNonce,
         settlementNonce: paymentIntentPlan.settlementNonce,
@@ -750,21 +772,32 @@ async function anchorReceipt(
   const latest = await store.require(runId);
   await store.update(runId, buildClearingObjects(latest));
   const latestWithClearing = await store.require(runId);
+  const anchoredVerificationManifest = finalizeVerificationManifest(latestWithClearing, latestWithClearing.deliveryText);
+  const anchoredReceiptForReputation = {
+    ...latestWithClearing,
+    verificationManifest: anchoredVerificationManifest,
+  };
+  const receiptsForReputation = (await loadAllReceipts(store)).map((storedReceipt) =>
+    storedReceipt.runId === runId ? anchoredReceiptForReputation : storedReceipt,
+  );
   const reputationSnapshot = buildWorkerReputationCard(
     latestWithClearing.workerAgentId,
-    await loadAllReceipts(store),
+    receiptsForReputation,
     now,
   );
-  const verificationManifest = markReputationSignalAnchored(latestWithClearing, reputationSnapshot);
+  const verificationManifest = markReputationSignalAnchored(anchoredReceiptForReputation, reputationSnapshot);
   const reputationReceipt = {
     ...latestWithClearing,
     reputationSnapshot,
     verificationManifest,
   };
+  const clearingObjects = buildClearingObjects(reputationReceipt);
+  const memoryRecord = buildAgentMemoryRecord({ ...reputationReceipt, ...clearingObjects });
   await store.update(runId, {
     reputationSnapshot,
     verificationManifest,
-    ...buildClearingObjects(reputationReceipt),
+    memoryRecord,
+    ...clearingObjects,
   });
 
   const reputationEvent = makeEvent({
@@ -782,6 +815,7 @@ async function anchorReceipt(
       totalMistEarned: reputationSnapshot.totalMistEarned,
       lastWalrusBlobId: reputationSnapshot.lastWalrusBlobId,
       lastEvidenceHash: reputationSnapshot.lastEvidenceHash,
+      memoryId: memoryRecord.memoryId,
     },
   });
   await store.appendEvent(runId, reputationEvent);

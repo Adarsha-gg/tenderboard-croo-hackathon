@@ -1,4 +1,5 @@
 import { MIST_PER_SUI } from '../sui/paymentPlan.js';
+import { buildAgentMemoryPassport } from './agentMemory.js';
 import type { LiveRunReceipt, TrustTier, WorkerReputationCard } from './types.js';
 
 const TRUST_TIERS: TrustTier[] = ['AAA', 'AA', 'A', 'B', 'C'];
@@ -21,6 +22,7 @@ export function buildWorkerReputationCard(
   const totalTrustScore = anchoredReceipts.reduce((total, receipt) => total + receipt.trustDecision.score, 0);
   const totalMistEarned = anchoredReceipts.reduce((total, receipt) => total + receiptMist(receipt), 0n);
   const lastAnchored = anchoredReceipts.at(-1);
+  const memoryPassport = buildAgentMemoryPassport(workerAgentId, receipts, generatedAt);
 
   return {
     objectType: 'tenderboard.worker_reputation_passport.v1',
@@ -32,6 +34,8 @@ export function buildWorkerReputationCard(
       (total, receipt) => total + (receipt.workerEvidence?.sourceReceipt.observations.length ?? 0),
       0,
     ),
+    memoryCount: memoryPassport.memoryCount,
+    averageClaimSupport: memoryPassport.averageClaimSupport,
     averageTrustScore:
       anchoredReceipts.length > 0 ? Math.round((totalTrustScore / anchoredReceipts.length) * 10) / 10 : undefined,
     tierCounts,
@@ -40,6 +44,7 @@ export function buildWorkerReputationCard(
     lastAnchoredRunId: lastAnchored?.runId,
     lastAnchoredAt: lastAnchored ? anchorTime(lastAnchored) : undefined,
     lastWalrusBlobId: lastAnchored?.walrusBlobId ?? lastAnchored?.receiptPlan?.walrusBlobId,
+    lastMemoryId: memoryPassport.latestMemoryId,
     lastEvidenceHash: lastAnchored?.verificationManifest.evidenceHash,
     lastAnchorDigest: lastAnchored?.suiAnchorDigest ?? lastAnchored?.receiptPlan?.anchorDigest,
   };

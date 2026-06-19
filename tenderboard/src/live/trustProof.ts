@@ -1,6 +1,7 @@
 import { findSecretPatternMatches } from '../policy/secretPatterns.js';
 import { stableHash } from './hash.js';
 import type {
+  AgentMemoryPassport,
   CreateRunRequest,
   CheckerPackId,
   ClaimVerificationResult,
@@ -24,6 +25,7 @@ export interface BuildTrustProofInput {
   privateNotesProvided: boolean;
   config: TenderBoardConfig;
   workerBidBoard?: WorkerBidBoard;
+  workerMemoryPassport?: AgentMemoryPassport;
 }
 
 export function buildTrustDecision(input: BuildTrustProofInput): TrustDecision {
@@ -42,6 +44,7 @@ export function buildTrustDecision(input: BuildTrustProofInput): TrustDecision {
     'Worker execution can only proceed with an available bid that stays inside the buyer SUI cap and public data boundary.',
   ];
   const selectedBid = input.workerBidBoard?.bids.find((bid) => bid.bidId === input.workerBidBoard?.selectedBidId);
+  const memoryPassport = input.workerMemoryPassport;
 
   let score = 92;
   if (input.removedLines.length > 0) {
@@ -76,6 +79,26 @@ export function buildTrustDecision(input: BuildTrustProofInput): TrustDecision {
     if (!selectedBid) {
       score -= 50;
       reasons.push('No worker bid is available for Sui payment approval.');
+    }
+  }
+
+  if (memoryPassport) {
+    controls.push('Worker routing uses the worker Walrus memory passport before dispatch.');
+    if (memoryPassport.memoryCount === 0) {
+      reasons.push('Worker has no prior Walrus memory records; treating this route as a cold start.');
+    } else {
+      reasons.push(
+        `Worker Walrus memory passport has ${memoryPassport.memoryCount} prior record(s), ${memoryPassport.walrusMemoryCount} Walrus-backed, and ${memoryPassport.anchoredMemoryCount} Sui-anchored.`,
+      );
+      if (memoryPassport.averageClaimSupport !== undefined) {
+        reasons.push(`Prior memory average claim support is ${memoryPassport.averageClaimSupport}/100.`);
+        if (memoryPassport.averageClaimSupport >= 90) {
+          score += 3;
+        } else if (memoryPassport.averageClaimSupport < 70) {
+          score -= 15;
+          reasons.push('Prior memory claim support is below the automatic-clearing threshold.');
+        }
+      }
     }
   }
 
@@ -173,6 +196,16 @@ export function buildVerificationManifest(input: BuildTrustProofInput): Verifica
     summary: summarizeVerification(checks, 'none', false),
     settlementRule: 'Release payment only after safe packet creation, Sui work order creation, explicit operator approval, delivery receipt, Walrus evidence upload, and Sui anchor readiness.',
     reputationWriteback: 'Use only Sui-anchored receipts as worker reputation signals.',
+    workerMemory: input.workerMemoryPassport
+      ? {
+          workerAgentId: input.workerMemoryPassport.workerAgentId,
+          memoryCount: input.workerMemoryPassport.memoryCount,
+          walrusMemoryCount: input.workerMemoryPassport.walrusMemoryCount,
+          anchoredMemoryCount: input.workerMemoryPassport.anchoredMemoryCount,
+          averageClaimSupport: input.workerMemoryPassport.averageClaimSupport,
+          latestMemoryId: input.workerMemoryPassport.latestMemoryId,
+        }
+      : undefined,
   };
 }
 

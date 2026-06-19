@@ -127,6 +127,15 @@ export interface VerificationSummary {
   reputationEligible: boolean;
 }
 
+export interface VerificationWorkerMemoryContext {
+  workerAgentId: string;
+  memoryCount: number;
+  walrusMemoryCount: number;
+  anchoredMemoryCount: number;
+  averageClaimSupport: number | undefined;
+  latestMemoryId: string | undefined;
+}
+
 export type ClaimSupportVerdict = 'supported' | 'weak' | 'stale' | 'unbound' | 'contradicted';
 
 export interface ClaimVerificationResult {
@@ -150,6 +159,7 @@ export interface VerificationManifest {
   requiredChecks: VerificationCheck[];
   summary?: VerificationSummary;
   claimResults?: ClaimVerificationResult[];
+  workerMemory?: VerificationWorkerMemoryContext | undefined;
   settlementRule: string;
   reputationWriteback: string;
 }
@@ -216,6 +226,8 @@ export interface WorkerReputationCard {
   anchoredRunCount: number;
   walrusEvidenceCount: number;
   sourceEvidenceCount: number;
+  memoryCount: number;
+  averageClaimSupport: number | undefined;
   averageTrustScore: number | undefined;
   tierCounts: Record<TrustTier, number>;
   totalMistEarned: string;
@@ -223,8 +235,48 @@ export interface WorkerReputationCard {
   lastAnchoredRunId: string | undefined;
   lastAnchoredAt: string | undefined;
   lastWalrusBlobId: string | undefined;
+  lastMemoryId: string | undefined;
   lastEvidenceHash: string | undefined;
   lastAnchorDigest: string | undefined;
+}
+
+export interface AgentMemoryRecord {
+  objectType: 'suiproof.agent_memory_record.v1';
+  memoryId: string;
+  workerAgentId: string;
+  runId: string;
+  taskTitle: string;
+  createdAt: string;
+  updatedAt: string;
+  status: LiveRunStatus;
+  summary: string;
+  tags: string[];
+  sourceObservationCount: number;
+  claimCount: number;
+  supportedClaimCount: number;
+  failedClaimCount: number;
+  averageClaimSupport: number | undefined;
+  verificationAdmissibility: VerificationAdmissibility;
+  evidenceStrength: VerificationEvidenceStrength;
+  settlementAction: SettlementAction | undefined;
+  walrusBlobId: string | undefined;
+  walrusReadUrl: string | undefined;
+  suiAnchorDigest: string | undefined;
+  evidenceHash: string | undefined;
+  memoryHash: string;
+}
+
+export interface AgentMemoryPassport {
+  objectType: 'suiproof.agent_memory_passport.v1';
+  workerAgentId: string;
+  generatedAt: string;
+  memoryCount: number;
+  walrusMemoryCount: number;
+  anchoredMemoryCount: number;
+  averageClaimSupport: number | undefined;
+  latestMemoryId: string | undefined;
+  latestWalrusBlobId: string | undefined;
+  records: AgentMemoryRecord[];
 }
 
 export interface PaymentIntentPlan {
@@ -465,6 +517,7 @@ export interface LiveRunReceipt {
   paymentIntentPlan?: PaymentIntentPlan;
   receiptPlan?: ReceiptPlan;
   reputationSnapshot?: WorkerReputationCard | undefined;
+  memoryRecord?: AgentMemoryRecord | undefined;
   obligationObject?: ObligationObject;
   evidenceEnvelope?: EvidenceEnvelope;
   clearingDecision?: ClearingDecision;

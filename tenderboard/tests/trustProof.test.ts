@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildClearingObjects } from '../src/live/clearingObjects.js';
 import { loadTenderBoardConfig } from '../src/live/config.js';
 import { buildTrustProof, finalizeVerificationManifest } from '../src/live/trustProof.js';
-import type { LiveRunReceipt, ScoutEvidence, VerificationManifest } from '../src/live/types.js';
+import type { AgentMemoryPassport, LiveRunReceipt, ScoutEvidence, VerificationManifest } from '../src/live/types.js';
 
 describe('trust proof model', () => {
   it('anchors a safe task with a Sui trust decision and verification manifest', () => {
@@ -35,6 +35,38 @@ describe('trust proof model', () => {
       evidenceStrength: 'none',
       settlementEligible: false,
       reputationEligible: false,
+    });
+  });
+
+  it('uses the worker Walrus memory passport in the pre-run trust gate', () => {
+    const config = loadTenderBoardConfig({ TENDERBOARD_MODE: 'sui-dev', TENDERBOARD_MAX_PAYMENT_SUI: '0.250' });
+    const proof = buildTrustProof({
+      request: {
+        title: 'Find Sui agent grants',
+        instructions: 'Return public links.',
+        checkerPack: 'research',
+        maxPayment: { amount: '0.050', currency: 'SUI' },
+      },
+      sanitizedTask: 'Task: Find Sui agent grants\nInstructions:\nReturn public links.',
+      removedLines: [],
+      privateNotesProvided: false,
+      config,
+      workerMemoryPassport: sampleMemoryPassport(),
+    });
+
+    expect(proof.trustDecision.reasons).toContain(
+      'Worker Walrus memory passport has 2 prior record(s), 2 Walrus-backed, and 1 Sui-anchored.',
+    );
+    expect(proof.trustDecision.reasons).toContain('Prior memory average claim support is 94/100.');
+    expect(proof.trustDecision.controls).toContain('Worker routing uses the worker Walrus memory passport before dispatch.');
+    expect(proof.trustDecision.score).toBe(95);
+    expect(proof.verificationManifest.workerMemory).toMatchObject({
+      workerAgentId: 'sui_worker',
+      memoryCount: 2,
+      walrusMemoryCount: 2,
+      anchoredMemoryCount: 1,
+      averageClaimSupport: 94,
+      latestMemoryId: 'memory_latest',
     });
   });
 
@@ -274,6 +306,21 @@ function researchManifest(): VerificationManifest {
     privateNotesProvided: false,
     config,
   }).verificationManifest;
+}
+
+function sampleMemoryPassport(): AgentMemoryPassport {
+  return {
+    objectType: 'suiproof.agent_memory_passport.v1',
+    workerAgentId: 'sui_worker',
+    generatedAt: '2026-06-19T18:00:00.000Z',
+    memoryCount: 2,
+    walrusMemoryCount: 2,
+    anchoredMemoryCount: 1,
+    averageClaimSupport: 94,
+    latestMemoryId: 'memory_latest',
+    latestWalrusBlobId: 'walrus_blob_latest',
+    records: [],
+  };
 }
 
 function validWorkerEvidence(overrides: { publishedAt?: string } = {}): ScoutEvidence {
