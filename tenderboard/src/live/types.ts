@@ -127,6 +127,21 @@ export interface VerificationSummary {
   reputationEligible: boolean;
 }
 
+export type ClaimSupportVerdict = 'supported' | 'weak' | 'stale' | 'unbound' | 'contradicted';
+
+export interface ClaimVerificationResult {
+  objectType: 'suiproof.claim_verification.v1';
+  claimId: string;
+  sourceObservationId: string;
+  verdict: ClaimSupportVerdict;
+  supportScore: number;
+  reasons: string[];
+  sourceUrl: string | undefined;
+  sourceTitle: string | undefined;
+  observedAt: string | undefined;
+  publishedAt: string | undefined;
+}
+
 export interface VerificationManifest {
   specHash: string;
   evidenceHash: string | undefined;
@@ -134,6 +149,7 @@ export interface VerificationManifest {
   acceptanceCriteria: string[];
   requiredChecks: VerificationCheck[];
   summary?: VerificationSummary;
+  claimResults?: ClaimVerificationResult[];
   settlementRule: string;
   reputationWriteback: string;
 }

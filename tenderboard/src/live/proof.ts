@@ -91,6 +91,10 @@ export function renderReceiptProof(receipt: LiveRunReceipt): string {
     '',
     ...renderWorkerEvidence(receipt),
     '',
+    '## Claim verification',
+    '',
+    ...renderClaimVerification(receipt),
+    '',
     '## Timeline',
     '',
   ];
@@ -104,6 +108,20 @@ export function renderReceiptProof(receipt: LiveRunReceipt): string {
   }
 
   return `${lines.join('\n')}\n`;
+}
+
+function renderClaimVerification(receipt: LiveRunReceipt): string[] {
+  const results = receipt.verificationManifest.claimResults ?? [];
+  if (results.length === 0) return ['No claim verification results recorded.'];
+
+  return [
+    '| Claim | Verdict | Score | Source | Reasons |',
+    '| --- | --- | --- | --- | --- |',
+    ...results.map(
+      (result) =>
+        `| ${escapeCell(result.claimId)} | ${escapeCell(result.verdict)} | ${result.supportScore} | ${escapeCell(result.sourceUrl ?? 'missing')} | ${escapeCell(result.reasons.join('; '))} |`,
+    ),
+  ];
 }
 
 function renderMarketAgents(receipt: LiveRunReceipt): string[] {

@@ -3,7 +3,10 @@ import { stableHash } from './hash.js';
 import type {
   CreateRunRequest,
   CheckerPackId,
+  ClaimVerificationResult,
   LiveRunReceipt,
+  ScoutClaim,
+  SourceObservation,
   TenderBoardConfig,
   TrustDecision,
   TrustTier,
@@ -174,7 +177,8 @@ export function buildVerificationManifest(input: BuildTrustProofInput): Verifica
 }
 
 export function finalizeVerificationManifest(receipt: LiveRunReceipt, deliveryText: string | undefined): VerificationManifest {
-  const sourceEvidence = sourceEvidenceStatus(receipt);
+  const claimResults = verifySourceClaims(receipt);
+  const sourceEvidence = sourceEvidenceStatus(receipt, claimResults);
   const evidenceStrength = evidenceStrengthForReceipt(receipt, deliveryText, sourceEvidence.valid);
   const evidenceHash = stableHash({
     runId: receipt.runId,
@@ -240,7 +244,7 @@ export function finalizeVerificationManifest(receipt: LiveRunReceipt, deliveryTe
         ...check,
         status: sourceEvidence.valid ? 'passed' : deliveryText ? 'requires_review' : 'pending',
         detail: sourceEvidence.valid
-          ? `Source receipt contains ${sourceEvidence.observationCount} observation(s) and ${sourceEvidence.claimCount} claim(s), with every claim bound to an observation.`
+          ? `Source receipt contains ${sourceEvidence.observationCount} observation(s) and ${sourceEvidence.claimCount} supported claim(s).`
           : deliveryText
             ? sourceEvidence.detail
             : check.detail,
@@ -261,6 +265,7 @@ export function finalizeVerificationManifest(receipt: LiveRunReceipt, deliveryTe
     evidenceHash,
     requiredChecks,
     summary: summarizeVerification(requiredChecks, evidenceStrength, Boolean(receipt.suiAnchorDigest)),
+    claimResults,
   };
 }
 
@@ -381,7 +386,7 @@ function evidenceStrengthForReceipt(
   return 'none';
 }
 
-function sourceEvidenceStatus(receipt: LiveRunReceipt): {
+function sourceEvidenceStatus(receipt: LiveRunReceipt, claimResults: ClaimVerificationResult[]): {
   valid: boolean;
   observationCount: number;
   claimCount: number;
@@ -406,14 +411,13 @@ function sourceEvidenceStatus(receipt: LiveRunReceipt): {
     return { valid: false, observationCount: observations.length, claimCount: 0, detail: 'Worker evidence contains no source-backed claims.' };
   }
 
-  const observationIds = new Set(observations.map((observation) => observation.observationId));
-  const unboundClaims = claims.filter((claim) => !observationIds.has(claim.sourceObservationId));
-  if (unboundClaims.length > 0) {
+  const failedClaims = claimResults.filter((result) => result.verdict !== 'supported');
+  if (failedClaims.length > 0) {
     return {
       valid: false,
       observationCount: observations.length,
       claimCount: claims.length,
-      detail: `${unboundClaims.length} claim(s) are not bound to a source observation.`,
+      detail: `${failedClaims.length} claim(s) failed claim support verification.`,
     };
   }
 
@@ -424,6 +428,138 @@ function sourceEvidenceStatus(receipt: LiveRunReceipt): {
     detail: 'Source receipt is valid.',
   };
 }
+
+function verifySourceClaims(receipt: LiveRunReceipt): ClaimVerificationResult[] {
+  const sourceReceipt = receipt.workerEvidence?.sourceReceipt;
+  const claims = receipt.workerEvidence?.claims ?? [];
+  const observations = new Map((sourceReceipt?.observations ?? []).map((observation) => [observation.observationId, observation]));
+  return claims.map((claim) => verifyClaimSupport(claim, observations.get(claim.sourceObservationId), sourceReceipt?.generatedAt));
+}
+
+function verifyClaimSupport(
+  claim: ScoutClaim,
+  observation: SourceObservation | undefined,
+  receiptGeneratedAt: string | undefined,
+): ClaimVerificationResult {
+  if (!observation) {
+    return claimResult(claim, undefined, 'unbound', 0, ['Claim is not bound to a source observation.']);
+  }
+
+  const reasons: string[] = [];
+  let score = 100;
+
+  if (claim.url !== observation.url) {
+    score -= 35;
+    reasons.push('Claim URL does not match source observation URL.');
+  } else {
+    reasons.push('Claim URL matches source observation URL.');
+  }
+
+  const titleOverlap = tokenOverlap(claim.title, observation.title);
+  if (titleOverlap < 0.45) {
+    score -= 30;
+    reasons.push('Claim title is weakly supported by source observation title.');
+  } else {
+    reasons.push('Claim title is supported by source observation title.');
+  }
+
+  const statementOverlap = Math.max(
+    tokenOverlap(claim.statement, observation.title),
+    tokenOverlap(claim.statement, JSON.stringify(observation.record)),
+  );
+  if (statementOverlap < 0.2) {
+    score -= 20;
+    reasons.push('Claim statement has weak overlap with the source record.');
+  } else {
+    reasons.push('Claim statement is grounded in the source record.');
+  }
+
+  if (!observation.recordHash?.startsWith('sha256:')) {
+    score -= 20;
+    reasons.push('Source observation record hash is missing or malformed.');
+  } else {
+    reasons.push('Source observation record hash is present.');
+  }
+
+  const stale = isStale(observation.publishedAt, receiptGeneratedAt ?? observation.observedAt);
+  if (stale) {
+    score -= 25;
+    reasons.push('Source observation is stale for automatic clearing.');
+  }
+
+  const verdict = stale ? 'stale' : score >= 70 ? 'supported' : score >= 40 ? 'weak' : 'contradicted';
+  return claimResult(claim, observation, verdict, Math.max(0, Math.min(100, Math.round(score))), reasons);
+}
+
+function claimResult(
+  claim: ScoutClaim,
+  observation: SourceObservation | undefined,
+  verdict: ClaimVerificationResult['verdict'],
+  supportScore: number,
+  reasons: string[],
+): ClaimVerificationResult {
+  return {
+    objectType: 'suiproof.claim_verification.v1',
+    claimId: claim.claimId,
+    sourceObservationId: claim.sourceObservationId,
+    verdict,
+    supportScore,
+    reasons,
+    sourceUrl: observation?.url,
+    sourceTitle: observation?.title,
+    observedAt: observation?.observedAt,
+    publishedAt: observation?.publishedAt,
+  };
+}
+
+function tokenOverlap(left: string, right: string): number {
+  const leftTokens = tokenSet(left);
+  const rightTokens = tokenSet(right);
+  if (leftTokens.size === 0 || rightTokens.size === 0) return 0;
+  let overlap = 0;
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) overlap += 1;
+  }
+  return overlap / leftTokens.size;
+}
+
+function tokenSet(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .split(/\s+/)
+      .map((token) => token.trim())
+      .filter((token) => token.length > 2)
+      .filter((token) => !CLAIM_STOP_WORDS.has(token)),
+  );
+}
+
+function isStale(publishedAt: string | undefined, generatedAt: string | undefined): boolean {
+  if (!publishedAt || !generatedAt) return false;
+  const published = new Date(publishedAt).getTime();
+  const generated = new Date(generatedAt).getTime();
+  if (!Number.isFinite(published) || !Number.isFinite(generated)) return false;
+  const days = Math.abs(generated - published) / (24 * 60 * 60 * 1000);
+  return days > 365;
+}
+
+const CLAIM_STOP_WORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'that',
+  'this',
+  'from',
+  'source',
+  'result',
+  'used',
+  'rendered',
+  'opportunity',
+  'scout',
+  'report',
+]);
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));

@@ -65,7 +65,7 @@ SuiProof Market treats payment, delivery, clearing, and reputation as separate g
 - `settlementEligible`: true only when non-reputation blockers are cleared
 - `reputationEligible`: true only after Sui anchoring
 
-For research work, source-backed claims must be bound to observations in the worker source receipt. If claims are missing, malformed, or not bound to observations, clearing moves to `requires_review`, settlement action becomes `manual_review`, and Sui anchoring is blocked even if a Walrus blob exists.
+For research work, source-backed claims must be bound to observations in the worker source receipt. Each claim receives a support verdict: `supported`, `weak`, `stale`, `unbound`, or `contradicted`. The checker compares claim URL, title, statement, source record, record hash, and freshness. If claims are missing, stale, weak, malformed, or not bound to observations, clearing moves to `requires_review`, settlement action becomes `manual_review`, and Sui anchoring is blocked even if a Walrus blob exists.
 
 ## Run
 

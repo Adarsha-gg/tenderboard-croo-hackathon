@@ -150,6 +150,13 @@ describe('trust proof model', () => {
     expect(finalized.requiredChecks.find((check) => check.id === 'public_sources')).toMatchObject({
       status: 'passed',
     });
+    expect(finalized.claimResults).toHaveLength(1);
+    expect(finalized.claimResults?.[0]).toMatchObject({
+      verdict: 'supported',
+      supportScore: expect.any(Number),
+      sourceUrl: 'https://example.com/sui-grant',
+    });
+    expect(finalized.claimResults?.[0]?.supportScore).toBeGreaterThanOrEqual(70);
     expect(finalized.requiredChecks.find((check) => check.id === 'walrus_evidence')).toMatchObject({
       status: 'passed',
     });
@@ -191,12 +198,64 @@ describe('trust proof model', () => {
     const finalized = finalizeVerificationManifest(receipt, receipt.deliveryText);
     const clearing = buildClearingObjects({ ...receipt, verificationManifest: finalized });
 
+    expect(finalized.claimResults?.[0]).toMatchObject({
+      verdict: 'unbound',
+      supportScore: 0,
+    });
     expect(finalized.requiredChecks.find((check) => check.id === 'public_sources')).toMatchObject({
       status: 'requires_review',
-      detail: '1 claim(s) are not bound to a source observation.',
+      detail: '1 claim(s) failed claim support verification.',
     });
     expect(finalized.summary?.settlementEligible).toBe(false);
     expect(clearing.clearingDecision.verdict).toBe('requires_review');
+  });
+
+  it('requires source claims to be fresh enough for automatic clearing', () => {
+    const receipt = {
+      ...sampleReceipt(),
+      verificationManifest: researchManifest(),
+      walrusBlobId: 'walrus_dev_blob_run_trust',
+      deliveryText: 'Opportunity Scout Report with stale source claims',
+      workerEvidence: validWorkerEvidence({
+        publishedAt: '2024-01-01T00:00:00.000Z',
+      }),
+    };
+    const finalized = finalizeVerificationManifest(receipt, receipt.deliveryText);
+    const clearing = buildClearingObjects({ ...receipt, verificationManifest: finalized });
+
+    expect(finalized.claimResults?.[0]).toMatchObject({
+      verdict: 'stale',
+    });
+    expect(finalized.requiredChecks.find((check) => check.id === 'public_sources')).toMatchObject({
+      status: 'requires_review',
+    });
+    expect(finalized.summary?.admissibility).toBe('insufficient');
+    expect(clearing.clearingDecision.verdict).toBe('requires_review');
+  });
+
+  it('marks claims weak when the source title and URL do not support the claim', () => {
+    const evidence = validWorkerEvidence();
+    evidence.claims = [
+      {
+        claimId: 'claim_weak',
+        resultIndex: 0,
+        title: 'Completely different unrelated topic',
+        url: 'https://example.com/other',
+        sourceObservationId: 'obs_1',
+        statement: 'This unsupported claim says something absent from the source.',
+      },
+    ];
+    const receipt = {
+      ...sampleReceipt(),
+      verificationManifest: researchManifest(),
+      walrusBlobId: 'walrus_dev_blob_run_trust',
+      deliveryText: 'Opportunity Scout Report with weak source claims',
+      workerEvidence: evidence,
+    };
+    const finalized = finalizeVerificationManifest(receipt, receipt.deliveryText);
+
+    expect(finalized.claimResults?.[0]?.verdict).toMatch(/weak|contradicted/);
+    expect(finalized.summary?.settlementEligible).toBe(false);
   });
 });
 
@@ -217,7 +276,7 @@ function researchManifest(): VerificationManifest {
   }).verificationManifest;
 }
 
-function validWorkerEvidence(): ScoutEvidence {
+function validWorkerEvidence(overrides: { publishedAt?: string } = {}): ScoutEvidence {
   return {
     schema: 'tenderboard.scout_evidence.v1',
     generatedAt: '2026-06-19T18:00:00.000Z',
@@ -238,7 +297,7 @@ function validWorkerEvidence(): ScoutEvidence {
           title: 'Sui grant opportunity',
           url: 'https://example.com/sui-grant',
           score: 100,
-          publishedAt: '2026-06-18T18:00:00.000Z',
+          publishedAt: overrides.publishedAt ?? '2026-06-18T18:00:00.000Z',
           recordHash: 'sha256:record',
           record: { title: 'Sui grant opportunity' },
         },

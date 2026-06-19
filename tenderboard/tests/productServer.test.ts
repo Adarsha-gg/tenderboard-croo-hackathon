@@ -487,6 +487,8 @@ describe('SuiProof Market product server', () => {
       expect(delivered.workerEvidence.claims.length).toBeGreaterThan(0);
       const observationIds = new Set(delivered.workerEvidence.sourceReceipt.observations.map((observation: any) => observation.observationId));
       expect(delivered.workerEvidence.claims.every((claim: any) => observationIds.has(claim.sourceObservationId))).toBe(true);
+      expect(delivered.verificationManifest.claimResults.length).toBe(delivered.workerEvidence.claims.length);
+      expect(delivered.verificationManifest.claimResults.every((result: any) => result.verdict === 'supported')).toBe(true);
       expect(JSON.stringify(delivered)).not.toContain('private strategy note');
       expect(delivered.evidenceEnvelope).toMatchObject({
         deliveryPresent: true,
