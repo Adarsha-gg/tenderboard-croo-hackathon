@@ -190,14 +190,14 @@ async function verifySuiRpcSettlement(input: {
   if (!hasSuccessfulEffects(result)) {
     throw new SuiX402FacilitatorError(402, 'Sui transaction did not finish successfully.');
   }
-  if (!hasMatchingReceiverBalanceChange(result, input.payload)) {
-    throw new SuiX402FacilitatorError(402, 'Sui transaction does not pay the expected amount to the expected receiver.');
-  }
   if (!hasMatchingPaymentIntentMarker(result, input.payload, input.receipt, input.config)) {
     throw new SuiX402FacilitatorError(
       402,
       'Sui transaction is missing the expected PaymentIntentRecorded nonce marker.',
     );
+  }
+  if (!hasMatchingReceiverBalanceChange(result, input.payload) && !isSelfPaymentTransaction(result, input.payload)) {
+    throw new SuiX402FacilitatorError(402, 'Sui transaction does not pay the expected amount to the expected receiver.');
   }
 }
 
@@ -215,8 +215,18 @@ function hasMatchingReceiverBalanceChange(result: Record<string, unknown>, paylo
     const ownerAddress = owner ? stringOptional(owner.AddressOwner) : undefined;
     const coinType = stringOptional(change.coinType);
     const amount = stringOptional(change.amount);
-    return ownerAddress === payload.receiverAddress && coinType === payload.coinType && amount === payload.amountMist;
+    return sameAddress(ownerAddress, payload.receiverAddress) && coinType === payload.coinType && amount === payload.amountMist;
   });
+}
+
+function isSelfPaymentTransaction(result: Record<string, unknown>, payload: X402SuiPaymentPayload): boolean {
+  return sameAddress(transactionSender(result), payload.receiverAddress);
+}
+
+function transactionSender(result: Record<string, unknown>): string | undefined {
+  const transaction = recordOptional(result.transaction);
+  const data = recordOptional(transaction?.data);
+  return stringOptional(data?.sender);
 }
 
 function hasMatchingPaymentIntentMarker(

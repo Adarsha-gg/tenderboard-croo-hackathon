@@ -447,6 +447,82 @@ describe('Receipter product server', () => {
     }
   });
 
+  it('verifies same-wallet Sui x402 demo payments through the nonce-bound event marker', async () => {
+    let currentPaymentMarker: Record<string, string> = {};
+    const { baseUrl, close } = await startTestServer(
+      {
+        RECEIPTER_MODE: 'sui',
+        RECEIPTER_RECEIPTS_DIR: tempDir,
+        SUI_NETWORK: 'testnet',
+        SUI_RPC_URL: 'https://sui-rpc.test',
+        SUI_OPERATOR_ADDRESS: '0xoperator',
+        SUI_PACKAGE_ID: '0xpackage',
+        SUI_RECEIPT_REGISTRY_ID: '0xregistry',
+        WALRUS_PUBLISHER_URL: 'https://publisher.walrus.testnet.example',
+        WALRUS_AGGREGATOR_URL: 'https://aggregator.walrus.testnet.example',
+      },
+      {
+        suiRpcFetch: async (input, init) => {
+          const request = JSON.parse(String(init?.body));
+          return new Response(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: request.id,
+              result: {
+                digest: request.params[0],
+                transaction: { data: { sender: '0xoperator' } },
+                effects: { status: { status: 'success' } },
+                balanceChanges: [
+                  {
+                    owner: { AddressOwner: '0xoperator' },
+                    coinType: '0x2::sui::SUI',
+                    amount: '-1000000',
+                  },
+                ],
+                events: [
+                  {
+                    type: '0xpackage::receipts::PaymentIntentRecorded',
+                    parsedJson: currentPaymentMarker,
+                  },
+                ],
+              },
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        },
+      },
+    );
+
+    try {
+      const created = await postJson(`${baseUrl}/api/runs`, {
+        title: 'Verify same-wallet Sui RPC payment',
+        instructions: 'Use public sources only.',
+        maxPayment: { amount: '0.050', currency: 'SUI' },
+      });
+      const receipt = await (await fetch(`${baseUrl}/api/runs/${created.runId}`)).json();
+      currentPaymentMarker = {
+        run_id: receipt.runId,
+        resource: `/api/runs/${receipt.runId}/worker-task`,
+        payment_intent_id: receipt.paymentIntentPlan.intentId,
+        payment_nonce: receipt.paymentIntentPlan.paymentNonce,
+        settlement_nonce: receipt.paymentIntentPlan.settlementNonce,
+        amount_mist: receipt.paymentIntentPlan.amountMist,
+        receiver: receipt.paymentIntentPlan.receiverAddress,
+        worker_agent_id: receipt.workerAgentId,
+      };
+
+      const verified = await postJson(`${baseUrl}/api/x402/verify`, buildX402Payload(receipt, { transaction: '0xsame_wallet_payment_digest' }));
+
+      expect(verified.verification).toMatchObject({
+        ok: true,
+        transaction: '0xsame_wallet_payment_digest',
+      });
+      expect(verified.receipt.status).toBe('working');
+    } finally {
+      await close();
+    }
+  });
+
   it('verifies real Sui receipt anchors through a signed anchor payload', async () => {
     let currentPaymentMarker: Record<string, string> = {};
     let currentAnchorMarker: Record<string, string> = {};
