@@ -4,9 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { loadTenderBoardConfig } from '../src/live/config.js';
+import type { MemoryStore } from '../src/live/memoryStore.js';
 import { RunStore } from '../src/live/runStore.js';
 import { makeSuiDevDigest } from '../src/live/suiRuntime.js';
-import type { LiveRunReceipt, X402SuiPaymentPayload } from '../src/live/types.js';
+import { stableHash } from '../src/live/hash.js';
+import type { LiveRunReceipt, ScoutEvidence, X402SuiPaymentPayload } from '../src/live/types.js';
 import { createTenderBoardServer } from '../src/server/httpServer.js';
 import { fakeScoutFetch } from './helpers/fakeScoutFetch.js';
 
@@ -349,6 +351,32 @@ describe('WalrusProof product server', () => {
         maxPayment: { amount: '0.050', currency: 'SUI' },
       });
       const receipt = await (await fetch(`${baseUrl}/api/runs/${created.runId}`)).json();
+      const signingRequest = await (await fetch(`${baseUrl}/api/runs/${created.runId}/payment-transaction`)).json();
+      expect(signingRequest).toMatchObject({
+        objectType: 'walrusproof.payment_signing_request.v1',
+        runId: created.runId,
+        verifyEndpoint: '/api/x402/verify',
+        walletTransactionRequest: {
+          objectType: 'walrusproof.sui_wallet_transaction_request.v1',
+          kind: 'x402_payment',
+          walletStandard: 'sui:signAndExecuteTransaction',
+        },
+        paymentPayloadTemplate: {
+          objectType: 'suiproof.x402_sui_payment_payload.v1',
+          transaction: '<SIGNED_SUI_TRANSACTION_DIGEST>',
+          runId: created.runId,
+        },
+      });
+
+      const rawDigestResponse = await fetch(`${baseUrl}/api/runs/${created.runId}/approve-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suiPaymentDigest: '0xunverified_digest' }),
+      });
+      const rawDigestBody = await rawDigestResponse.json();
+      expect(rawDigestResponse.status).toBe(400);
+      expect(rawDigestBody.error).toContain('no longer accepts raw suiPaymentDigest');
+
       currentPaymentMarker = {
         run_id: receipt.runId,
         resource: `/api/runs/${receipt.runId}/worker-task`,
@@ -378,6 +406,161 @@ describe('WalrusProof product server', () => {
       expect(rpcCalls[0]!.input).toBe('https://sui-rpc.test');
       expect(String(rpcCalls[0]!.init?.body)).toContain('sui_getTransactionBlock');
       expect(String(rpcCalls[0]!.init?.body)).toContain('0xsui_payment_digest');
+    } finally {
+      await close();
+    }
+  });
+
+  it('verifies real Sui receipt anchors through a signed anchor payload', async () => {
+    let currentPaymentMarker: Record<string, string> = {};
+    let currentAnchorMarker: Record<string, string> = {};
+    let currentReputationMarker: Record<string, string> = {};
+    const rpcCalls: Array<{ input: RequestInfo | URL; init: RequestInit | undefined }> = [];
+    const { baseUrl, close } = await startTestServer(
+      {
+        TENDERBOARD_MODE: 'sui',
+        TENDERBOARD_RECEIPTS_DIR: tempDir,
+        SUI_NETWORK: 'testnet',
+        SUI_RPC_URL: 'https://sui-rpc.test',
+        SUI_OPERATOR_ADDRESS: '0xoperator',
+        SUI_PACKAGE_ID: '0xpackage',
+        SUI_RECEIPT_REGISTRY_ID: '0xregistry',
+        WALRUS_PUBLISHER_URL: 'https://publisher.walrus.testnet.example',
+        WALRUS_AGGREGATOR_URL: 'https://aggregator.walrus.testnet.example',
+      },
+      {
+        suiRpcFetch: async (input, init) => {
+          rpcCalls.push({ input, init });
+          const request = JSON.parse(String(init?.body));
+          return new Response(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: request.id,
+              result: {
+                digest: request.params[0],
+                effects: { status: { status: 'success' } },
+                balanceChanges: [
+                  {
+                    owner: { AddressOwner: '0xoperator' },
+                    coinType: '0x2::sui::SUI',
+                    amount: '35000000',
+                  },
+                ],
+                events:
+                  request.params[0] === '0xpayment_digest'
+                    ? [
+                        {
+                          type: '0xpackage::receipts::PaymentIntentRecorded',
+                          parsedJson: currentPaymentMarker,
+                        },
+                      ]
+                    : [
+                        {
+                          type: '0xpackage::receipts::ReceiptAnchored',
+                          parsedJson: currentAnchorMarker,
+                        },
+                        {
+                          type: '0xpackage::receipts::WorkerReputationUpdated',
+                          parsedJson: currentReputationMarker,
+                        },
+                      ],
+              },
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        },
+        memoryStore: {
+          backend: 'walrus' as const,
+          async putEvidenceBundle(receipt) {
+            return {
+              blobId: `test_blob_${receipt.runId}`,
+              blobObjectId: '0xwalrusblob',
+              certifiedEpoch: 1,
+              endEpoch: 53,
+              readUrl: `https://aggregator.walrus.testnet.example/v1/blobs/test_blob_${receipt.runId}`,
+            };
+          },
+        },
+      },
+    );
+
+    try {
+      const created = await postJson(`${baseUrl}/api/runs`, {
+        title: 'Anchor through wallet payload',
+        instructions: 'Use public sources only.',
+        maxPayment: { amount: '0.050', currency: 'SUI' },
+      });
+      const receipt = await (await fetch(`${baseUrl}/api/runs/${created.runId}`)).json();
+      currentPaymentMarker = {
+        run_id: receipt.runId,
+        resource: `/api/runs/${receipt.runId}/worker-task`,
+        payment_intent_id: receipt.paymentIntentPlan.intentId,
+        payment_nonce: receipt.paymentIntentPlan.paymentNonce,
+        settlement_nonce: receipt.paymentIntentPlan.settlementNonce,
+        amount_mist: receipt.paymentIntentPlan.amountMist,
+        receiver: receipt.paymentIntentPlan.receiverAddress,
+        worker_agent_id: receipt.workerAgentId,
+      };
+      const paid = await postJson(`${baseUrl}/api/x402/verify`, buildX402Payload(receipt, { transaction: '0xpayment_digest' }));
+      const delivered = await postJson(`${baseUrl}/api/runs/${created.runId}/worker-delivery`, {
+        objectType: 'walrusproof.external_worker_delivery.v1',
+        version: 1,
+        runId: created.runId,
+        workerAgentId: paid.receipt.workerAgentId,
+        deliveryText: 'Supported claim: WalrusProof can anchor signed receipt payloads.',
+        sourceEvidence: buildSourceEvidence(created.runId),
+      });
+      const stored = await postJson(`${baseUrl}/api/runs/${created.runId}/store-evidence`, {});
+      const signingRequest = await (await fetch(`${baseUrl}/api/runs/${created.runId}/anchor-transaction`)).json();
+      expect(signingRequest).toMatchObject({
+        objectType: 'walrusproof.anchor_signing_request.v1',
+        runId: created.runId,
+        verifyEndpoint: `/api/runs/${created.runId}/anchor-receipt`,
+        walletTransactionRequest: {
+          objectType: 'walrusproof.sui_wallet_transaction_request.v1',
+          kind: 'receipt_anchor',
+        },
+        anchorPayloadTemplate: {
+          objectType: 'walrusproof.sui_receipt_anchor_payload.v1',
+          transaction: '<SIGNED_SUI_TRANSACTION_DIGEST>',
+          runId: created.runId,
+          walrusBlobId: stored.walrusBlobId,
+        },
+      });
+
+      const rawDigestResponse = await fetch(`${baseUrl}/api/runs/${created.runId}/anchor-receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suiAnchorDigest: '0xunverified_anchor' }),
+      });
+      const rawDigestBody = await rawDigestResponse.json();
+      expect(rawDigestResponse.status).toBe(400);
+      expect(rawDigestBody.error).toContain('no longer accepts raw suiAnchorDigest');
+
+      const anchorPayload = {
+        ...signingRequest.anchorPayloadTemplate,
+        transaction: '0xanchor_digest',
+      };
+      currentAnchorMarker = {
+        run_id: created.runId,
+        payment_reference: '0xpayment_digest',
+        walrus_blob_id: stored.walrusBlobId,
+        duplicate_prevention_key: stored.receiptPlan.duplicatePreventionKey,
+      };
+      currentReputationMarker = {
+        worker_agent_id: stored.workerAgentId,
+        last_run_id: created.runId,
+        last_walrus_blob_id: stored.walrusBlobId,
+      };
+
+      const anchored = await postJson(`${baseUrl}/api/runs/${created.runId}/anchor-receipt`, { anchorPayload });
+
+      expect(delivered.status).toBe('delivered');
+      expect(anchored.status).toBe('anchored');
+      expect(anchored.suiAnchorDigest).toBe('0xanchor_digest');
+      expect(anchored.receiptPlan.anchorDigest).toBe('0xanchor_digest');
+      expect(JSON.stringify(anchored.events)).toContain('walrusproof.sui_anchor_verification.v1');
+      expect(rpcCalls.some((call) => String(call.init?.body).includes('0xanchor_digest'))).toBe(true);
     } finally {
       await close();
     }
@@ -840,16 +1023,49 @@ describe('WalrusProof product server', () => {
   });
 
   it('keeps the built-in Opportunity Scout delivery as a sui-dev demo fallback only', async () => {
-    const { baseUrl, close } = await startTestServer({
-      TENDERBOARD_MODE: 'sui',
-      TENDERBOARD_RECEIPTS_DIR: tempDir,
-      SUI_NETWORK: 'testnet',
-      SUI_OPERATOR_ADDRESS: '0xoperator',
-      SUI_PACKAGE_ID: '0xpackage',
-      SUI_RECEIPT_REGISTRY_ID: '0xregistry',
-      WALRUS_PUBLISHER_URL: 'https://publisher.walrus.testnet.example',
-      WALRUS_AGGREGATOR_URL: 'https://aggregator.walrus.testnet.example',
-    });
+    let currentPaymentMarker: Record<string, string> = {};
+    const { baseUrl, close } = await startTestServer(
+      {
+        TENDERBOARD_MODE: 'sui',
+        TENDERBOARD_RECEIPTS_DIR: tempDir,
+        SUI_NETWORK: 'testnet',
+        SUI_RPC_URL: 'https://sui-rpc.test',
+        SUI_OPERATOR_ADDRESS: '0xoperator',
+        SUI_PACKAGE_ID: '0xpackage',
+        SUI_RECEIPT_REGISTRY_ID: '0xregistry',
+        WALRUS_PUBLISHER_URL: 'https://publisher.walrus.testnet.example',
+        WALRUS_AGGREGATOR_URL: 'https://aggregator.walrus.testnet.example',
+      },
+      {
+        suiRpcFetch: async (input, init) => {
+          const request = JSON.parse(String(init?.body));
+          return new Response(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: request.id,
+              result: {
+                digest: request.params[0],
+                effects: { status: { status: 'success' } },
+                balanceChanges: [
+                  {
+                    owner: { AddressOwner: '0xoperator' },
+                    coinType: '0x2::sui::SUI',
+                    amount: '35000000',
+                  },
+                ],
+                events: [
+                  {
+                    type: '0xpackage::receipts::PaymentIntentRecorded',
+                    parsedJson: currentPaymentMarker,
+                  },
+                ],
+              },
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        },
+      },
+    );
 
     try {
       const created = await postJson(`${baseUrl}/api/runs`, {
@@ -857,7 +1073,18 @@ describe('WalrusProof product server', () => {
         instructions: 'Make it useful.',
         maxPayment: { amount: '0.050', currency: 'SUI' },
       });
-      await postJson(`${baseUrl}/api/runs/${created.runId}/approve-payment`, { suiPaymentDigest: '0xpayment_digest' });
+      const receipt = await (await fetch(`${baseUrl}/api/runs/${created.runId}`)).json();
+      currentPaymentMarker = {
+        run_id: receipt.runId,
+        resource: `/api/runs/${receipt.runId}/worker-task`,
+        payment_intent_id: receipt.paymentIntentPlan.intentId,
+        payment_nonce: receipt.paymentIntentPlan.paymentNonce,
+        settlement_nonce: receipt.paymentIntentPlan.settlementNonce,
+        amount_mist: receipt.paymentIntentPlan.amountMist,
+        receiver: receipt.paymentIntentPlan.receiverAddress,
+        worker_agent_id: receipt.workerAgentId,
+      };
+      await postJson(`${baseUrl}/api/x402/verify`, buildX402Payload(receipt, { transaction: '0xpayment_digest' }));
 
       const response = await fetch(`${baseUrl}/api/runs/${created.runId}/worker-delivery`, {
         method: 'POST',
@@ -873,7 +1100,7 @@ describe('WalrusProof product server', () => {
     }
   });
 
-  it('requires a payment digest before approval in Sui mode', async () => {
+  it('requires a signed x402 payload before approval in Sui mode', async () => {
     const { baseUrl, close } = await startTestServer({
       TENDERBOARD_MODE: 'sui',
       TENDERBOARD_RECEIPTS_DIR: tempDir,
@@ -900,7 +1127,7 @@ describe('WalrusProof product server', () => {
       const body = await response.json();
 
       expect(response.status).toBe(400);
-      expect(body.error).toContain('Sui mode requires suiPaymentDigest');
+      expect(body.error).toContain('requires a signed x402 payload');
     } finally {
       await close();
     }
@@ -938,7 +1165,7 @@ describe('WalrusProof product server', () => {
 
 async function startTestServer(
   env: NodeJS.ProcessEnv,
-  options: { suiRpcFetch?: typeof fetch } = {},
+  options: { suiRpcFetch?: typeof fetch; memoryStore?: MemoryStore } = {},
 ): Promise<{ baseUrl: string; close: () => Promise<void> }> {
   const config = loadTenderBoardConfig(env);
   const store = new RunStore(config.receiptsDir);
@@ -947,6 +1174,7 @@ async function startTestServer(
     store,
     scoutFetch: fakeScoutFetch as typeof fetch,
     ...(options.suiRpcFetch ? { suiRpcFetch: options.suiRpcFetch } : {}),
+    ...(options.memoryStore ? { memoryStore: options.memoryStore } : {}),
   });
   await new Promise<void>((resolve) => server.listen(0, resolve));
   const address = server.address() as AddressInfo;
@@ -974,6 +1202,56 @@ function buildX402Payload(receipt: LiveRunReceipt, overrides: Partial<X402SuiPay
     coinType: receipt.paymentIntentPlan.coinType,
     workerAgentId: receipt.workerAgentId,
     ...overrides,
+  };
+}
+
+function buildSourceEvidence(runId: string): ScoutEvidence {
+  const record = { title: 'WalrusProof signed receipt payloads', runId };
+  const observation = {
+    observationId: 'obs_signed_anchor',
+    source: 'github' as const,
+    sourceLabel: 'GitHub',
+    endpoint: 'https://api.github.com/repos/Adarsha-gg/tenderboard-croo-hackathon',
+    query: 'WalrusProof signed receipt payload',
+    observedAt: '2026-06-20T12:00:00.000Z',
+    title: 'WalrusProof signed receipt payloads',
+    url: 'https://example.com/walrusproof-anchor',
+    score: 100,
+    publishedAt: '2026-06-20T11:00:00.000Z',
+    recordHash: stableHash(record),
+    record,
+  };
+  const sourceReceiptBody = {
+    schema: 'tenderboard.source_receipt.v1' as const,
+    generatedAt: '2026-06-20T12:00:00.000Z',
+    query: 'WalrusProof signed receipt payload',
+    observations: [observation],
+    warnings: [],
+  };
+  const sourceReceipt = {
+    ...sourceReceiptBody,
+    receiptId: `source_receipt_${runId}`,
+    receiptHash: stableHash(sourceReceiptBody),
+  };
+  const body = {
+    schema: 'tenderboard.scout_evidence.v1' as const,
+    generatedAt: '2026-06-20T12:00:00.000Z',
+    query: 'WalrusProof signed receipt payload',
+    sourceReceipt,
+    claims: [
+      {
+        claimId: 'claim_signed_anchor',
+        resultIndex: 0,
+        title: 'WalrusProof signed receipt payloads',
+        url: 'https://example.com/walrusproof-anchor',
+        sourceObservationId: 'obs_signed_anchor',
+        statement: 'WalrusProof signed receipt payloads are supported by source observation obs_signed_anchor.',
+      },
+    ],
+  };
+  return {
+    ...body,
+    evidenceHash: stableHash(body),
   };
 }
 
