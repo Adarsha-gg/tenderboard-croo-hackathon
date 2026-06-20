@@ -1,16 +1,16 @@
-# WalrusProof
+# Receipter
 
-WalrusProof is a Walrus-native reputation layer for AI agent work.
+Receipter is a Walrus-native reputation layer for AI agent work.
 
 It turns every paid agent job into a verifiable proof-of-work memory: sanitized task packet, worker bid, SUI payment intent, source-checked evidence, Walrus evidence blob, Sui receipt anchor, and an owner-held Sui `AgentPassport` object that points to the agent's portable Walrus memory.
 
 ## What It Does
 
 1. A buyer writes a paid task, private notes, acceptance criteria, and a checker pack.
-2. WalrusProof removes private/secret-looking content before anything reaches the worker.
-3. WalrusProof creates a trust decision: score, tier, verdict, reasons, controls, and risk multiplier.
-4. WalrusProof creates a verification manifest with spec hash, checker pack, acceptance criteria, required checks, settlement rule, and reputation write-back note.
-5. WalrusProof creates a Sui-shaped work order and requires explicit payment approval.
+2. Receipter removes private/secret-looking content before anything reaches the worker.
+3. Receipter creates a trust decision: score, tier, verdict, reasons, controls, and risk multiplier.
+4. Receipter creates a verification manifest with spec hash, checker pack, acceptance criteria, required checks, settlement rule, and reputation write-back note.
+5. Receipter creates a Sui-shaped work order and requires explicit payment approval.
 6. The worker delivers evidence.
 7. The full receipt/evidence payload is stored as a Walrus evidence bundle.
 8. The compact proof pointer is anchored to the Sui receipt registry.
@@ -63,7 +63,7 @@ The longer-term product is portable agent reputation: safe task intake, privacy 
 
 ## Product Direction
 
-WalrusProof should not become a generic marketplace or payment wrapper. The defensible lane is governed sourcing for agent work:
+Receipter should not become a generic marketplace or payment wrapper. The defensible lane is governed sourcing for agent work:
 
 - publish only the safe worker-facing scope
 - compare worker routes or bids by price, SLA, requested data, and risk
@@ -74,19 +74,19 @@ WalrusProof should not become a generic marketplace or payment wrapper. The defe
 ## Repository Layout
 
 ```text
-tenderboard/                                      main TypeScript app
-tenderboard/sui                                  Sui Move passport + receipt + reputation stake package
-specs/2026-06-19-sui-overflow-tenderboard         Sui Overflow product spec
+receipter/                                      main TypeScript app
+receipter/sui                                  Sui Move passport + receipt + reputation stake package
+specs/2026-06-19-sui-overflow-receipter         Sui Overflow product spec
 SUBMISSION.md                                     submission copy
 SUBMISSION_PACKAGE.md                             copy/paste submission fields
 DEMO_VIDEO_SCRIPT.md                              demo script
-assets/walrusproof-logo.png                       1:1 project logo
+assets/receipter-logo.png                       1:1 project logo
 ```
 
 ## Run Locally
 
 ```bash
-cd tenderboard
+cd receipter
 npm install
 npm start
 ```
@@ -97,7 +97,7 @@ Open:
 http://127.0.0.1:4174
 ```
 
-For the live hackathon demo, run the app from `tenderboard` with `TENDERBOARD_MODE=sui` and real Sui/Walrus testnet env vars, then open:
+For the live hackathon demo, run the app from `receipter` with `RECEIPTER_MODE=sui` and real Sui/Walrus testnet env vars, then open:
 
 ```text
 http://127.0.0.1:4174?live=1
@@ -110,7 +110,7 @@ Hosted deployment notes are in [DEPLOYMENT.md](DEPLOYMENT.md).
 ## Run Checks
 
 ```bash
-cd tenderboard
+cd receipter
 npm test
 npm run typecheck
 npm run proof:latest
@@ -122,7 +122,7 @@ npm run smoke:stake-live
 ## Deterministic Seed Data
 
 ```bash
-cd tenderboard
+cd receipter
 npm run seed:memory
 ```
 
@@ -138,7 +138,7 @@ Current testnet deployment:
 - Sui AgentPassport: `0x8a136d56df3a6d616498524f537074133d1cb63d24ac556f3a6aa81cd6fbb06e`
 - upgrade cap: `0xc50924def84e7bcadb6aaaea58f887017903102ace49363f82b9e18bad698b7d`
 
-To run live mode locally, set `SUI_OPERATOR_ADDRESS`, `SUI_PACKAGE_ID`, `SUI_RECEIPT_REGISTRY_ID`, `SUI_STAKE_ORACLE_REGISTRY_ID`, `SUI_RPC_URL`, `WALRUS_PUBLISHER_URL`, and `WALRUS_AGGREGATOR_URL`. Set `TENDERBOARD_WORKER_AGENT_PASSPORT_OBJECT_ID` when the selected worker has a minted Sui `AgentPassport`. `SUI_CLI_PATH` and `SUI_CLIENT_CONFIG` are optional explicit test fallbacks, not the production path.
+To run live mode locally, set `SUI_OPERATOR_ADDRESS`, `SUI_PACKAGE_ID`, `SUI_RECEIPT_REGISTRY_ID`, `SUI_STAKE_ORACLE_REGISTRY_ID`, `SUI_RPC_URL`, `WALRUS_PUBLISHER_URL`, and `WALRUS_AGGREGATOR_URL`. Set `RECEIPTER_WORKER_AGENT_PASSPORT_OBJECT_ID` when the selected worker has a minted Sui `AgentPassport`. `SUI_CLI_PATH` and `SUI_CLIENT_CONFIG` are optional explicit test fallbacks, not the production path.
 
 CLI/dev-only today: explicit backend Sui CLI fallback for payment and receipt anchoring; the built-in worker delivery helper; `sui-dev` deterministic local smoke mode; and credentialed MemWal smoke unless MemWal credentials are configured. Live payment, receipt anchoring, AgentPassport memory updates, and stake/challenge/slash flows now use signer-ready wallet transaction requests plus Sui JSON-RPC verification. x402 payment replay protection is persisted in `x402-replay-ledger.json` under the receipts directory.
 
@@ -157,15 +157,15 @@ MEMORY_BACKEND=memwal
 MEMWAL_DELEGATE_KEY=...
 MEMWAL_ACCOUNT_ID=...
 MEMWAL_SERVER_URL=...
-MEMWAL_NAMESPACE=walrusproof
+MEMWAL_NAMESPACE=receipter
 ```
 
-In MemWal mode, WalrusProof still stores the full evidence bundle on raw Walrus, then writes a distilled searchable reputation fact to MemWal.
+In MemWal mode, Receipter still stores the full evidence bundle on raw Walrus, then writes a distilled searchable reputation fact to MemWal.
 
 Live MemWal smoke:
 
 ```bash
-cd tenderboard
+cd receipter
 MEMORY_BACKEND=memwal npm run smoke:memwal-live
 ```
 

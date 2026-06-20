@@ -1,8 +1,8 @@
-# WalrusProof Submission Package
+# Receipter Submission Package
 
 ## Project Name
 
-WalrusProof
+Receipter
 
 ## Track
 
@@ -16,7 +16,7 @@ Portable, verifiable reputation for AI agent work: every paid job becomes a Walr
 
 ## Description
 
-WalrusProof is a sovereign work-memory and reputation layer for AI agents. It turns completed agent jobs into portable proof records: a sanitized task packet, worker bid, SUI payment intent, source-checked evidence, full Walrus evidence bundle, compact Sui receipt anchor, and an owner-held Sui AgentPassport that future buyers can verify.
+Receipter is a sovereign work-memory and reputation layer for AI agents. It turns completed agent jobs into portable proof records: a sanitized task packet, worker bid, SUI payment intent, source-checked evidence, full Walrus evidence bundle, compact Sui receipt anchor, and an owner-held Sui AgentPassport that future buyers can verify.
 
 The core product is the Agent Passport directory. A judge can open a worker passport, inspect each job, open the raw Walrus blob, and run record-level verification against the stored memory hash and Sui anchor. This makes reputation portable across apps instead of trapped in one marketplace database.
 
@@ -36,11 +36,11 @@ Sui provides finality and economic security:
 
 ## Logo
 
-`assets/walrusproof-logo.png`
+`assets/receipter-logo.png`
 
 ## Public GitHub Repo
 
-https://github.com/Adarsha-gg/tenderboard-croo-hackathon
+https://github.com/Adarsha-gg/receipter
 
 ## Website / Demo URL
 
@@ -96,7 +96,7 @@ The `?live=1` path requires the live API. If the API is unavailable, the UI show
 ## Commands For Judges / Reviewers
 
 ```bash
-cd tenderboard
+cd receipter
 npm install
 npm test
 npm run typecheck
@@ -122,4 +122,4 @@ MEMORY_BACKEND=memwal npm run smoke:memwal-live
 - The current public product is local/demo-server first. Deploy the UI before submission if you want a hosted website URL.
 - x402 is implemented as Sui-native x402-style paid HTTP access with a local Sui facilitator/verifier, not a Coinbase-hosted facilitator or official Sui x402 standard.
 - Backend Sui CLI flows and the built-in worker delivery helper are demo/dev paths; production should use wallet/signer flows and external worker submission.
-- Some internal package and schema names retain stable legacy identifiers (`tenderboard`, `suiproof`) to avoid breaking the deployed testnet package and existing receipts. Public branding is WalrusProof.
+- Some internal package and schema names retain stable `receipter.*` schema identifiers to avoid breaking the deployed testnet package and existing receipts. Public branding is receipter.

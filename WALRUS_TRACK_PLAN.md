@@ -1,6 +1,6 @@
-# WalrusProof — Walrus Track Build Plan
+# Receipter — Walrus Track Build Plan
 
-> Single source of truth for shipping WalrusProof into a Walrus-track winner.
+> Single source of truth for shipping Receipter into a Walrus-track winner.
 > Target: **Walrus track — "Walrus as a Verifiable Data Platform for AI."**
 > Status date: 2026-06-19.
 
@@ -8,7 +8,7 @@
 
 ## 0. North star (read this first)
 
-**WalrusProof is verifiable agent *work* memory.** An AI agent does a paid job; the
+**Receipter is verifiable agent *work* memory.** An AI agent does a paid job; the
 system checks the evidence; Walrus stores the full memory artifact; Sui anchors the
 compact proof; the next buyer routes work using that prior, independently-verifiable
 memory.
@@ -89,7 +89,7 @@ MemoryStore (interface)
 
 Refactor required: today `httpServer.ts` calls `storeEvidenceOnWalrus` directly. Introduce
 `MemoryStore` and inject it (mirrors the existing `scoutFetch`/`suiRpcFetch` injection
-pattern in `TenderBoardServerOptions`).
+pattern in `ReceipterServerOptions`).
 
 ---
 
@@ -100,7 +100,7 @@ pattern in `TenderBoardServerOptions`).
 - Full live proof exists for payment, Walrus readback, Sui receipt anchor, passport update, and stake/slash smoke. `npm run seed:memory` remains deterministic local/dev acceptance data.
 - Multi-worker sourcing: `preferredBidId` award + 5 bid templates (3 publicly selectable).
 - Verification gate genuinely refuses to anchor weak evidence (`requires_review`).
-- Sui Move package `tenderboard::receipts` (source-level): `anchor_receipt`,
+- Sui Move package `receipter::receipts` (source-level): `anchor_receipt`,
   `ReceiptAnchored`, `WorkerReputationUpdated`.
 - 36/36 tests pass; typecheck clean.
 
@@ -111,7 +111,7 @@ pattern in `TenderBoardServerOptions`).
 - **Inspector UI is built.** The front end now has an Agent Passport directory, per-record
   Walrus links, and record-level verify actions.
 - **Identity is now aligned in public submission docs.** Some internal package/module/schema names
-  keep legacy `tenderboard` / `suiproof` prefixes as stable protocol identifiers.
+  keep current `receipter.*` schema prefix as stable protocol identifiers.
 - **Stake/slash registry governance remains a future governance task.** The backend executor is
   oracle-gated, Move consumes an oracle-issued `ChallengeDecision`, and live mode now has
   `SUI_STAKE_ORACLE_REGISTRY_ID`; production governance should rotate/administer that registry.
@@ -121,7 +121,7 @@ pattern in `TenderBoardServerOptions`).
 ## 5. Target architecture
 
 ```
-WalrusProof
+Receipter
 ├── Memory layer (NEW interface)
 │   ├── MemoryStore (interface)
 │   ├── WalrusMemoryStore   (raw Walrus HTTP)
@@ -144,16 +144,16 @@ WalrusProof
 
 ## 6. Data model (already implemented — keep stable)
 
-- `tenderboard.scout_evidence.v1` — `{ query, sourceReceipt, claims[], evidenceHash }`.
-- `suiproof.agent_memory_record.v1` — per job: task, claim counts, avg claim support,
+- `receipter.scout_evidence.v1` — `{ query, sourceReceipt, claims[], evidenceHash }`.
+- `receipter.agent_memory_record.v1` — per job: task, claim counts, avg claim support,
   evidence strength, settlement action, Walrus blob id, Sui anchor digest, `memoryHash`,
   `marketplaceProof { paymentBound, workerSelected, sourceVerified, walrusStored, suiAnchored }`.
-- `suiproof.agent_memory_passport.v1` — per worker: record list + rollups
+- `receipter.agent_memory_passport.v1` — per worker: record list + rollups
   (memoryCount, walrusMemoryCount, anchoredMemoryCount, averageClaimSupport).
-- `walrusproof.memory_index.v1` — global directory of passports.
-- `tenderboard.sui.evidence.v1` — the full bundle stored on Walrus.
+- `receipter.memory_index.v1` — global directory of passports.
+- `receipter.sui.evidence.v1` — the full bundle stored on Walrus.
 
-> Naming inconsistency to fix: schemas mix `suiproof.*`, `walrusproof.*`, `tenderboard.*`.
+> Naming inconsistency to fix: schemas mix `receipter.*`, `receipter.*`, `receipter.*`.
 > Standardize the prefix when we lock the product name (Section 12).
 
 ---
@@ -205,7 +205,7 @@ WalrusProof
 ### Milestone C — Memory-layer abstraction + MemWal (Section 8)
 6. `MemoryStore` interface; refactor server to inject it; `WalrusMemoryStore` wraps current code.
    - **Done:** `src/live/memoryStore.ts` defines the interface and default Walrus backend;
-     `createTenderBoardServer` accepts an injected `memoryStore`.
+     `createReceipterServer` accepts an injected `memoryStore`.
 7. `MemWalMemoryStore` backend behind `MEMORY_BACKEND=memwal`.
    - **Done:** backend writes the full proof bundle to raw Walrus, then writes a distilled
      reputation fact to MemWal via `remember(...)`.
@@ -227,7 +227,7 @@ WalrusProof
 12. Identity cleanup (Section 12), demo video, README/SUBMISSION aligned, blob id + package
     id + explorer links pasted into the submission.
     - **Done except recording:** `SUBMISSION_PACKAGE.md` now contains copy/paste fields and
-      `assets/walrusproof-logo.png` is the 1:1 logo.
+      `assets/receipter-logo.png` is the 1:1 logo.
 
 ---
 
@@ -258,7 +258,7 @@ publishers), MemWal docs + playground + GitHub, Seal docs, Sui Stack Messaging.
 ## 9. Testnet realness checklist (env)
 
 ```
-TENDERBOARD_MODE=sui
+RECEIPTER_MODE=sui
 SUI_NETWORK=testnet
 SUI_RPC_URL=https://fullnode.testnet.sui.io:443
 SUI_OPERATOR_ADDRESS=...
@@ -304,17 +304,17 @@ Then: publish package → set ids → run one job in `sui` mode → confirm real
 
 ## 12. Identity cleanup (do before submitting)
 
-Public identity is now **WalrusProof** across README, SUBMISSION, and demo script.
+Public identity is now **Receipter** across README, SUBMISSION, and demo script.
 
 Internal compatibility note:
-- repo path remains `tenderboard`
-- npm package remains `walrusproof-market`
-- Move package remains `SuiProofMarketReceipts`
-- Move modules remain `tenderboard::*`
-- schema prefixes still include `suiproof.*`, `walrusproof.*`, and `tenderboard.*`
+- repo path remains `receipter`
+- npm package remains `receipter`
+- Move package remains `ReceipterReceipts`
+- Move modules remain `receipter::*`
+- schema prefixes still include `receipter.*`, `receipter.*`, and `receipter.*`
 
 Those internal names are treated as stable protocol identifiers for the current testnet package
-and data fixtures, not public branding. The old CROO/RetainerHub plan was moved to `archive/`.
+and data fixtures, not public branding.
 
 ---
 
@@ -341,7 +341,7 @@ and data fixtures, not public branding. The old CROO/RetainerHub plan was moved 
 - Added `MemWalMemoryStore` semantic overlay behind `MEMORY_BACKEND=memwal`.
 - Hardened `seed:memory` into an acceptance check; temp local smoke produced 3 workers / 6
   records / 6 Walrus-backed / 6 Sui-anchored.
-- Extended `createWalrusProofOracleClient()` with `assessStakeChallenge(...)` for external
+- Extended `createReceipterOracleClient()` with `assessStakeChallenge(...)` for external
   agents/marketplaces to consume verifier-gated slashing.
 - Added `OracleRegistry` + one-time `ChallengeDecision` objects to Move; live slash now consumes
   the oracle decision object.

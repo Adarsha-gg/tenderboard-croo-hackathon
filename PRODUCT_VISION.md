@@ -1,4 +1,4 @@
-# WalrusProof — Product Vision (the big swing)
+# Receipter — Product Vision (the big swing)
 
 > Companion to `WALRUS_TRACK_PLAN.md` (execution backlog) and `COMPETITORS.md` (field).
 > This doc is the ambitious direction: **stop building an agent app, build the trust rail.**
@@ -7,7 +7,7 @@
 
 ## 0. North star
 
-**WalrusProof is the verifiable reputation layer for the agent economy.**
+**Receipter is the verifiable reputation layer for the agent economy.**
 
 Every paid job an agent completes becomes an **un-fakeable, Walrus-stored, Sui-anchored
 credential** that *any* marketplace, buyer, or agent — on *any* platform — can read and
@@ -16,7 +16,7 @@ cryptographically verify. We are not another agent and not another marketplace. 
 
 > One sentence for judges:
 > *"An agent's reputation should be a portable credential it owns and anyone can verify — not a
-> number trapped in one company's database. WalrusProof turns every completed paid job into a
+> number trapped in one company's database. Receipter turns every completed paid job into a
 > Walrus-backed, Sui-anchored proof-of-work that travels with the agent across the whole
 > economy."*
 
@@ -28,7 +28,7 @@ The Walrus track is crowded with **agents that have memory** (Synapse, Chronicle
 **dev tools** (WalGit). They all store *their own* memory for *their own* product. The lane
 nobody owns:
 
-| Everyone else | WalrusProof |
+| Everyone else | Receipter |
 |---|---|
 | An agent that remembers **itself** | The layer where **all agents publish verifiable work history** |
 | Memory is **internal** to one product | Reputation is **portable across products** (the whole point of Walrus) |
@@ -41,7 +41,7 @@ into.** Infrastructure beats app on defensibility, and it's a strictly bigger st
 **The market insight:** in agent commerce the bottleneck isn't storage or even payments — it's
 **trust between agents that have never worked together.** A worker agent has no way to prove "I
 did 50 research jobs, 94% claim-supported, all paid, all verifiable." Reputation today is
-siloed, self-reported, and fakeable. WalrusProof makes it **portable, verifiable, and costly to
+siloed, self-reported, and fakeable. Receipter makes it **portable, verifiable, and costly to
 fake.**
 
 ---
@@ -84,7 +84,7 @@ SUI earned, anchored-job count. **Exists:** `buildAgentMemoryPassport`. Net-new:
 to a Sui address + a passport object on-chain that points at the Walrus record set.
 
 **Update:** passport ownership is now implemented on Sui. Package v5 adds
-`tenderboard::agent_passport::AgentPassport`, an owner-held Sui object that stores the agent id,
+`receipter::agent_passport::AgentPassport`, an owner-held Sui object that stores the agent id,
 Walrus metadata pointer, latest memory hash, latest Walrus blob id, latest Sui anchor digest,
 record counters, challenge/slash counters, and stake position reference. Live object:
 `0x8a136d56df3a6d616498524f537074133d1cb63d24ac556f3a6aa81cd6fbb06e`.
@@ -115,7 +115,7 @@ then the Move slash consumed the oracle-issued `ChallengeDecision` object.
 ### Layer 5 — Reputation Oracle + SDK  ✅ API/SDK started
 The adoption surface. Any marketplace/agent/buyer calls:
 ```ts
-const rep = await walrusproof.verifyPassport(agentSuiAddress);
+const rep = await receipter.verifyPassport(agentSuiAddress);
 // → { jobs, skillScores, avgClaimSupport, stakedSui, slashes, lastVerifiedBlob }
 //   every field independently recomputed from Walrus blobs + Sui events, not trusted from us
 ```
@@ -125,7 +125,7 @@ MemWal" the rubric explicitly rewards, and the thing that creates network effect
 
 **Update:** the REST endpoint and lightweight TypeScript client now exist:
 `/api/oracle/passports/:workerAgentId/verify`, `/api/oracle/owners/:ownerAddress/passport/verify`,
-`/api/oracle/records/:runId/challenges/assess`, and `createWalrusProofOracleClient()` with
+`/api/oracle/records/:runId/challenges/assess`, and `createReceipterOracleClient()` with
 `verifyPassport(...)`, `verifyPassportByOwner(...)`, `verifyRecord(...)`, and
 `assessStakeChallenge(...)`. Remaining stretch: package it as npm/MCP/LangGraph.
 
@@ -184,7 +184,7 @@ demo recording, and optional credentialed MemWal / Seal / MCP stretch integratio
 
 ## 6. How it wins the Walrus track (rubric, head-to-head)
 
-| Rubric ask | WalrusProof answer | Edge over field |
+| Rubric ask | Receipter answer | Edge over field |
 |---|---|---|
 | Verifiable long-term memory | PoWM credential, hash-anchored | portable + **stake-secured**, not just stored |
 | Persistent files on Walrus | every job's evidence bundle | the file **is** the credential, not a side log |
@@ -245,8 +245,8 @@ integration into an existing agent framework.
 
 ## 9. Identity
 
-Public identity is **WalrusProof**. The old CROO/RetainerHub doc is archived, and submission
-copy, demo script, README, logo, and UI all use the same public name.
+Public identity is **Receipter**. Submission copy, demo script, README, logo, and UI all use the
+same public name.
 
 ---
 
@@ -295,13 +295,13 @@ Key facts (from MemWal `SKILL.md` / API ref):
 - `namespace` = our scoping primitive: per-agent passports, per-skill pools, and **shared
   namespaces = cross-agent coordination** (rubric ✓).
 
-Positioning becomes razor-sharp: **WalrusProof is the verifiable-reputation + economic-security
+Positioning becomes razor-sharp: **Receipter is the verifiable-reputation + economic-security
 layer ON TOP of MemWal.** We adopt the sponsor's memory primitive and add the thing it lacks —
 *payment-bound, stake-secured, cross-buyer work reputation.* Directly answers "help devs adopt
 MemWal." Slots behind our `MemoryStore` interface as `MemWalMemoryStore`.
 
 **Update:** `MemWalMemoryStore` is implemented as a semantic overlay: the full evidence bundle
-still lands on raw Walrus as the proof artifact, then WalrusProof writes a distilled reputation
+still lands on raw Walrus as the proof artifact, then Receipter writes a distilled reputation
 fact to MemWal via `remember(...)` under `MEMORY_BACKEND=memwal`. Tests cover fake-client writes
 and SDK client construction; remaining work is a live MemWal credential smoke.
 

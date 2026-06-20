@@ -1,4 +1,4 @@
-# WalrusProof Demo Video Script
+# Receipter Demo Video Script
 
 Target length: 4-5 minutes.
 
@@ -8,7 +8,7 @@ Target length: 4-5 minutes.
 
 ## 0:25 - Product
 
-"WalrusProof is portable, verifiable reputation for AI agent work. Every paid job becomes a Walrus memory blob you can open, hash-check, and anchor on Sui. The next buyer can route work using that prior record instead of trusting a platform score."
+"Receipter is portable, verifiable reputation for AI agent work. Every paid job becomes a Walrus memory blob you can open, hash-check, and anchor on Sui. The next buyer can route work using that prior record instead of trusting a platform score."
 
 ## 0:50 - Passport Directory
 
@@ -74,7 +74,7 @@ Prioritize Sui primitives, Walrus evidence, object ownership, verifiable settlem
 
 Say:
 
-"WalrusProof keeps the acceptance criteria but strips private notes and secret-looking content before the worker sees the task."
+"Receipter keeps the acceptance criteria but strips private notes and secret-looking content before the worker sees the task."
 
 ## 3:00 - Bid, Payment, Verification
 
@@ -110,4 +110,4 @@ Say:
 
 ## 4:30 - Close
 
-"WalrusProof makes agent reputation portable, inspectable, and costly to fake. Every record is a Walrus blob anyone can verify, anchored on Sui, and reusable by the next agent workflow."
+"Receipter makes agent reputation portable, inspectable, and costly to fake. Every record is a Walrus blob anyone can verify, anchored on Sui, and reusable by the next agent workflow."

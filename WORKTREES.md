@@ -1,4 +1,4 @@
-# TenderBoard Worktree Map
+# Receipter Worktree Map
 
 The main repo is kept clean. Use separate Git worktrees for focused AI tasks.
 
@@ -23,21 +23,21 @@ Use for:
 
 Do not do risky feature work directly here unless it is tiny.
 
-## Live CROO worktree
+## Live Sui/Walrus worktree
 
 ```text
-C:\Users\adars\Coding\hackathon-worktrees\tenderboard-live-croo
+C:\Users\adars\Coding\hackathon-worktrees\receipter-live
 ```
 
 Branch:
 
 ```text
-work/tenderboard-live-croo
+work/receipter-live
 ```
 
 Use for:
 
-- real CROO credentials setup testing
+- real Sui and Walrus credentials setup testing
 - live preflight fixes
 - first real funded `payOrder` run
 - receipt/tx proof fixes
@@ -45,13 +45,13 @@ Use for:
 ## Submission polish worktree
 
 ```text
-C:\Users\adars\Coding\hackathon-worktrees\tenderboard-submission-polish
+C:\Users\adars\Coding\hackathon-worktrees\receipter-submission-polish
 ```
 
 Branch:
 
 ```text
-work/tenderboard-submission-polish
+work/receipter-submission-polish
 ```
 
 Use for:
@@ -65,13 +65,13 @@ Use for:
 ## Worker scout worktree
 
 ```text
-C:\Users\adars\Coding\hackathon-worktrees\tenderboard-worker-scout
+C:\Users\adars\Coding\hackathon-worktrees\receipter-worker-scout
 ```
 
 Branch:
 
 ```text
-work/tenderboard-worker-scout
+work/receipter-worker-scout
 ```
 
 Use for:
@@ -107,7 +107,7 @@ git worktree list
 Check one worktree:
 
 ```bash
-cd C:\Users\adars\Coding\hackathon-worktrees\tenderboard-live-croo
+cd C:\Users\adars\Coding\hackathon-worktrees\receipter-live
 git status --short
 ```
 
@@ -117,6 +117,6 @@ Merge a finished branch into main:
 cd C:\Users\adars\Coding\hackathon
 git checkout main
 git pull
-git merge work/tenderboard-live-croo
+git merge work/receipter-live
 git push
 ```
