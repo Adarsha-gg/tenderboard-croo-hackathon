@@ -21,7 +21,10 @@ import { createMemoryStore, type MemoryStore } from '../live/memoryStore.js';
 import { buildX402SuiPaymentChallenge, buildX402SuiPaymentResponse } from '../live/x402.js';
 import { parseX402PaymentHeader, parseX402PaymentPayload, verifySuiX402Payment } from '../sui/facilitator.js';
 import { executeSuiAnchorReceipt } from '../sui/anchorExecutor.js';
-import { executeSuiX402Payment } from '../sui/paymentExecutor.js';
+import { buildX402PaymentPayload, executeSuiX402Payment } from '../sui/paymentExecutor.js';
+import { buildSuiAnchorPlan } from '../sui/anchorPlan.js';
+import { buildSuiReceiptAnchorPayload, buildSuiReceiptAnchorTransactionRequest } from '../sui/anchorTransactionBuilder.js';
+import { parseSuiReceiptAnchorPayload, verifySuiReceiptAnchor } from '../sui/anchorVerifier.js';
 import {
   bindAnchorDigest,
   bindPaymentDigest,
@@ -290,9 +293,16 @@ async function route(
     return;
   }
 
+  const paymentTransactionMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/payment-transaction$/);
+  if (method === 'GET' && paymentTransactionMatch) {
+    const receipt = await store.require(paymentTransactionMatch[1]!);
+    sendJson(res, 200, buildPaymentSigningResponse(receipt));
+    return;
+  }
+
   const approveMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/approve-payment$/);
   if (method === 'POST' && approveMatch) {
-    const body = await readJson<{ suiPaymentDigest?: string }>(req);
+    const body = await readJson<{ suiPaymentDigest?: string; allowCliFallback?: boolean }>(req);
     const receipt = await approvePayment(approveMatch[1]!, body, config, store, bus);
     sendJson(res, 200, receipt);
     return;
@@ -313,10 +323,17 @@ async function route(
     return;
   }
 
+  const anchorTransactionMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/anchor-transaction$/);
+  if (method === 'GET' && anchorTransactionMatch) {
+    const receipt = await store.require(anchorTransactionMatch[1]!);
+    sendJson(res, 200, buildAnchorSigningResponse(receipt, config));
+    return;
+  }
+
   const anchorMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/anchor-receipt$/);
   if (method === 'POST' && anchorMatch) {
-    const body = await readJson<{ suiAnchorDigest?: string }>(req);
-    const receipt = await anchorReceipt(anchorMatch[1]!, body, config, store, bus);
+    const body = await readJson<{ suiAnchorDigest?: string; allowCliFallback?: boolean; anchorPayload?: unknown }>(req);
+    const receipt = await anchorReceipt(anchorMatch[1]!, body, config, store, bus, suiRpcFetch);
     sendJson(res, 200, receipt);
     return;
   }
@@ -513,9 +530,57 @@ async function createRun(
   return { runId, status: receipt.status, sanitizedTask: receipt.sanitizedTask };
 }
 
+function buildPaymentSigningResponse(receipt: LiveRunReceipt) {
+  const paymentIntentPlan = requirePaymentIntentPlan(receipt);
+  if (receipt.status !== 'awaiting_payment_approval') {
+    throw httpError(409, `Run is not waiting for payment signing. Current status: ${receipt.status}`);
+  }
+  const walletTransactionRequest = paymentIntentPlan.walletTransactionRequest;
+  if (!walletTransactionRequest) {
+    throw httpError(409, 'Run does not have a production Sui wallet payment transaction request. Check Sui package and operator configuration.');
+  }
+  return {
+    objectType: 'walrusproof.payment_signing_request.v1',
+    runId: receipt.runId,
+    status: receipt.status,
+    verifyEndpoint: '/api/x402/verify',
+    workerTaskResource: `/api/runs/${receipt.runId}/worker-task`,
+    paymentIntentPlan,
+    walletTransactionRequest,
+    paymentPayloadTemplate: buildX402PaymentPayload(receipt, '<SIGNED_SUI_TRANSACTION_DIGEST>'),
+  };
+}
+
+function buildAnchorSigningResponse(receipt: LiveRunReceipt, config: TenderBoardConfig) {
+  if (!receipt.walrusBlobId) {
+    throw httpError(409, 'Run needs a Walrus blob id before Sui anchoring.');
+  }
+  if (receipt.status !== 'anchoring' && receipt.status !== 'anchored') {
+    throw httpError(409, `Run cannot be anchored from status: ${receipt.status}`);
+  }
+  if (receipt.status !== 'anchored' && receipt.clearingDecision?.verdict !== 'ready_to_anchor') {
+    throw httpError(409, `Run is not verification-admissible for Sui anchoring. Current clearing verdict: ${receipt.clearingDecision?.verdict ?? 'missing'}`);
+  }
+
+  const plan = buildSuiAnchorPlan(receipt, config);
+  if (!plan.ready) {
+    throw httpError(409, `Sui anchor plan is not ready. Missing: ${plan.missing.join(', ')}`);
+  }
+
+  return {
+    objectType: 'walrusproof.anchor_signing_request.v1',
+    runId: receipt.runId,
+    status: receipt.status,
+    verifyEndpoint: `/api/runs/${receipt.runId}/anchor-receipt`,
+    anchorPlan: plan,
+    walletTransactionRequest: buildSuiReceiptAnchorTransactionRequest(plan),
+    anchorPayloadTemplate: buildSuiReceiptAnchorPayload(plan, '<SIGNED_SUI_TRANSACTION_DIGEST>'),
+  };
+}
+
 async function approvePayment(
   runId: string,
-  body: { suiPaymentDigest?: string },
+  body: { suiPaymentDigest?: string; allowCliFallback?: boolean },
   config: TenderBoardConfig,
   store: RunStore,
   bus: RunEventBus,
@@ -523,12 +588,15 @@ async function approvePayment(
   const receipt = await store.require(runId);
   let automaticPaymentResult: Awaited<ReturnType<typeof executeSuiX402Payment>> | undefined;
   const providedPaymentDigest = body.suiPaymentDigest?.trim();
+  if (config.mode !== 'sui-dev' && providedPaymentDigest) {
+    throw httpError(400, 'Live Sui payment approval no longer accepts raw suiPaymentDigest. Submit a signed x402 payment payload to /api/x402/verify.');
+  }
   const suiPaymentDigest =
     config.mode === 'sui-dev'
       ? makeSuiDevDigest('payment', runId)
-      : providedPaymentDigest ?? (config.suiCliPath ? ((automaticPaymentResult = await executeAutomaticSuiPayment(receipt, config)).digest) : undefined);
+      : body.allowCliFallback && config.suiCliPath ? ((automaticPaymentResult = await executeAutomaticSuiPayment(receipt, config)).digest) : undefined;
   if (!suiPaymentDigest) {
-    throw httpError(400, 'Sui mode requires suiPaymentDigest from the payment approval transaction or SUI_CLI_PATH for automatic payment.');
+    throw httpError(400, 'Live Sui payment requires a signed x402 payload via /api/x402/verify. CLI fallback is test-only and must be requested explicitly.');
   }
   return recordPaymentApproval(runId, suiPaymentDigest, config, store, bus, automaticPaymentResult
     ? {
@@ -876,10 +944,11 @@ async function storeEvidence(
 
 async function anchorReceipt(
   runId: string,
-  body: { suiAnchorDigest?: string },
+  body: { suiAnchorDigest?: string; allowCliFallback?: boolean; anchorPayload?: unknown },
   config: TenderBoardConfig,
   store: RunStore,
   bus: RunEventBus,
+  suiRpcFetch: typeof fetch | undefined,
 ): Promise<LiveRunReceipt> {
   const receipt = await store.require(runId);
   if (!receipt.walrusBlobId) {
@@ -893,13 +962,24 @@ async function anchorReceipt(
   }
 
   let automaticAnchorResult: Awaited<ReturnType<typeof executeSuiAnchorReceipt>> | undefined;
+  let anchorVerification: Awaited<ReturnType<typeof verifySuiReceiptAnchor>> | undefined;
   const providedAnchorDigest = nonBlank(body.suiAnchorDigest);
+  if (config.mode !== 'sui-dev' && providedAnchorDigest) {
+    throw httpError(400, 'Live Sui receipt anchoring no longer accepts raw suiAnchorDigest. Submit anchorPayload from the signed wallet transaction.');
+  }
   const suiAnchorDigest =
     config.mode === 'sui-dev'
       ? makeSuiDevDigest('anchor', runId)
-      : providedAnchorDigest ?? (config.suiCliPath ? ((automaticAnchorResult = await executeAutomaticSuiAnchor(receipt, config)).digest) : undefined);
+      : body.anchorPayload
+        ? ((anchorVerification = await verifySuiReceiptAnchor({
+            receipt,
+            payload: parseSuiReceiptAnchorPayload(body.anchorPayload),
+            config,
+            ...(suiRpcFetch ? { fetchImpl: suiRpcFetch } : {}),
+          })).transaction)
+        : body.allowCliFallback && config.suiCliPath ? ((automaticAnchorResult = await executeAutomaticSuiAnchor(receipt, config)).digest) : undefined;
   if (!suiAnchorDigest) {
-    throw httpError(400, 'Sui mode requires suiAnchorDigest from the receipt registry transaction or SUI_CLI_PATH for automatic anchoring.');
+    throw httpError(400, 'Live Sui anchoring requires anchorPayload from a signed wallet transaction. CLI fallback is test-only and must be requested explicitly.');
   }
 
   const receiptPlan = requireReceiptPlan(receipt);
@@ -928,6 +1008,7 @@ async function anchorReceipt(
       settlementNonce: paymentIntentPlan.settlementNonce,
       automatic: Boolean(automaticAnchorResult),
       commandArgs: automaticAnchorResult?.args,
+      verification: anchorVerification,
     },
   });
   await store.appendEvent(runId, event);

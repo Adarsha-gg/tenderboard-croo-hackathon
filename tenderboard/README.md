@@ -130,11 +130,11 @@ Export a call plan:
 npm run sui:anchor-plan <run-id>
 ```
 
-If `SUI_CLI_PATH` is configured, `POST /api/runs/:id/anchor-receipt` executes the Move receipt-registry call directly from the backend. Without it, Sui mode still accepts a manually supplied `suiAnchorDigest`.
+In live `sui` mode, clients request signer-ready transaction data from `GET /api/runs/:id/payment-transaction` and `GET /api/runs/:id/anchor-transaction`. Payment settlement is accepted through `/api/x402/verify`; receipt anchoring is accepted through `POST /api/runs/:id/anchor-receipt` with the structured `anchorPayload` returned by the wallet flow. Raw `suiPaymentDigest` and `suiAnchorDigest` bypasses are rejected in live mode. `SUI_CLI_PATH` remains an explicit test-only fallback.
 
 Do not claim mainnet anchoring until the package and Walrus publisher path are redeployed on mainnet.
 
-In `sui` mode payment approval requires a real Sui payment transaction digest, the Walrus evidence step uses the configured HTTP publisher, and the Sui anchor step records the real receipt-registry transaction digest. `sui-dev` remains a local smoke mode only; do not use it for the hackathon demo pitch.
+In `sui` mode payment approval requires a verified signed x402-style Sui payment payload, the Walrus evidence step uses the configured HTTP publisher, and the Sui anchor step verifies the signed receipt-registry transaction through Sui JSON-RPC events before recording the digest. `sui-dev` remains a local smoke mode only; do not use it for the hackathon demo pitch.
 
 WalrusProof Market generates Payment Kit-compatible URI metadata for SUI payment approval planning. Worker task access is exposed as x402-style paid HTTP access for agents on Sui: unpaid worker requests receive HTTP `402` with Sui payment instructions, and paid requests receive the task packet with an `X-Payment-Response` header bound to the recorded Sui transaction digest.
 
@@ -214,8 +214,9 @@ The browser uses the same API external agents can call:
 
 ```text
 POST /api/runs                         hirer agent creates a safe Sui work order
+GET  /api/runs/:id/payment-transaction hirer gets signer-ready Sui payment transaction data
 POST /api/x402/verify                  local Sui facilitator/verifier checks payment and unlocks work
-POST /api/runs/:id/approve-payment     hirer agent records Sui payment approval
+POST /api/runs/:id/approve-payment     sui-dev or explicit CLI fallback only
 GET  /api/runs/:id/agent-handoff       worker agent reads the awarded handoff
 GET  /api/walrus/memory                read the global Walrus memory index
 GET  /api/walrus/memory/:id            read the worker's Walrus memory passport
@@ -225,10 +226,11 @@ GET  /api/oracle/owners/:address/passport/verify verify a passport by Sui owner 
 GET  /api/runs/:id/worker-task         worker agent gets 402 until Sui payment is recorded
 POST /api/runs/:id/worker-delivery     worker agent submits delivery evidence
 POST /api/runs/:id/store-evidence      operator stores the memory bundle on Walrus
-POST /api/runs/:id/anchor-receipt      operator records the Sui receipt anchor
+GET  /api/runs/:id/anchor-transaction  operator gets signer-ready Sui anchor transaction data
+POST /api/runs/:id/anchor-receipt      operator submits verified anchorPayload from signed Sui tx
 ```
 
-CLI/dev-only today: backend Sui CLI execution for payment, receipt anchoring, stake, challenge, and slash; the built-in Opportunity Scout delivery helper; `sui-dev` deterministic local smoke mode; and credentialed MemWal smoke unless MemWal env vars are configured. In production, an external worker agent should submit its own delivery and source evidence.
+CLI/dev-only today: explicit backend Sui CLI fallback for payment and receipt anchoring, backend Sui CLI execution for stake, challenge, and slash; the built-in Opportunity Scout delivery helper; `sui-dev` deterministic local smoke mode; and credentialed MemWal smoke unless MemWal env vars are configured. In production, an external worker agent should submit its own delivery and source evidence.
 
 ## Important Files
 

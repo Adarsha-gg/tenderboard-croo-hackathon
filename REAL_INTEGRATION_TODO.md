@@ -6,13 +6,13 @@ This file tracks the places where WalrusProof still uses local CLI, demo, metada
 
 ## Must Fix Before Calling It Production
 
-- [ ] Replace backend Sui CLI payment execution with real wallet / sponsored transaction flow.
-  - Current: `approve-payment` can execute `sui client ptb` through `SUI_CLI_PATH`.
+- [x] Replace backend Sui CLI payment execution with real wallet / sponsored transaction flow.
+  - Completed: live Sui mode exposes `/api/runs/:id/payment-transaction` for wallet signing and requires `/api/x402/verify` for settlement verification. CLI payment is now an explicit test-only fallback.
   - Files: `tenderboard/src/server/httpServer.ts`, `tenderboard/src/sui/paymentExecutor.ts`.
   - Real version: frontend builds a Sui transaction block, wallet signs it, backend verifies it through the local Sui facilitator/verifier for the x402-style flow before unlocking worker access.
 
-- [ ] Replace backend Sui CLI receipt anchoring with a signed transaction flow.
-  - Current: `anchor-receipt` can execute `sui client call` through `SUI_CLI_PATH`.
+- [x] Replace backend Sui CLI receipt anchoring with a signed transaction flow.
+  - Completed: live Sui mode exposes `/api/runs/:id/anchor-transaction` for wallet signing and requires an `anchorPayload` whose transaction is verified through Sui JSON-RPC events before recording the anchor. CLI anchoring is now an explicit test-only fallback.
   - Files: `tenderboard/src/server/httpServer.ts`, `tenderboard/src/sui/anchorExecutor.ts`.
   - Real version: app builds the anchor transaction, user/operator signs, backend verifies emitted receipt-registry event and stores the digest.
 
@@ -21,8 +21,8 @@ This file tracks the places where WalrusProof still uses local CLI, demo, metada
   - File: `tenderboard/src/sui/stakeExecutor.ts`.
   - Real version: signer-controlled PTBs for opening stake, challenging, resolving, and slashing, with event verification after execution.
 
-- [ ] Remove the unverified manual digest bypass from payment approval.
-  - Current: live Sui mode can still accept `suiPaymentDigest` directly on `/api/runs/:id/approve-payment`.
+- [x] Remove the unverified manual digest bypass from payment approval.
+  - Completed: live Sui mode rejects raw `suiPaymentDigest` on `/api/runs/:id/approve-payment`; callers must submit a signed x402 payment payload to `/api/x402/verify`.
   - Risk: a UI or caller can submit a digest unless every path routes through `/api/x402/verify`.
   - Real version: only accept payment via verified x402 payload or server-built signed transaction result.
 
@@ -42,8 +42,8 @@ This file tracks the places where WalrusProof still uses local CLI, demo, metada
   - Current: private notes are sanitized and excluded, but there is no live Seal encryption/decryption policy.
   - Real version: buyer-private evidence is Seal-encrypted, access is time-boxed, and decrypt/readback is verified.
 
-- [ ] Decide whether to use Harbor or raw public Walrus publisher for the submission.
-  - Current: raw Walrus testnet publisher/aggregator works.
+- [x] Decide whether to use Harbor or raw public Walrus publisher for the submission.
+  - Completed: current submission path is raw public Walrus publisher/aggregator. Harbor remains an explicit unimplemented strategy, not a claim.
   - Real version: either keep raw Walrus and say so, or wire Harbor if we want Seal-by-default / managed upload semantics.
 
 ## Sui Identity / Passport Gaps
@@ -64,8 +64,8 @@ This file tracks the places where WalrusProof still uses local CLI, demo, metada
   - File: `tenderboard/src/client/index.html`.
   - Real version: judging/demo mode should fail loudly if the live API is unavailable, or show a visible "sample data" label.
 
-- [ ] Replace built-in worker delivery with real external worker agent submission.
-  - Current: `/worker-delivery` can call the built-in Opportunity Scout worker for demoability.
+- [x] Replace built-in worker delivery with real external worker agent submission.
+  - Completed: `/worker-delivery` requires `walrusproof.external_worker_delivery.v1` payloads in production; built-in Opportunity Scout delivery is restricted to explicit `sui-dev` fallback.
   - Files: `tenderboard/src/server/httpServer.ts`, `tenderboard/src/live/suiRuntime.ts`.
   - Real version: a separate worker agent signs/submits delivery and source evidence, or an agent runtime does it through an authenticated API key / wallet identity.
 

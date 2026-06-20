@@ -34,3 +34,19 @@ PR draft details are tracked in `PR_DRAFTS.md`.
 Remaining process blocker:
 
 - GitHub PRs cannot be opened until `gh auth login -h github.com` is repaired. `gh auth status` currently reports an invalid token for `Adarsha-gg`.
+
+## Signed Wallet Flow Follow-Up
+
+- Merged PR #1 into `main`.
+- Started branch `codex/wallet-signed-flow`.
+- Added live-mode payment signing endpoint:
+  - `GET /api/runs/:id/payment-transaction`
+  - `POST /api/x402/verify` remains the only live payment recording path.
+  - Raw `suiPaymentDigest` is rejected in live `sui` mode.
+- Added live-mode anchor signing endpoint:
+  - `GET /api/runs/:id/anchor-transaction`
+  - `POST /api/runs/:id/anchor-receipt` now accepts structured `anchorPayload` and verifies Sui JSON-RPC events.
+  - Raw `suiAnchorDigest` is rejected in live `sui` mode.
+- Validation:
+  - `npm.cmd run typecheck` passed.
+  - `npm.cmd test` passed: 22 files, 93 tests.
