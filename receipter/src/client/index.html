@@ -457,12 +457,12 @@
             <div style="background:#fff;border:1px solid #EAEEF5;border-radius:18px;padding:22px;">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span style="width:30px;height:30px;border-radius:9px;background:#E3F4F6;display:flex;align-items:center;justify-content:center;color:#0F7A8C;font-size:15px;">◆</span><span style="font-family:'Space Grotesk';font-weight:600;font-size:15px;">Walrus storage</span></div>
               <sc-if value="{{ cStored }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:11px;"><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Blob id</span><span style="font-family:'JetBrains Mono';color:#41516A;">{{ cBlobShown }}</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Aggregator</span><span style="color:#0F7A8C;font-weight:600;">readable</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Certified epoch</span><span style="font-family:'JetBrains Mono';color:#41516A;">142 → 194</span></div></div></sc-if>
-              <sc-if value="{{ cNotStored }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onStore }}" style="width:100%;background:#0F7A8C;border:none;color:#fff;font-weight:600;font-size:13.5px;padding:12px;border-radius:11px;transition:filter .15s" style-hover="filter:brightness(1.08)">Store evidence on Walrus</button></sc-if>
+              <sc-if value="{{ cNotStored }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onStore }}" style="width:100%;background:#0F7A8C;border:none;color:#fff;font-weight:600;font-size:13.5px;padding:12px;border-radius:11px;transition:filter .15s;opacity:{{ cStoreOpacity }};pointer-events:{{ cStorePointer }};" style-hover="filter:brightness(1.08)">{{ cStoreLabel }}</button></sc-if>
             </div>
             <div style="background:#fff;border:1px solid #EAEEF5;border-radius:18px;padding:22px;">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span style="width:30px;height:30px;border-radius:9px;background:#EDEFF3;display:flex;align-items:center;justify-content:center;color:#3E4A5C;font-size:15px;">⚓</span><span style="font-family:'Space Grotesk';font-weight:600;font-size:15px;">Sui anchor</span></div>
               <sc-if value="{{ cAnchored }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:11px;"><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Anchor tx</span><span style="font-family:'JetBrains Mono';color:#41516A;">{{ cAnchorShown }}</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Registry</span><span style="color:#3E4A5C;font-weight:600;">receipt_registry</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:#8A99AD;">Passport</span><span style="color:#16793B;font-weight:600;">updated</span></div></div></sc-if>
-              <sc-if value="{{ cNotAnchored }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onAnchor }}" style="width:100%;background:#3E4A5C;border:none;color:#fff;font-weight:600;font-size:13.5px;padding:12px;border-radius:11px;transition:filter .15s;opacity:{{ cAnchorOpacity }};" style-hover="filter:brightness(1.08)">Anchor receipt on Sui</button></sc-if>
+              <sc-if value="{{ cNotAnchored }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onAnchor }}" style="width:100%;background:#3E4A5C;border:none;color:#fff;font-weight:600;font-size:13.5px;padding:12px;border-radius:11px;transition:filter .15s;opacity:{{ cAnchorOpacity }};pointer-events:{{ cAnchorPointer }};" style-hover="filter:brightness(1.08)">{{ cAnchorLabel }}</button></sc-if>
             </div>
           </div>
         </div>
@@ -476,7 +476,7 @@
         <sc-if value="{{ cBackVisible }}" hint-placeholder-val="{{ false }}"><button onClick="{{ cBackFn }}" style="background:#fff;border:1px solid #E1E6EF;color:#46566E;font-weight:600;font-size:14px;padding:11px 20px;border-radius:11px;" style-hover="border-color:#C2CBDC">← Back</button></sc-if>
         <div style="flex:1;"></div>
         <span style="font-size:13px;color:#9AA8BD;margin-right:16px;">Step {{ cStepName }}</span>
-        <button onClick="{{ cNext }}" style="background:#0E1726;border:none;color:#fff;font-weight:600;font-size:14px;padding:12px 24px;border-radius:11px;box-shadow:0 8px 18px rgba(14,23,38,.2);opacity:{{ cContinueOpacity }};transition:transform .15s" style-hover="transform:translateY(-1px)">{{ cContinueLabel }}</button>
+        <button onClick="{{ cNext }}" style="background:#0E1726;border:none;color:#fff;font-weight:600;font-size:14px;padding:12px 24px;border-radius:11px;box-shadow:0 8px 18px rgba(14,23,38,.2);opacity:{{ cContinueOpacity }};pointer-events:{{ cContinuePointer }};transition:transform .15s" style-hover="transform:translateY(-1px)">{{ cContinueLabel }}</button>
       </div>
     </div>
   </div>
@@ -731,7 +731,7 @@ class Component extends DCLogic {
       try{ return await this.post(path, body); }
       catch(e){
         lastError = e;
-        const retryable = e && (e.status === 402 || e.status === 502 || e.status === 503);
+        const retryable = e && (e.status === 502 || e.status === 503);
         if(!retryable || i === (attempts || 1)-1) throw e;
         await new Promise(resolve => setTimeout(resolve, 900 + i * 700));
       }
@@ -895,7 +895,18 @@ class Component extends DCLogic {
   supportColor(v){ if(v>=0.8) return this.C.green; if(v>=0.6) return this.C.amber; return this.C.red; }
   rating(avg){ return Math.min(5,(4.3+avg*0.72)).toFixed(1); }
   copy(text){ try{ navigator.clipboard.writeText(text); }catch(e){} this.toast('Copied to clipboard'); }
-  toast(t){ this.setState({toast:t}); clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({toast:null}),1400); }
+  humanError(e){
+    const message=e&&e.message?e.message:String(e);
+    if(message.includes('Rate limit exceeded') || message.includes('429')){
+      const retry=message.match(/retry_after_seconds"?:\s*([0-9]+)/);
+      return `Walrus is rate limited. Wait ${retry?retry[1]:'60'} seconds before trying again.`;
+    }
+    if(message.includes('assert_new_duplicate_prevention_key') || message.includes('MoveAbort') && message.includes('duplicate')){
+      return 'This Sui anchor key was already used. Do not retry this run; open the successful wallet transaction or start a fresh run.';
+    }
+    return message;
+  }
+  toast(t, ms){ this.setState({toast:t}); clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({toast:null}),ms||2200); }
   stop(e){ if(e&&e.stopPropagation) e.stopPropagation(); }
 
   // ---- nav ----
@@ -948,6 +959,7 @@ class Component extends DCLogic {
       runId:'run_'+(new Date()).toISOString().replace(/[-:T.Z]/g,'').slice(0,14)+'_'+Math.random().toString(36).slice(2,6),
       selectedBid:'public_scout_standard', advOpen:false,
       paid:false, delivered:true, stored:false, anchored:false, blob:null, anchor:null, payDigest:null,
+      busyAction:null,
     }});
   }
   cToggleAdv(){ this.setState(s=>({create:{...s.create,advOpen:!s.create.advOpen}})); }
@@ -956,6 +968,12 @@ class Component extends DCLogic {
   async cNext(){
     const c=this.state.create;
     if(!c) return;
+    if(c.busyAction) return;
+    if(c.step===1){
+      await this.cEnsureRun();
+      this.setState(s=>({create:{...s.create,step:2}}));
+      return;
+    }
     if(c.step===2){
       await this.cEnsureRun();
       this.setState(s=>({create:{...s.create,step:3}}));
@@ -989,6 +1007,8 @@ class Component extends DCLogic {
     return run;
   }
   async cApprove(){
+    if(this.state.create&&this.state.create.busyAction) return;
+    this.setState(s=>({create:{...s.create,busyAction:'payment'}}));
     try{
       const run = await this.cEnsureRun();
       let paid;
@@ -1003,6 +1023,10 @@ class Component extends DCLogic {
       this.setState(s=>({create:{...s.create,apiRun:paid,paid:true,payDigest:paid.suiPaymentDigest || paid.receiptPlan && paid.receiptPlan.paymentDigest}}));
       this.toast('Sui payment verified');
     } catch(e){
+      if(e&&e.status===402){
+        this.toast(this.humanError(e), 7000);
+        return;
+      }
       try{
         const run = await this.cEnsureRun();
         const signing = await this.api('/api/runs/'+encodeURIComponent(run.runId)+'/payment-transaction');
@@ -1012,6 +1036,8 @@ class Component extends DCLogic {
       } catch(nextError){
         this.toast(nextError.message || e.message || String(nextError || e));
       }
+    } finally {
+      this.setState(s=>({create:{...s.create,busyAction:null}}));
     }
   }
   async cDeliver(){
@@ -1027,13 +1053,19 @@ class Component extends DCLogic {
     return delivered;
   }
   async cStore(){
+    if(this.state.create&&this.state.create.busyAction) return;
+    this.setState(s=>({create:{...s.create,busyAction:'store'}}));
     try{
       const delivered = await this.cDeliver();
       const stored = await this.post('/api/runs/'+encodeURIComponent(delivered.runId)+'/store-evidence', {});
       this.setState(s=>({create:{...s.create,apiRun:stored,stored:true,blob:stored.walrusBlobId}}));
-    } catch(e){ this.toast(e.message || String(e)); }
+      this.toast('Walrus evidence stored');
+    } catch(e){ this.toast(this.humanError(e), 6000); }
+    finally { this.setState(s=>({create:{...s.create,busyAction:null}})); }
   }
   async cAnchor(){
+    if(this.state.create&&this.state.create.busyAction) return;
+    this.setState(s=>({create:{...s.create,busyAction:'anchor'}}));
     try{
       const c=this.state.create;
       const run = c.apiRun || await this.cEnsureRun();
@@ -1044,6 +1076,14 @@ class Component extends DCLogic {
       this.setState(s=>({create:{...s.create,apiRun:anchored,anchored:true,anchor:anchored.suiAnchorDigest}}));
       this.toast('Sui receipt anchored');
     } catch(e){
+      if(e&&e.status===402){
+        this.toast(this.humanError(e), 7000);
+        return;
+      }
+      if((e&&e.message&&e.message.includes('assert_new_duplicate_prevention_key')) || (String(e).includes('MoveAbort')&&String(e).includes('duplicate'))){
+        this.toast(this.humanError(e), 7000);
+        return;
+      }
       try{
         const c=this.state.create;
         const run = c.apiRun || await this.cEnsureRun();
@@ -1054,6 +1094,8 @@ class Component extends DCLogic {
       } catch(nextError){
         this.toast(nextError.message || e.message || String(nextError || e));
       }
+    } finally {
+      this.setState(s=>({create:{...s.create,busyAction:null}}));
     }
   }
   async cFinish(){
@@ -1085,6 +1127,21 @@ class Component extends DCLogic {
     this.toast('Passport updated · new anchored record');
   }
   cBids(){
+    const c=this.state.create;
+    const board=c&&c.apiRun&&c.apiRun.workerBidBoard;
+    if(board&&Array.isArray(board.bids)){
+      return board.bids.map((bid, i)=>({
+        bidId:bid.bidId,
+        worker:bid.workerAgentId,
+        price:bid.priceSui,
+        sla:bid.sla,
+        data:bid.requestedDataLabel,
+        verdict:bid.verdict,
+        reason:bid.reason,
+        trust:bid.verdict==='available'?Math.max(88,94-i):Math.max(52,74-i*6),
+        tier:bid.verdict==='available'?(i<2?'AAA':'AA'):'blocked',
+      }));
+    }
     return [
       {bidId:'public_scout_standard', worker:'sui_opportunity_scout', price:'0.050', sla:'~6 min', data:'public', verdict:'available', reason:'Within budget · public-only scope · verified owner', trust:94, tier:'AAA'},
       {bidId:'public_scout_deep', worker:'deep_research_pool', price:'0.120', sla:'~18 min', data:'public', verdict:'blocked', reason:'Price 0.120 SUI exceeds the 0.050 SUI payment cap', trust:88, tier:'AA'},
@@ -1106,7 +1163,8 @@ class Component extends DCLogic {
     const paymentNonce=paymentPlan&&paymentPlan.paymentNonce || ('pn_'+c.runId.slice(-6)+'a91');
     const settlementNonce=paymentPlan&&paymentPlan.settlementNonce || ('sn_'+c.runId.slice(-6)+'c47');
     const paymentNetwork='sui:'+(paymentPlan&&paymentPlan.expectedNetwork || 'testnet');
-    const continueDisabled=(c.step===3&&!c.paid)||(c.step===5&&!c.anchored);
+    const busyAction=c.busyAction;
+    const continueDisabled=!!busyAction||(c.step===3&&!c.paid)||(c.step===5&&!c.anchored);
     let continueLabel='Continue';
     if(c.step===0) continueLabel='Generate safe packet →';
     if(c.step===1) continueLabel='Compare worker bids →';
@@ -1114,6 +1172,9 @@ class Component extends DCLogic {
     if(c.step===3) continueLabel='Continue to delivery →';
     if(c.step===4) continueLabel='Store evidence →';
     if(c.step===5) continueLabel='Finish';
+    if(busyAction==='payment') continueLabel='Waiting for wallet verification...';
+    if(busyAction==='store') continueLabel='Storing evidence on Walrus...';
+    if(busyAction==='anchor') continueLabel='Waiting for Sui anchor...';
     return {
       showCreate:true, cStepName:steps[c.step],
       cSteps:steps.map((label,i)=>({label, num:String(i+1),
@@ -1150,8 +1211,13 @@ class Component extends DCLogic {
       ],
       cReqChecks:[{label:'≥5 public-source items with links'},{label:'Deadline / sponsor / fit flagged'},{label:'Ranked recommendation present'},{label:'All claims bound to source observations'}],
       cSettlement:'ready_to_anchor',
+      cStoreLabel:busyAction==='store'?'Storing on Walrus...':'Store evidence on Walrus',
+      cAnchorLabel:busyAction==='anchor'?'Anchoring on Sui...':'Anchor receipt on Sui',
+      cStoreOpacity:busyAction?'.55':'1', cStorePointer:busyAction?'none':'auto',
+      cContinuePointer:continueDisabled?'none':'auto',
+      cAnchorPointer:(busyAction||!c.stored)?'none':'auto',
       cStored:c.stored, cAnchored:c.anchored, cBlobShown:c.blob?this.short(c.blob,14,8):'—', cAnchorShown:c.anchor?this.short(c.anchor,14,8):'—', onStore:()=>this.cStore(), onAnchor:()=>this.cAnchor(),
-      cContinueLabel:continueLabel, cContinueOpacity:continueDisabled?'.4':'1', cAnchorOpacity:c.stored?'1':'.5',
+      cContinueLabel:continueLabel, cContinueOpacity:continueDisabled?'.4':'1', cAnchorOpacity:busyAction?'.55':(c.stored?'1':'.5'),
       cBackVisible:c.step>0&&c.step<6, cNext:()=>{ if(!continueDisabled){ if(c.step===5) this.cFinish(); else this.cNext(); } }, cBackFn:()=>this.cBack(), cClose:()=>this.closeOverlay(),
     };
   }
