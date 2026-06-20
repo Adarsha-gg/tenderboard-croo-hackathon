@@ -22,5 +22,8 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@mysten-incubation/memwal": "^0.0.7"
   }
 }
