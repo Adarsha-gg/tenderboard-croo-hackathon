@@ -5,19 +5,19 @@ node_modules/
 dist/
 coverage/
 
-# TenderBoard generated/local artifacts
-tenderboard/outputs/
-tenderboard/data/
-tenderboard/proof/
-tenderboard/server*.log
+# RECEIPTER generated/local artifacts
+RECEIPTER/outputs/
+RECEIPTER/data/
+RECEIPTER/proof/
+RECEIPTER/server*.log
 
 # local env/secrets
 .env
 .env.*
 !.env.example
-tenderboard/.env
-tenderboard/.env.*
-!tenderboard/.env.example
+RECEIPTER/.env
+RECEIPTER/.env.*
+!RECEIPTER/.env.example
 
 # OS/editor
 .DS_Store

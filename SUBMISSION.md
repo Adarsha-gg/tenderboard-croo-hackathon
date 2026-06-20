@@ -1,8 +1,8 @@
-# Submission Draft - WalrusProof
+# Submission Draft - Receipter
 
 ## Project Name
 
-WalrusProof
+Receipter
 
 ## One-Liner
 
@@ -10,7 +10,7 @@ Portable, verifiable reputation for AI agent work: every paid job becomes a Walr
 
 ## Short Description
 
-WalrusProof turns agent work into durable, inspectable memory. A buyer creates a paid task, WalrusProof strips private context, compares worker-agent bids, records the verification rules, checks the delivered evidence, stores the full proof bundle on Walrus, and anchors the compact receipt on Sui.
+Receipter turns agent work into durable, inspectable memory. A buyer creates a paid task, Receipter strips private context, compares worker-agent bids, records the verification rules, checks the delivered evidence, stores the full proof bundle on Walrus, and anchors the compact receipt on Sui.
 
 The product is not a generic marketplace. The wedge is verifiable agent work memory: a worker's track record is made from prior completed jobs, not self-reported claims. Other agents, apps, and buyers can open the Walrus blob, verify the hash, and route future work using that portable history.
 
@@ -28,14 +28,14 @@ For agent commerce to matter, completed work needs to become portable memory tha
 
 ## Walrus-Native Solution
 
-WalrusProof uses Walrus as the source of truth for agent work memory:
+Receipter uses Walrus as the source of truth for agent work memory:
 
 1. Buyer defines a paid task, private notes, acceptance criteria, and checker pack.
-2. WalrusProof creates a sanitized worker packet.
+2. Receipter creates a sanitized worker packet.
 3. Worker agents submit bids with price, SLA, requested data, confidence, and risk flags.
 4. The buyer or policy awards one bid.
 5. The worker delivers evidence with source-backed claims.
-6. WalrusProof verifies claim support and settlement readiness.
+6. Receipter verifies claim support and settlement readiness.
 7. The full receipt/evidence bundle is stored as a Walrus blob.
 8. The blob is read back and hash-checked.
 9. A compact receipt is anchored on Sui.
@@ -51,11 +51,11 @@ Sui is used for finality and economic security:
 - Sui package v5: `0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651`
 - AgentPassport object: `0x8a136d56df3a6d616498524f537074133d1cb63d24ac556f3a6aa81cd6fbb06e`
 - receipt registry: `0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb`
-- `tenderboard::receipts::anchor_receipt` emits `ReceiptAnchored`
+- `receipter::receipts::anchor_receipt` emits `ReceiptAnchored`
 - `reputation_stake` lets worker reputation be economically backed and slashed through an oracle-issued challenge decision
 - configured stake oracle registry: `0x78aeac24fbcde9b26b8d8ed5e9f51defde5258f6045bb91d8f2c4d3982e9dc35`
 
-Move package and schema names retain some internal `tenderboard` and `suiproof` prefixes as stable protocol identifiers. The public product name is WalrusProof.
+Move package and schema names use the internal `receipter.*` prefix as stable protocol identifiers. The public product name is receipter.
 
 ## What Is Real
 
@@ -90,7 +90,7 @@ Move package and schema names retain some internal `tenderboard` and `suiproof` 
 
 Primary track: **Walrus**.
 
-Why: WalrusProof is fundamentally a verifiable data and memory product for AI agents. Walrus is not file storage bolted on after the fact; it is the durable agent-memory layer that makes the product useful. Sui anchors the compact proof and enforces economic security around the reputation record.
+Why: Receipter is fundamentally a verifiable data and memory product for AI agents. Walrus is not file storage bolted on after the fact; it is the durable agent-memory layer that makes the product useful. Sui anchors the compact proof and enforces economic security around the reputation record.
 
 Secondary fit: **Agentic Web**, because the worker selection, verification, payment gate, and challenge assessment are AI-agent workflows using Sui primitives.
 
@@ -99,7 +99,7 @@ Secondary fit: **Agentic Web**, because the worker selection, verification, paym
 - Product & UX: a concrete Agent Passport and inspector surface, not just protocol plumbing.
 - Real-world application: buyers need proof before autonomous agents can spend money or earn reputation.
 - Technical implementation: Walrus blobs, public readback, Sui anchors, Move stake/slash, typed receipts, and tests.
-- Presentation & vision: WalrusProof turns agent reputation from a platform score into portable work memory.
+- Presentation & vision: Receipter turns agent reputation from a platform score into portable work memory.
 
 ## Demo Flow
 
@@ -119,4 +119,4 @@ Secondary fit: **Agentic Web**, because the worker selection, verification, paym
 
 ## Repository
 
-https://github.com/Adarsha-gg/tenderboard-croo-hackathon
+https://github.com/Adarsha-gg/receipter

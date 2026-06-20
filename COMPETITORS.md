@@ -1,10 +1,10 @@
-# WalrusProof — Competitive Landscape (Walrus track)
+# Receipter — Competitive Landscape (Walrus track)
 
 > Intel as of 2026-06-19. Companion to `WALRUS_TRACK_PLAN.md`.
 
 ## TL;DR
 - **🔴 Synapse Vault is the project to beat.** Walrus-track, fully **deployed on testnet**, and
-  it already ships *everything WalrusProof planned*: MemWal recall every tick, Walrus audit
+  it already ships *everything Receipter planned*: MemWal recall every tick, Walrus audit
   artifacts + on-chain hash anchor, a **read-only memory inspector**, a **hire/marketplace**,
   multi-agent coordination, Seal, Walrus Sites, even enclave attestation. We are **behind it on
   execution and breadth.** Direct collision — needs a strategy response, not just more building.
@@ -37,7 +37,7 @@ on-chain) → COORDINATE (peer signal via Sui Stack Messaging) → REMEMBER (out
 
 **Why this is the hard problem:** Synapse already does verifiable MemWal memory + Walrus
 hash-anchored artifacts + inspector + marketplace + multi-agent coordination — *deployed* — which
-is the bulk of WalrusProof's differentiators. It checks **every** Walrus-track rubric box with
+is the bulk of Receipter's differentiators. It checks **every** Walrus-track rubric box with
 live proofs.
 
 **The one gap / our only real opening:** Synapse is **vertical (one team's DeFi treasury)**. Its
@@ -125,7 +125,7 @@ description + any link to confirm.
    "agent + verifiable memory marketplace" framing now loses on execution. We must either
    out-narrow the field or out-execute one specific thing.
 2. **Honest standing:** on breadth/execution today the order is roughly **Synapse ≫ Edge ≈ WalGit
-   > WalrusProof > ChronicleOS**. We are behind the leaders and ahead only of the unbuilt twin.
+   > Receipter > ChronicleOS**. We are behind the leaders and ahead only of the unbuilt twin.
 3. **The only defensible wedge left:** *portable WORK reputation that routes paid jobs between
    strangers.* Synapse's memory is one product recalling itself; ours would be a worker's
    **passport carried to new buyers across arbitrary task types** (research, code, ops…). Lead

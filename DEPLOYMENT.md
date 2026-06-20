@@ -1,4 +1,4 @@
-# WalrusProof Hosted Deployment
+# Receipter Hosted Deployment
 
 This is the no-local-CLI deployment path for judges or a hosted demo.
 
@@ -7,7 +7,7 @@ This is the no-local-CLI deployment path for judges or a hosted demo.
 Use live Sui/Walrus mode:
 
 ```text
-TENDERBOARD_MODE=sui
+RECEIPTER_MODE=sui
 MEMORY_BACKEND=walrus
 ```
 
@@ -16,11 +16,11 @@ Do not depend on `SUI_CLI_PATH` or a local `client.yaml` in hosted mode. Payment
 ## Required Environment
 
 ```text
-TENDERBOARD_MODE=sui
-TENDERBOARD_RECEIPTS_DIR=/var/lib/walrusproof/runs
-TENDERBOARD_WORKER_AGENT_ID=sui_opportunity_scout
-TENDERBOARD_WORKER_AGENT_ADDRESS=<worker-owner-sui-address>
-TENDERBOARD_WORKER_AGENT_PASSPORT_OBJECT_ID=<agent-passport-object-id>
+RECEIPTER_MODE=sui
+RECEIPTER_RECEIPTS_DIR=/var/lib/receipter/runs
+RECEIPTER_WORKER_AGENT_ID=sui_opportunity_scout
+RECEIPTER_WORKER_AGENT_ADDRESS=<worker-owner-sui-address>
+RECEIPTER_WORKER_AGENT_PASSPORT_OBJECT_ID=<agent-passport-object-id>
 
 SUI_NETWORK=testnet
 SUI_RPC_URL=https://fullnode.testnet.sui.io:443
@@ -41,7 +41,7 @@ MEMORY_BACKEND=memwal
 MEMWAL_DELEGATE_KEY=<delegate-key>
 MEMWAL_ACCOUNT_ID=<account-id>
 MEMWAL_SERVER_URL=<memwal-server-url>
-MEMWAL_NAMESPACE=walrusproof
+MEMWAL_NAMESPACE=receipter
 ```
 
 Optional Seal encryption should only be enabled when a live policy and SDK path are configured:
@@ -49,12 +49,12 @@ Optional Seal encryption should only be enabled when a live policy and SDK path 
 ```text
 SEAL_ENCRYPTION_MODE=sdk
 SEAL_POLICY_ID=<seal-policy-id>
-SEAL_NAMESPACE=walrusproof
+SEAL_NAMESPACE=receipter
 ```
 
 ## Persistent Storage
 
-`TENDERBOARD_RECEIPTS_DIR` must be backed by persistent disk, not ephemeral build storage.
+`RECEIPTER_RECEIPTS_DIR` must be backed by persistent disk, not ephemeral build storage.
 
 The directory stores:
 
@@ -92,7 +92,7 @@ Raw digest bypasses are rejected in live mode for payment and receipt anchoring.
 
 - Deploy the Sui package and record package, receipt registry, stake registry, and passport object IDs.
 - Fund the operator/receiver and worker owner addresses on Sui testnet.
-- Configure a persistent `TENDERBOARD_RECEIPTS_DIR`.
+- Configure a persistent `RECEIPTER_RECEIPTS_DIR`.
 - Configure a reachable Walrus publisher and aggregator.
 - Start the server with the host's Node.js start command.
 - Run `npm run check:live` and a real paid run before submitting the demo link.
