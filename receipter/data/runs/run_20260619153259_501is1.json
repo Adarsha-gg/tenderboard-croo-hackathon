@@ -1,0 +1,647 @@
+{
+  "runId": "run_20260619153259_501is1",
+  "mode": "sui-dev",
+  "status": "delivered",
+  "createdAt": "2026-06-19T15:32:59.690Z",
+  "updatedAt": "2026-06-19T15:33:00.059Z",
+  "taskTitle": "Track open-source agent-memory frameworks",
+  "sanitizedTask": "Task: Track open-source agent-memory frameworks\nMax payment: 0.050 SUI\nChecker pack: research\n\nInstructions:\nSurvey active open-source agent memory frameworks and recent releases. Return repositories and notable threads with links and short notes.\n\nAcceptance criteria:\n- Return at least 5 repositories or threads with links.\n- Note stars, recency, or traction when visible.\n- End with a ranked recommendation.\n\nDo not request buyer-private material.",
+  "privacy": {
+    "requestedDataLabel": "public",
+    "privateNotesProvided": false,
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders."
+  },
+  "maxPayment": {
+    "amount": "0.050",
+    "currency": "SUI"
+  },
+  "workerBidBoard": {
+    "buyerMaxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "requestedDataLabel": "public",
+    "selectedBidId": "public_scout_lite",
+    "bids": [
+      {
+        "bidId": "public_scout_standard",
+        "workerAgentId": "sui_opportunity_scout",
+        "priceSui": "0.035",
+        "sla": "24h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_expedited",
+        "workerAgentId": "opportunity_scout.public.expedited",
+        "priceSui": "0.075",
+        "sla": "4h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "premium_price",
+          "over_budget"
+        ],
+        "verdict": "blocked",
+        "reason": "Price 0.075 SUI exceeds buyer max 0.05 SUI."
+      },
+      {
+        "bidId": "context_scout_private",
+        "workerAgentId": "opportunity_scout.context.private",
+        "priceSui": "0.025",
+        "sla": "12h",
+        "requestedDataLabel": "buyer_private",
+        "riskFlags": [
+          "requests_buyer_private_data",
+          "unsafe_data_request"
+        ],
+        "verdict": "blocked",
+        "reason": "Bid requests buyer-private data, which is outside the worker boundary."
+      },
+      {
+        "bidId": "public_scout_lite",
+        "workerAgentId": "opportunity_scout.public.lite",
+        "priceSui": "0.020",
+        "sla": "36h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "budget_tier"
+        ],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_deep",
+        "workerAgentId": "opportunity_scout.public.deep",
+        "priceSui": "0.045",
+        "sla": "48h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      }
+    ]
+  },
+  "hirerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "sui_hirer.governed.buyer",
+    "role": "hirer",
+    "displayName": "Sui Hirer Agent",
+    "responsibilities": [
+      "Define the job, acceptance criteria, private notes, and SUI payment cap.",
+      "Publish only the sanitized worker-facing packet.",
+      "Approve payment and receipt anchoring only after proof gates pass."
+    ],
+    "controls": [
+      "Private notes never enter the worker packet.",
+      "Worker bids must fit the SUI cap and public data boundary.",
+      "Reputation updates only after Walrus evidence and Sui receipt anchoring."
+    ],
+    "budgetSui": "0.050",
+    "requestedDataLabel": "public"
+  },
+  "workerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "opportunity_scout.public.lite",
+    "role": "worker",
+    "displayName": "Opportunity Scout Worker",
+    "responsibilities": [
+      "Bid on the sanitized task packet.",
+      "Use public sources to produce delivery evidence.",
+      "Return source receipts that can be stored on Walrus and anchored to Sui."
+    ],
+    "controls": [
+      "Receives only the sanitized task packet.",
+      "Cannot request buyer-private or secret data.",
+      "Payment and reputation are bound to the selected bid and receipt plan."
+    ],
+    "priceSui": "0.020",
+    "requestedDataLabel": "public"
+  },
+  "agentHandoff": {
+    "objectType": "receipter.agent_handoff.v1",
+    "handoffId": "handoff_0052b66691d65020",
+    "hirerAgentId": "sui_hirer.governed.buyer",
+    "workerAgentId": "opportunity_scout.public.lite",
+    "selectedBidId": "public_scout_lite",
+    "safePacketHash": "sha256:0052b66691d6502038589948913d20631296239dc28eab4e7d15cf507389ee3f",
+    "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac",
+    "paymentIntentId": "payment_intent_run_20260619153259_501is1",
+    "status": "requires_review"
+  },
+  "trustDecision": {
+    "workerAgentId": "opportunity_scout.public.lite",
+    "score": 82,
+    "tier": "A",
+    "verdict": "allow",
+    "pricedMultiplier": 1.5,
+    "reasons": [
+      "No secret-looking lines were found in the public worker packet.",
+      "Requested payment is close to the configured cap.",
+      "Buyer-defined acceptance criteria were anchored before dispatch.",
+      "3 worker bid(s) are available and 2 risky bid(s) were blocked.",
+      "Worker has no prior Walrus memory records; treating this route as a cold start.",
+      "Worker route is pinned to opportunity_scout.public.lite."
+    ],
+    "controls": [
+      "Private notes are never included in the worker packet.",
+      "Secret-looking task lines are removed before worker dispatch.",
+      "Sui payment approval is bound to the exact work order before delivery.",
+      "Payment is capped at 0.050 SUI by config.",
+      "Final evidence must produce a Walrus blob id before Sui anchoring.",
+      "Receipts exclude SDK keys, private notes, wallet secrets, and .env values.",
+      "Worker execution can only proceed with an available bid that stays inside the buyer SUI cap and public data boundary.",
+      "Worker routing uses the worker Walrus memory passport before dispatch."
+    ]
+  },
+  "verificationManifest": {
+    "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac",
+    "checkerPack": "research",
+    "acceptanceCriteria": [
+      "Return at least 5 repositories or threads with links.",
+      "Note stars, recency, or traction when visible.",
+      "End with a ranked recommendation.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requiredChecks": [
+      {
+        "id": "safe_packet",
+        "label": "Safe worker packet",
+        "status": "passed",
+        "detail": "No forbidden secret pattern remains in the worker packet."
+      },
+      {
+        "id": "payment_cap",
+        "label": "Payment cap",
+        "status": "passed",
+        "detail": "0.050 SUI is within the 0.050 SUI configured cap."
+      },
+      {
+        "id": "order_bound_approval",
+        "label": "Sui work-order approval",
+        "status": "passed",
+        "detail": "Sui work order sui_work_order_run_20260619153259_501is1 was bound before payment approval."
+      },
+      {
+        "id": "delivery_evidence",
+        "label": "Delivery evidence",
+        "status": "passed",
+        "detail": "Delivery evidence hash sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361."
+      },
+      {
+        "id": "walrus_evidence",
+        "label": "Walrus evidence storage",
+        "status": "passed",
+        "detail": "Walrus evidence bundle walrus_dev_blob_6d209854b1afd984b8cdadb67381737d is bound to the receipt."
+      },
+      {
+        "id": "criteria_coverage",
+        "label": "Acceptance criteria coverage",
+        "status": "requires_review",
+        "detail": "Delivery is present but lacks enough source-backed evidence to cover acceptance criteria automatically."
+      },
+      {
+        "id": "public_sources",
+        "label": "Public source evidence",
+        "status": "requires_review",
+        "detail": "Source receipt contains no observations."
+      },
+      {
+        "id": "reputation_signal",
+        "label": "Reputation signal",
+        "status": "pending",
+        "detail": "Receipt is a reputation candidate; waiting for Sui anchor before WorkerReputationUpdated."
+      }
+    ],
+    "summary": {
+      "objectType": "receipter.verification_summary.v1",
+      "admissibility": "insufficient",
+      "evidenceStrength": "walrus_backed",
+      "passed": 5,
+      "pending": 1,
+      "requiresReview": 2,
+      "blockerIds": [
+        "criteria_coverage",
+        "public_sources",
+        "reputation_signal"
+      ],
+      "settlementEligible": false,
+      "reputationEligible": false
+    },
+    "settlementRule": "Release payment only after safe packet creation, Sui work order creation, explicit operator approval, delivery receipt, Walrus evidence upload, and Sui anchor readiness.",
+    "reputationWriteback": "Use only Sui-anchored receipts as worker reputation signals.",
+    "workerMemory": {
+      "workerAgentId": "opportunity_scout.public.lite",
+      "memoryCount": 0,
+      "walrusMemoryCount": 0,
+      "anchoredMemoryCount": 0
+    },
+    "evidenceHash": "sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361",
+    "claimResults": []
+  },
+  "paymentIntentPlan": {
+    "objectType": "receipter.payment_intent_plan.v1",
+    "intentId": "payment_intent_run_20260619153259_501is1",
+    "paymentNonce": "pay_5d216ef63e43b82ed7345bff1558e88e",
+    "settlementNonce": "set_ffca9dec92b21ad35acf3663f841e274",
+    "amountMist": "20000000",
+    "amountSui": "0.020",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+    "operatorAddress": "<SUI_OPERATOR_ADDRESS>",
+    "selectedBid": {
+      "bidId": "public_scout_lite",
+      "workerAgentId": "opportunity_scout.public.lite",
+      "priceSui": "0.020",
+      "sla": "36h",
+      "requestedDataLabel": "public"
+    },
+    "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=20000000&amountMist=20000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_5d216ef63e43b82ed7345bff1558e88e&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_5d216ef63e43b82ed7345bff1558e88e&settlementNonce=set_ffca9dec92b21ad35acf3663f841e274&network=testnet&runId=run_20260619153259_501is1&intentId=payment_intent_run_20260619153259_501is1&selectedBidId=public_scout_lite&workerAgentId=opportunity_scout.public.lite&bidPriceSui=0.020&sla=36h",
+    "paymentKitMode": "sui_pay_uri_metadata_only",
+    "paymentKitCompatibility": "sui:pay-uri-v1",
+    "expiresAt": "2026-06-20T15:32:59.690Z",
+    "createdAt": "2026-06-19T15:32:59.690Z"
+  },
+  "receiptPlan": {
+    "objectType": "receipter.receipt_plan.v1",
+    "intentId": "payment_intent_run_20260619153259_501is1",
+    "paymentNonce": "pay_5d216ef63e43b82ed7345bff1558e88e",
+    "settlementNonce": "set_ffca9dec92b21ad35acf3663f841e274",
+    "duplicatePreventionKey": "testnet:payment_intent_run_20260619153259_501is1:pay_5d216ef63e43b82ed7345bff1558e88e:set_ffca9dec92b21ad35acf3663f841e274",
+    "amountMist": "20000000",
+    "amountSui": "0.020",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+    "operatorAddress": "<SUI_OPERATOR_ADDRESS>",
+    "selectedBidId": "public_scout_lite",
+    "workerAgentId": "opportunity_scout.public.lite",
+    "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=20000000&amountMist=20000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_5d216ef63e43b82ed7345bff1558e88e&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_5d216ef63e43b82ed7345bff1558e88e&settlementNonce=set_ffca9dec92b21ad35acf3663f841e274&network=testnet&runId=run_20260619153259_501is1&intentId=payment_intent_run_20260619153259_501is1&selectedBidId=public_scout_lite&workerAgentId=opportunity_scout.public.lite&bidPriceSui=0.020&sla=36h",
+    "paymentKitMode": "sui_pay_uri_metadata_only",
+    "paymentKitCompatibility": "sui:pay-uri-v1",
+    "updatedAt": "2026-06-19T15:33:00.059Z",
+    "paymentDigest": "sui_dev_payment_run_20260619153259_501is1",
+    "walrusBlobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+    "walrusBlobObjectId": "0x6d209854b1afd984b8cdadb67381737dccf10e57b9b26274a91cacc735da8a83",
+    "walrusCertifiedEpoch": 0,
+    "walrusEndEpoch": 2,
+    "walrusReadUrl": "walrus-dev://6d209854b1afd984b8cdadb67381737d"
+  },
+  "reputationSnapshot": {
+    "objectType": "receipter.worker_reputation_passport.v1",
+    "workerAgentId": "opportunity_scout.public.lite",
+    "generatedAt": "2026-06-19T15:32:59.690Z",
+    "anchoredRunCount": 0,
+    "walrusEvidenceCount": 0,
+    "sourceEvidenceCount": 0,
+    "memoryCount": 0,
+    "tierCounts": {
+      "AAA": 0,
+      "AA": 0,
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "totalMistEarned": "0",
+    "totalSuiEarned": "0"
+  },
+  "workerAgentId": "opportunity_scout.public.lite",
+  "workOrderId": "sui_work_order_run_20260619153259_501is1",
+  "suiNetwork": "testnet",
+  "suiWorkOrderObjectId": "0x776f726b5f6f726465723a72756e5f32303236303631393135333235395f3530",
+  "suiEscrowObjectId": "0x657363726f773a72756e5f32303236303631393135333235395f353031697331",
+  "events": [
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "run_created",
+      "message": "Sui-bound task created."
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "task_sanitized",
+      "message": "Private notes were not sent to the worker."
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "worker_bid_board_evaluated",
+      "message": "Worker bids were evaluated against SUI budget and privacy label.",
+      "data": {
+        "selectedBidId": "public_scout_lite",
+        "availableBids": 3,
+        "blockedBids": 2
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "trust_evaluated",
+      "message": "Trust gate returned allow at 82/100.",
+      "data": {
+        "score": 82,
+        "tier": "A",
+        "verdict": "allow"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "sui",
+      "type": "sui_work_order_created",
+      "message": "Nonce-bound Sui payment intent prepared. Payment approval is required.",
+      "data": {
+        "workOrderId": "sui_work_order_run_20260619153259_501is1",
+        "intentId": "payment_intent_run_20260619153259_501is1",
+        "paymentNonce": "pay_5d216ef63e43b82ed7345bff1558e88e",
+        "settlementNonce": "set_ffca9dec92b21ad35acf3663f841e274",
+        "amountMist": "20000000",
+        "coinType": "0x2::sui::SUI",
+        "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+        "network": "testnet",
+        "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=20000000&amountMist=20000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_5d216ef63e43b82ed7345bff1558e88e&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_5d216ef63e43b82ed7345bff1558e88e&settlementNonce=set_ffca9dec92b21ad35acf3663f841e274&network=testnet&runId=run_20260619153259_501is1&intentId=payment_intent_run_20260619153259_501is1&selectedBidId=public_scout_lite&workerAgentId=opportunity_scout.public.lite&bidPriceSui=0.020&sla=36h",
+        "paymentKitMode": "sui_pay_uri_metadata_only"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "worker_reputation_snapshot_attached",
+      "message": "Pre-run worker reputation passport attached from anchored public receipts.",
+      "data": {
+        "workerAgentId": "opportunity_scout.public.lite",
+        "anchoredRunCount": 0,
+        "walrusEvidenceCount": 0,
+        "memoryCount": 0
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "app",
+      "type": "agent_handoff_created",
+      "message": "Hirer agent awarded the sanitized Sui work order to the selected worker agent.",
+      "data": {
+        "hirerAgentId": "sui_hirer.governed.buyer",
+        "workerAgentId": "opportunity_scout.public.lite",
+        "selectedBidId": "public_scout_lite",
+        "safePacketHash": "sha256:0052b66691d6502038589948913d20631296239dc28eab4e7d15cf507389ee3f"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.690Z",
+      "source": "sui",
+      "type": "verification_manifest_created",
+      "message": "Verification manifest is ready for Sui anchoring.",
+      "data": {
+        "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.700Z",
+      "source": "app",
+      "type": "payment_approved",
+      "message": "Sui payment approval was recorded for this work order."
+    },
+    {
+      "at": "2026-06-19T15:32:59.700Z",
+      "source": "sui",
+      "type": "sui_dev_payment_recorded",
+      "message": "Sui payment digest recorded and bound to the receipt plan.",
+      "data": {
+        "digest": "sui_dev_payment_run_20260619153259_501is1",
+        "intentId": "payment_intent_run_20260619153259_501is1",
+        "paymentNonce": "pay_5d216ef63e43b82ed7345bff1558e88e",
+        "settlementNonce": "set_ffca9dec92b21ad35acf3663f841e274",
+        "amountMist": "20000000",
+        "coinType": "0x2::sui::SUI",
+        "receiverAddress": "<SUI_OPERATOR_ADDRESS>"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.700Z",
+      "source": "worker",
+      "type": "worker_task_available",
+      "message": "Selected worker agent can now submit delivery for the paid work order.",
+      "data": {
+        "workerAgentId": "opportunity_scout.public.lite",
+        "selectedBidId": "public_scout_lite",
+        "handoffId": "handoff_0052b66691d65020"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.704Z",
+      "source": "worker",
+      "type": "delivery_sent",
+      "message": "Worker agent submitted delivery for the paid work order.",
+      "data": {
+        "workerAgentId": "opportunity_scout.public.lite",
+        "handoffId": "handoff_0052b66691d65020",
+        "sourceEvidenceHash": "sha256:b67a764f046b675eec8823e68d232b64ba38f9c23554134e0987eb11b2444483"
+      }
+    },
+    {
+      "at": "2026-06-19T15:32:59.704Z",
+      "source": "walrus",
+      "type": "walrus_upload_pending",
+      "message": "Full receipt and evidence should be uploaded to Walrus before Sui anchoring."
+    },
+    {
+      "at": "2026-06-19T15:33:00.059Z",
+      "source": "walrus",
+      "type": "walrus_dev_blob_recorded",
+      "message": "Evidence bundle stored for Sui receipt anchoring.",
+      "data": {
+        "blobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+        "blobObjectId": "0x6d209854b1afd984b8cdadb67381737dccf10e57b9b26274a91cacc735da8a83",
+        "endEpoch": 2,
+        "readUrl": "walrus-dev://6d209854b1afd984b8cdadb67381737d",
+        "memoryId": "memory_f6352700a24bb1ee",
+        "memoryHash": "sha256:f6352700a24bb1eeac8a9ea986e54e67df2dc0bbc422ae5b1a1a78d6de5939a8",
+        "intentId": "payment_intent_run_20260619153259_501is1",
+        "paymentNonce": "pay_5d216ef63e43b82ed7345bff1558e88e",
+        "settlementNonce": "set_ffca9dec92b21ad35acf3663f841e274"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.059Z",
+      "source": "sui",
+      "type": "sui_anchor_ready",
+      "message": "Walrus evidence id is ready to be committed to the Sui receipt registry.",
+      "data": {}
+    }
+  ],
+  "obligationObject": {
+    "objectType": "receipter.obligation.v1",
+    "obligationId": "obligation_run_20260619153259_501is1",
+    "taskTitle": "Track open-source agent-memory frameworks",
+    "sanitizedTaskHash": "sha256:da9e666f8fc2e2e69097aed961e1fe71b2e491d5cfe47b99b1aa9e4e8cbcfbc4",
+    "specHash": "sha256:241845d276470219a39a3392c1ee112e6bc0f57ccede09d44de01a7ebe6b2cac",
+    "selectedBid": {
+      "bidId": "public_scout_lite",
+      "workerAgentId": "opportunity_scout.public.lite",
+      "priceSui": "0.020",
+      "sla": "36h",
+      "requestedDataLabel": "public"
+    },
+    "acceptanceCriteria": [
+      "Return at least 5 repositories or threads with links.",
+      "Note stars, recency, or traction when visible.",
+      "End with a ranked recommendation.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requestedDataLabel": "public",
+    "maxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders.",
+    "workOrderId": "sui_work_order_run_20260619153259_501is1",
+    "suiWorkOrderObjectId": "0x776f726b5f6f726465723a72756e5f32303236303631393135333235395f3530",
+    "createdAt": "2026-06-19T15:32:59.690Z",
+    "updatedAt": "2026-06-19T15:33:00.059Z"
+  },
+  "evidenceEnvelope": {
+    "objectType": "receipter.evidence_envelope.v1",
+    "envelopeId": "evidence_run_20260619153259_501is1",
+    "obligationId": "obligation_run_20260619153259_501is1",
+    "evidenceHash": "sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361",
+    "deliveryPresent": true,
+    "requestedDataLabel": "public",
+    "walrusReady": true,
+    "walrusBlobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+    "walrusBlobObjectId": "0x6d209854b1afd984b8cdadb67381737dccf10e57b9b26274a91cacc735da8a83",
+    "walrusCertifiedEpoch": 0,
+    "walrusEndEpoch": 2,
+    "walrusReadUrl": "walrus-dev://6d209854b1afd984b8cdadb67381737d",
+    "updatedAt": "2026-06-19T15:33:00.059Z"
+  },
+  "clearingDecision": {
+    "objectType": "receipter.clearing_decision.v1",
+    "decisionId": "clearing_run_20260619153259_501is1",
+    "obligationId": "obligation_run_20260619153259_501is1",
+    "verdict": "requires_review",
+    "reasons": [
+      "Selected bid public_scout_lite is bound to the obligation.",
+      "Acceptance criteria count: 8.",
+      "Task data label: public.",
+      "Verification admissibility: insufficient.",
+      "Evidence strength: walrus_backed.",
+      "Verification blocker(s): criteria_coverage, public_sources, reputation_signal.",
+      "Delivery is present with evidence hash sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361.",
+      "Walrus evidence walrus_dev_blob_6d209854b1afd984b8cdadb67381737d is ready for Sui anchoring."
+    ],
+    "trustVerdict": "allow",
+    "evidenceHash": "sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361",
+    "walrusReady": true,
+    "verificationStatus": {
+      "passed": 5,
+      "pending": 1,
+      "requiresReview": 2
+    },
+    "verificationAdmissibility": "insufficient",
+    "evidenceStrength": "walrus_backed",
+    "blockerIds": [
+      "criteria_coverage",
+      "public_sources",
+      "reputation_signal"
+    ],
+    "decidedAt": "2026-06-19T15:33:00.059Z"
+  },
+  "settlementInstruction": {
+    "objectType": "receipter.settlement_instruction.v1",
+    "instructionId": "settlement_run_20260619153259_501is1",
+    "obligationId": "obligation_run_20260619153259_501is1",
+    "action": "manual_review",
+    "workerAgentId": "opportunity_scout.public.lite",
+    "selectedBidId": "public_scout_lite",
+    "amount": {
+      "amount": "0.020",
+      "currency": "SUI"
+    },
+    "preconditions": [
+      "Resolve trust, bid, or work-order blocking issue before settlement."
+    ],
+    "suiEscrowObjectId": "0x657363726f773a72756e5f32303236303631393135333235395f353031697331",
+    "suiPaymentDigest": "sui_dev_payment_run_20260619153259_501is1",
+    "walrusBlobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+    "updatedAt": "2026-06-19T15:33:00.059Z"
+  },
+  "suiPaymentDigest": "sui_dev_payment_run_20260619153259_501is1",
+  "deliveryText": "Receipter worker completed: Track open-source agent-memory frameworks\n\nWhat I did:\n- Received only the Sui-bound safe task text.\n- Did not receive private notes or secrets.\n- Produced evidence for a Walrus memory blob and Sui receipt anchor.\n- Searched public sources for real links related to the task.\n\nOpportunity Scout Report\nGenerated: 2026-06-19T15:32:59.704Z\nSearch: track open-source agent-memory frameworks\n\nNo links found.\n\nWarnings:\n- No public results found. Try a broader task like \"find AI agent hackathons\".",
+  "workerEvidence": {
+    "schema": "receipter.scout_evidence.v1",
+    "generatedAt": "2026-06-19T15:32:59.704Z",
+    "query": "track open-source agent-memory frameworks",
+    "sourceReceipt": {
+      "schema": "receipter.source_receipt.v1",
+      "generatedAt": "2026-06-19T15:32:59.704Z",
+      "query": "track open-source agent-memory frameworks",
+      "observations": [],
+      "warnings": [
+        "No public results found. Try a broader task like \"find AI agent hackathons\"."
+      ],
+      "receiptId": "source_receipt_6772645bb91d21f3",
+      "receiptHash": "sha256:6772645bb91d21f3ffd033c5301b878b9c10c8012edd4d79b746d5a53dcea74e"
+    },
+    "claims": [],
+    "evidenceHash": "sha256:b67a764f046b675eec8823e68d232b64ba38f9c23554134e0987eb11b2444483"
+  },
+  "memoryRecord": {
+    "objectType": "receipter.agent_memory_record.v1",
+    "memoryId": "memory_f6352700a24bb1ee",
+    "workerAgentId": "opportunity_scout.public.lite",
+    "runId": "run_20260619153259_501is1",
+    "taskTitle": "Track open-source agent-memory frameworks",
+    "workOrderId": "sui_work_order_run_20260619153259_501is1",
+    "paymentIntentId": "payment_intent_run_20260619153259_501is1",
+    "selectedBidId": "public_scout_lite",
+    "amountMist": "20000000",
+    "amountSui": "0.020",
+    "createdAt": "2026-06-19T15:32:59.690Z",
+    "updatedAt": "2026-06-19T15:33:00.059Z",
+    "status": "delivered",
+    "summary": "Track open-source agent-memory frameworks: insufficient verification, 0 supported claim(s), 0 failed claim(s).",
+    "tags": [
+      "research",
+      "insufficient",
+      "walrus_backed",
+      "manual_review"
+    ],
+    "sourceObservationCount": 0,
+    "claimCount": 0,
+    "supportedClaimCount": 0,
+    "failedClaimCount": 0,
+    "verificationAdmissibility": "insufficient",
+    "evidenceStrength": "walrus_backed",
+    "settlementAction": "manual_review",
+    "paymentDigest": "sui_dev_payment_run_20260619153259_501is1",
+    "walrusBlobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+    "walrusReadUrl": "walrus-dev://6d209854b1afd984b8cdadb67381737d",
+    "evidenceHash": "sha256:e701c6aa79d97bb438fbf77a87db5da04b6683ab7b4177c790e429959bd4b361",
+    "marketplaceProof": {
+      "paymentBound": true,
+      "workerSelected": true,
+      "sourceVerified": false,
+      "walrusStored": true,
+      "suiAnchored": false
+    },
+    "memoryHash": "sha256:f6352700a24bb1eeac8a9ea986e54e67df2dc0bbc422ae5b1a1a78d6de5939a8"
+  },
+  "walrusBlobId": "walrus_dev_blob_6d209854b1afd984b8cdadb67381737d",
+  "walrusBlobObjectId": "0x6d209854b1afd984b8cdadb67381737dccf10e57b9b26274a91cacc735da8a83",
+  "walrusCertifiedEpoch": 0,
+  "walrusEndEpoch": 2,
+  "walrusReadUrl": "walrus-dev://6d209854b1afd984b8cdadb67381737d"
+}

@@ -1,0 +1,917 @@
+{
+  "runId": "run_20260620182520_983rbi",
+  "mode": "sui",
+  "status": "awaiting_payment_approval",
+  "createdAt": "2026-06-20T18:25:20.336Z",
+  "updatedAt": "2026-06-20T18:25:20.336Z",
+  "taskTitle": "Find AI agent hackathons and builder programs",
+  "sanitizedTask": "Task: Find AI agent hackathons and builder programs\nMax payment: 0.050 SUI\nChecker pack: research\n\nInstructions:\nSearch public sources for active AI agent hackathons, grants, and builder programs. Return the strongest opportunities with links and a short recommendation.\n\nAcceptance criteria:\n- Return at least 5 public-source opportunities with links.\n- Flag deadline, sponsor, and fit when visible.\n- End with a ranked recommendation and why.\n\nDo not request buyer-private material.",
+  "privacy": {
+    "requestedDataLabel": "public",
+    "privateNotesProvided": true,
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders."
+  },
+  "maxPayment": {
+    "amount": "0.050",
+    "currency": "SUI"
+  },
+  "workerBidBoard": {
+    "buyerMaxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "requestedDataLabel": "public",
+    "selectedBidId": "public_scout_standard",
+    "bids": [
+      {
+        "bidId": "public_scout_standard",
+        "workerAgentId": "sui_opportunity_scout",
+        "priceSui": "0.035",
+        "sla": "24h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_expedited",
+        "workerAgentId": "opportunity_scout.public.expedited",
+        "priceSui": "0.075",
+        "sla": "4h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "premium_price",
+          "over_budget"
+        ],
+        "verdict": "blocked",
+        "reason": "Price 0.075 SUI exceeds buyer max 0.05 SUI."
+      },
+      {
+        "bidId": "context_scout_private",
+        "workerAgentId": "opportunity_scout.context.private",
+        "priceSui": "0.025",
+        "sla": "12h",
+        "requestedDataLabel": "buyer_private",
+        "riskFlags": [
+          "requests_buyer_private_data",
+          "unsafe_data_request"
+        ],
+        "verdict": "blocked",
+        "reason": "Bid requests buyer-private data, which is outside the worker boundary."
+      },
+      {
+        "bidId": "public_scout_lite",
+        "workerAgentId": "opportunity_scout.public.lite",
+        "priceSui": "0.020",
+        "sla": "36h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "budget_tier"
+        ],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_deep",
+        "workerAgentId": "opportunity_scout.public.deep",
+        "priceSui": "0.045",
+        "sla": "48h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      }
+    ]
+  },
+  "hirerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "sui_hirer.governed.buyer",
+    "role": "hirer",
+    "ownerAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "displayName": "Sui Hirer Agent",
+    "responsibilities": [
+      "Define the job, acceptance criteria, private notes, and SUI payment cap.",
+      "Publish only the sanitized worker-facing packet.",
+      "Approve payment and receipt anchoring only after proof gates pass."
+    ],
+    "controls": [
+      "Private notes never enter the worker packet.",
+      "Worker bids must fit the SUI cap and public data boundary.",
+      "Reputation updates only after Walrus evidence and Sui receipt anchoring."
+    ],
+    "budgetSui": "0.050",
+    "requestedDataLabel": "public"
+  },
+  "workerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "sui_opportunity_scout",
+    "role": "worker",
+    "ownerAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "agentPassportObjectId": "0x8a136d56df3a6d616498524f537074133d1cb63d24ac556f3a6aa81cd6fbb06e",
+    "displayName": "Opportunity Scout Worker",
+    "responsibilities": [
+      "Bid on the sanitized task packet.",
+      "Use public sources to produce delivery evidence.",
+      "Return source receipts that can be stored on Walrus and anchored to Sui."
+    ],
+    "controls": [
+      "Receives only the sanitized task packet.",
+      "Cannot request buyer-private or secret data.",
+      "Payment and reputation are bound to the selected bid and receipt plan."
+    ],
+    "priceSui": "0.035",
+    "requestedDataLabel": "public"
+  },
+  "agentHandoff": {
+    "objectType": "receipter.agent_handoff.v1",
+    "handoffId": "handoff_a0559a9571c9b1e3",
+    "hirerAgentId": "sui_hirer.governed.buyer",
+    "workerAgentId": "sui_opportunity_scout",
+    "selectedBidId": "public_scout_standard",
+    "safePacketHash": "sha256:a0559a9571c9b1e37966b70ba90e799e2eb5b38b97910614d5aaaa594f05078d",
+    "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa",
+    "paymentIntentId": "payment_intent_run_20260620182520_983rbi",
+    "status": "awaiting_payment"
+  },
+  "trustDecision": {
+    "workerAgentId": "sui_opportunity_scout",
+    "score": 85,
+    "tier": "A",
+    "verdict": "allow",
+    "pricedMultiplier": 1.5,
+    "reasons": [
+      "No secret-looking lines were found in the public worker packet.",
+      "Requested payment is close to the configured cap.",
+      "Private notes were provided and kept inside the buyer boundary.",
+      "Buyer-defined acceptance criteria were anchored before dispatch.",
+      "3 worker bid(s) are available and 2 risky bid(s) were blocked.",
+      "Worker Walrus memory passport has 7 prior record(s), 6 Walrus-backed, and 5 Sui-anchored.",
+      "Prior memory average claim support is 100/100.",
+      "Worker route is pinned to sui_opportunity_scout."
+    ],
+    "controls": [
+      "Private notes are never included in the worker packet.",
+      "Secret-looking task lines are removed before worker dispatch.",
+      "Sui payment approval is bound to the exact work order before delivery.",
+      "Payment is capped at 0.050 SUI by config.",
+      "Final evidence must produce a Walrus blob id before Sui anchoring.",
+      "Receipts exclude SDK keys, private notes, wallet secrets, and .env values.",
+      "Worker execution can only proceed with an available bid that stays inside the buyer SUI cap and public data boundary.",
+      "Worker routing uses the worker Walrus memory passport before dispatch."
+    ]
+  },
+  "verificationManifest": {
+    "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa",
+    "checkerPack": "research",
+    "acceptanceCriteria": [
+      "Return at least 5 public-source opportunities with links.",
+      "Flag deadline, sponsor, and fit when visible.",
+      "End with a ranked recommendation and why.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requiredChecks": [
+      {
+        "id": "safe_packet",
+        "label": "Safe worker packet",
+        "status": "passed",
+        "detail": "No forbidden secret pattern remains in the worker packet."
+      },
+      {
+        "id": "payment_cap",
+        "label": "Payment cap",
+        "status": "passed",
+        "detail": "0.050 SUI is within the 0.050 SUI configured cap."
+      },
+      {
+        "id": "order_bound_approval",
+        "label": "Sui work-order approval",
+        "status": "pending",
+        "detail": "Waiting for Sui work order id and operator approval."
+      },
+      {
+        "id": "delivery_evidence",
+        "label": "Delivery evidence",
+        "status": "pending",
+        "detail": "Waiting for worker delivery."
+      },
+      {
+        "id": "walrus_evidence",
+        "label": "Walrus evidence storage",
+        "status": "pending",
+        "detail": "Waiting for the full receipt and source evidence bundle to be stored on Walrus."
+      },
+      {
+        "id": "criteria_coverage",
+        "label": "Acceptance criteria coverage",
+        "status": "pending",
+        "detail": "3 buyer-defined criterion/criteria must be covered by the delivery."
+      },
+      {
+        "id": "public_sources",
+        "label": "Public source evidence",
+        "status": "pending",
+        "detail": "Worker delivery should include public links that support the recommendation."
+      },
+      {
+        "id": "reputation_signal",
+        "label": "Reputation signal",
+        "status": "pending",
+        "detail": "Waiting for the Sui receipt anchor before reputation can be updated."
+      }
+    ],
+    "summary": {
+      "objectType": "receipter.verification_summary.v1",
+      "admissibility": "pending",
+      "evidenceStrength": "none",
+      "passed": 2,
+      "pending": 6,
+      "requiresReview": 0,
+      "blockerIds": [
+        "order_bound_approval",
+        "delivery_evidence",
+        "walrus_evidence",
+        "criteria_coverage",
+        "public_sources",
+        "reputation_signal"
+      ],
+      "settlementEligible": false,
+      "reputationEligible": false
+    },
+    "settlementRule": "Release payment only after safe packet creation, Sui work order creation, explicit operator approval, delivery receipt, Walrus evidence upload, and Sui anchor readiness.",
+    "reputationWriteback": "Use only Sui-anchored receipts as worker reputation signals.",
+    "workerMemory": {
+      "workerAgentId": "sui_opportunity_scout",
+      "memoryCount": 7,
+      "walrusMemoryCount": 6,
+      "anchoredMemoryCount": 5,
+      "averageClaimSupport": 100,
+      "latestMemoryId": "memory_d447c1c0dd0b0604"
+    }
+  },
+  "paymentIntentPlan": {
+    "objectType": "receipter.payment_intent_plan.v1",
+    "intentId": "payment_intent_run_20260620182520_983rbi",
+    "paymentNonce": "pay_39f1a69d3ad5f08d15fa2600a078ad8f",
+    "settlementNonce": "set_ab5ad958915866f98d8046ca556c3a14",
+    "amountMist": "35000000",
+    "amountSui": "0.035",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "operatorAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "selectedBid": {
+      "bidId": "public_scout_standard",
+      "workerAgentId": "sui_opportunity_scout",
+      "priceSui": "0.035",
+      "sla": "24h",
+      "requestedDataLabel": "public"
+    },
+    "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&receiver=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&operator=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&label=Receipter&message=Receipter+agent+memory+payment&paymentNonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&settlementNonce=set_ab5ad958915866f98d8046ca556c3a14&network=testnet&runId=run_20260620182520_983rbi&intentId=payment_intent_run_20260620182520_983rbi&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h&packageId=0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651&registry=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb&receiptRegistryId=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb",
+    "paymentKitMode": "sui_wallet_transaction_request",
+    "paymentKitCompatibility": "sui:wallet-standard-sign-and-execute-v1",
+    "expiresAt": "2026-06-21T18:25:20.336Z",
+    "createdAt": "2026-06-20T18:25:20.336Z",
+    "walletTransactionRequest": {
+      "objectType": "receipter.sui_wallet_transaction_request.v1",
+      "version": 1,
+      "kind": "x402_payment",
+      "chain": "sui:testnet",
+      "network": "testnet",
+      "signerRole": "hirer",
+      "walletStandard": "sui:signAndExecuteTransaction",
+      "builder": "sui-typescript-sdk-transaction",
+      "description": "Pay 0.035 SUI for Receipter worker access.",
+      "gasBudgetMist": "100000000",
+      "required": {
+        "packageId": "0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651",
+        "receiptRegistryId": "0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb",
+        "receiverAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285"
+      },
+      "commands": [
+        {
+          "kind": "splitCoins",
+          "source": "gas",
+          "amountsMist": [
+            "35000000"
+          ],
+          "assign": "payment"
+        },
+        {
+          "kind": "transferObjects",
+          "objects": [
+            "payment.0"
+          ],
+          "recipient": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285"
+        },
+        {
+          "kind": "moveCall",
+          "target": "0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651::receipts::record_payment_intent",
+          "arguments": [
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "run_20260620182520_983rbi",
+              "encoding": "utf8",
+              "bytes": [
+                114,
+                117,
+                110,
+                95,
+                50,
+                48,
+                50,
+                54,
+                48,
+                54,
+                50,
+                48,
+                49,
+                56,
+                50,
+                53,
+                50,
+                48,
+                95,
+                57,
+                56,
+                51,
+                114,
+                98,
+                105
+              ],
+              "hex": "0x72756e5f32303236303632303138323532305f393833726269"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "/api/runs/run_20260620182520_983rbi/worker-task",
+              "encoding": "utf8",
+              "bytes": [
+                47,
+                97,
+                112,
+                105,
+                47,
+                114,
+                117,
+                110,
+                115,
+                47,
+                114,
+                117,
+                110,
+                95,
+                50,
+                48,
+                50,
+                54,
+                48,
+                54,
+                50,
+                48,
+                49,
+                56,
+                50,
+                53,
+                50,
+                48,
+                95,
+                57,
+                56,
+                51,
+                114,
+                98,
+                105,
+                47,
+                119,
+                111,
+                114,
+                107,
+                101,
+                114,
+                45,
+                116,
+                97,
+                115,
+                107
+              ],
+              "hex": "0x2f6170692f72756e732f72756e5f32303236303632303138323532305f3938337262692f776f726b65722d7461736b"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "payment_intent_run_20260620182520_983rbi",
+              "encoding": "utf8",
+              "bytes": [
+                112,
+                97,
+                121,
+                109,
+                101,
+                110,
+                116,
+                95,
+                105,
+                110,
+                116,
+                101,
+                110,
+                116,
+                95,
+                114,
+                117,
+                110,
+                95,
+                50,
+                48,
+                50,
+                54,
+                48,
+                54,
+                50,
+                48,
+                49,
+                56,
+                50,
+                53,
+                50,
+                48,
+                95,
+                57,
+                56,
+                51,
+                114,
+                98,
+                105
+              ],
+              "hex": "0x7061796d656e745f696e74656e745f72756e5f32303236303632303138323532305f393833726269"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "pay_39f1a69d3ad5f08d15fa2600a078ad8f",
+              "encoding": "utf8",
+              "bytes": [
+                112,
+                97,
+                121,
+                95,
+                51,
+                57,
+                102,
+                49,
+                97,
+                54,
+                57,
+                100,
+                51,
+                97,
+                100,
+                53,
+                102,
+                48,
+                56,
+                100,
+                49,
+                53,
+                102,
+                97,
+                50,
+                54,
+                48,
+                48,
+                97,
+                48,
+                55,
+                56,
+                97,
+                100,
+                56,
+                102
+              ],
+              "hex": "0x7061795f3339663161363964336164356630386431356661323630306130373861643866"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "set_ab5ad958915866f98d8046ca556c3a14",
+              "encoding": "utf8",
+              "bytes": [
+                115,
+                101,
+                116,
+                95,
+                97,
+                98,
+                53,
+                97,
+                100,
+                57,
+                53,
+                56,
+                57,
+                49,
+                53,
+                56,
+                54,
+                54,
+                102,
+                57,
+                56,
+                100,
+                56,
+                48,
+                52,
+                54,
+                99,
+                97,
+                53,
+                53,
+                54,
+                99,
+                51,
+                97,
+                49,
+                52
+              ],
+              "hex": "0x7365745f6162356164393538393135383636663938643830343663613535366333613134"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "35000000",
+              "encoding": "utf8",
+              "bytes": [
+                51,
+                53,
+                48,
+                48,
+                48,
+                48,
+                48,
+                48
+              ],
+              "hex": "0x3335303030303030"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+              "encoding": "utf8",
+              "bytes": [
+                48,
+                120,
+                97,
+                56,
+                56,
+                99,
+                54,
+                97,
+                50,
+                53,
+                50,
+                98,
+                55,
+                54,
+                53,
+                57,
+                100,
+                54,
+                97,
+                55,
+                53,
+                51,
+                48,
+                52,
+                52,
+                53,
+                53,
+                56,
+                57,
+                99,
+                55,
+                53,
+                101,
+                54,
+                50,
+                99,
+                51,
+                100,
+                56,
+                50,
+                56,
+                57,
+                100,
+                101,
+                101,
+                49,
+                53,
+                51,
+                101,
+                48,
+                52,
+                56,
+                56,
+                50,
+                101,
+                49,
+                102,
+                52,
+                102,
+                48,
+                55,
+                102,
+                48,
+                50,
+                56,
+                53
+              ],
+              "hex": "0x307861383863366132353262373635396436613735333034343535383963373565363263336438323839646565313533653034383832653166346630376630323835"
+            },
+            {
+              "kind": "pure",
+              "type": "vector<u8>",
+              "value": "sui_opportunity_scout",
+              "encoding": "utf8",
+              "bytes": [
+                115,
+                117,
+                105,
+                95,
+                111,
+                112,
+                112,
+                111,
+                114,
+                116,
+                117,
+                110,
+                105,
+                116,
+                121,
+                95,
+                115,
+                99,
+                111,
+                117,
+                116
+              ],
+              "hex": "0x7375695f6f70706f7274756e6974795f73636f7574"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "runId": "run_20260620182520_983rbi",
+        "resource": "/api/runs/run_20260620182520_983rbi/worker-task",
+        "paymentIntentId": "payment_intent_run_20260620182520_983rbi",
+        "paymentNonce": "pay_39f1a69d3ad5f08d15fa2600a078ad8f",
+        "settlementNonce": "set_ab5ad958915866f98d8046ca556c3a14",
+        "amountMist": "35000000",
+        "amountSui": "0.035",
+        "receiverAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+        "coinType": "0x2::sui::SUI",
+        "workerAgentId": "sui_opportunity_scout",
+        "selectedBidId": "public_scout_standard"
+      }
+    }
+  },
+  "receiptPlan": {
+    "objectType": "receipter.receipt_plan.v1",
+    "intentId": "payment_intent_run_20260620182520_983rbi",
+    "paymentNonce": "pay_39f1a69d3ad5f08d15fa2600a078ad8f",
+    "settlementNonce": "set_ab5ad958915866f98d8046ca556c3a14",
+    "duplicatePreventionKey": "testnet:payment_intent_run_20260620182520_983rbi:pay_39f1a69d3ad5f08d15fa2600a078ad8f:set_ab5ad958915866f98d8046ca556c3a14",
+    "amountMist": "35000000",
+    "amountSui": "0.035",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "operatorAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+    "selectedBidId": "public_scout_standard",
+    "workerAgentId": "sui_opportunity_scout",
+    "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&receiver=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&operator=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&label=Receipter&message=Receipter+agent+memory+payment&paymentNonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&settlementNonce=set_ab5ad958915866f98d8046ca556c3a14&network=testnet&runId=run_20260620182520_983rbi&intentId=payment_intent_run_20260620182520_983rbi&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h&packageId=0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651&registry=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb&receiptRegistryId=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb",
+    "paymentKitMode": "sui_wallet_transaction_request",
+    "paymentKitCompatibility": "sui:wallet-standard-sign-and-execute-v1",
+    "updatedAt": "2026-06-20T18:25:20.336Z"
+  },
+  "reputationSnapshot": {
+    "objectType": "receipter.worker_reputation_passport.v1",
+    "workerAgentId": "sui_opportunity_scout",
+    "generatedAt": "2026-06-20T18:25:20.336Z",
+    "anchoredRunCount": 5,
+    "walrusEvidenceCount": 5,
+    "sourceEvidenceCount": 7,
+    "memoryCount": 7,
+    "averageClaimSupport": 100,
+    "averageTrustScore": 84.4,
+    "tierCounts": {
+      "AAA": 0,
+      "AA": 0,
+      "A": 5,
+      "B": 0,
+      "C": 0
+    },
+    "totalMistEarned": "175000000",
+    "totalSuiEarned": "0.175",
+    "lastAnchoredRunId": "run_20260619170152_fh8zk6",
+    "lastAnchoredAt": "2026-06-19T17:02:00.958Z",
+    "lastWalrusBlobId": "lDssvU3Jw6eRyE2N0X0fvCE3b_oCV5peftFj4UkAklw",
+    "lastMemoryId": "memory_d447c1c0dd0b0604",
+    "lastEvidenceHash": "sha256:9f49ebf677eaffec0f4d8b01adaf3da4b3de0677940211bd7b66e7598db163ff",
+    "lastAnchorDigest": "Hxxuk6jCAMFvUyiif8q6GLjDQ6w6m1BjMAnUb1zNEDLP"
+  },
+  "workerAgentId": "sui_opportunity_scout",
+  "workOrderId": "sui_work_order_run_20260620182520_983rbi",
+  "suiNetwork": "testnet",
+  "suiPackageId": "0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651",
+  "suiReceiptRegistryId": "0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb",
+  "events": [
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "run_created",
+      "message": "Sui-bound task created."
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "task_sanitized",
+      "message": "Private notes were not sent to the worker."
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "worker_bid_board_evaluated",
+      "message": "Worker bids were evaluated against SUI budget and privacy label.",
+      "data": {
+        "selectedBidId": "public_scout_standard",
+        "availableBids": 3,
+        "blockedBids": 2
+      }
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "trust_evaluated",
+      "message": "Trust gate returned allow at 85/100.",
+      "data": {
+        "score": 85,
+        "tier": "A",
+        "verdict": "allow"
+      }
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "sui",
+      "type": "sui_work_order_created",
+      "message": "Nonce-bound Sui payment intent prepared. Payment approval is required.",
+      "data": {
+        "workOrderId": "sui_work_order_run_20260620182520_983rbi",
+        "intentId": "payment_intent_run_20260620182520_983rbi",
+        "paymentNonce": "pay_39f1a69d3ad5f08d15fa2600a078ad8f",
+        "settlementNonce": "set_ab5ad958915866f98d8046ca556c3a14",
+        "amountMist": "35000000",
+        "coinType": "0x2::sui::SUI",
+        "receiverAddress": "0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285",
+        "network": "testnet",
+        "paymentUri": "sui:pay?recipient=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&receiver=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&operator=0xa88c6a252b7659d6a7530445589c75e62c3d8289dee153e04882e1f4f07f0285&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&label=Receipter&message=Receipter+agent+memory+payment&paymentNonce=pay_39f1a69d3ad5f08d15fa2600a078ad8f&settlementNonce=set_ab5ad958915866f98d8046ca556c3a14&network=testnet&runId=run_20260620182520_983rbi&intentId=payment_intent_run_20260620182520_983rbi&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h&packageId=0x57efddeb8888ff788487deb2e21042fe6ead4ee10dadd8d8386ecad8df17e651&registry=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb&receiptRegistryId=0x62b35a579149dcf50127e68f4ad00107e72df975ed57993ab5d825e0400fa1bb",
+        "paymentKitMode": "sui_wallet_transaction_request"
+      }
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "worker_reputation_snapshot_attached",
+      "message": "Pre-run worker reputation passport attached from anchored public receipts.",
+      "data": {
+        "workerAgentId": "sui_opportunity_scout",
+        "anchoredRunCount": 5,
+        "walrusEvidenceCount": 5,
+        "memoryCount": 7,
+        "averageClaimSupport": 100,
+        "lastMemoryId": "memory_d447c1c0dd0b0604",
+        "averageTrustScore": 84.4
+      }
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "app",
+      "type": "agent_handoff_created",
+      "message": "Hirer agent awarded the sanitized Sui work order to the selected worker agent.",
+      "data": {
+        "hirerAgentId": "sui_hirer.governed.buyer",
+        "workerAgentId": "sui_opportunity_scout",
+        "selectedBidId": "public_scout_standard",
+        "safePacketHash": "sha256:a0559a9571c9b1e37966b70ba90e799e2eb5b38b97910614d5aaaa594f05078d"
+      }
+    },
+    {
+      "at": "2026-06-20T18:25:20.336Z",
+      "source": "sui",
+      "type": "verification_manifest_created",
+      "message": "Verification manifest is ready for Sui anchoring.",
+      "data": {
+        "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa"
+      }
+    }
+  ],
+  "obligationObject": {
+    "objectType": "receipter.obligation.v1",
+    "obligationId": "obligation_run_20260620182520_983rbi",
+    "taskTitle": "Find AI agent hackathons and builder programs",
+    "sanitizedTaskHash": "sha256:1c8ff294854a360f30ab49dfd40db375bc5f2f7e60f58614e83c3315916b21d0",
+    "specHash": "sha256:b42606501fed63a00895ef938f84671fe56948c08afdbb6f584899034760e3aa",
+    "selectedBid": {
+      "bidId": "public_scout_standard",
+      "workerAgentId": "sui_opportunity_scout",
+      "priceSui": "0.035",
+      "sla": "24h",
+      "requestedDataLabel": "public"
+    },
+    "acceptanceCriteria": [
+      "Return at least 5 public-source opportunities with links.",
+      "Flag deadline, sponsor, and fit when visible.",
+      "End with a ranked recommendation and why.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requestedDataLabel": "public",
+    "maxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders.",
+    "workOrderId": "sui_work_order_run_20260620182520_983rbi",
+    "createdAt": "2026-06-20T18:25:20.336Z",
+    "updatedAt": "2026-06-20T18:25:20.336Z"
+  },
+  "evidenceEnvelope": {
+    "objectType": "receipter.evidence_envelope.v1",
+    "envelopeId": "evidence_run_20260620182520_983rbi",
+    "obligationId": "obligation_run_20260620182520_983rbi",
+    "deliveryPresent": false,
+    "requestedDataLabel": "public",
+    "walrusReady": false,
+    "updatedAt": "2026-06-20T18:25:20.336Z"
+  },
+  "clearingDecision": {
+    "objectType": "receipter.clearing_decision.v1",
+    "decisionId": "clearing_run_20260620182520_983rbi",
+    "obligationId": "obligation_run_20260620182520_983rbi",
+    "verdict": "pending_delivery",
+    "reasons": [
+      "Selected bid public_scout_standard is bound to the obligation.",
+      "Acceptance criteria count: 8.",
+      "Task data label: public.",
+      "Verification admissibility: pending.",
+      "Evidence strength: none.",
+      "Verification blocker(s): order_bound_approval, delivery_evidence, walrus_evidence, criteria_coverage, public_sources, reputation_signal.",
+      "Worker delivery is still required before evidence clearing.",
+      "Walrus evidence is not ready for Sui anchoring yet."
+    ],
+    "trustVerdict": "allow",
+    "walrusReady": false,
+    "verificationStatus": {
+      "passed": 2,
+      "pending": 6,
+      "requiresReview": 0
+    },
+    "verificationAdmissibility": "pending",
+    "evidenceStrength": "none",
+    "blockerIds": [
+      "order_bound_approval",
+      "delivery_evidence",
+      "walrus_evidence",
+      "criteria_coverage",
+      "public_sources",
+      "reputation_signal"
+    ],
+    "decidedAt": "2026-06-20T18:25:20.336Z"
+  },
+  "settlementInstruction": {
+    "objectType": "receipter.settlement_instruction.v1",
+    "instructionId": "settlement_run_20260620182520_983rbi",
+    "obligationId": "obligation_run_20260620182520_983rbi",
+    "action": "hold_payment",
+    "workerAgentId": "sui_opportunity_scout",
+    "selectedBidId": "public_scout_standard",
+    "amount": {
+      "amount": "0.035",
+      "currency": "SUI"
+    },
+    "preconditions": [
+      "Wait for worker delivery and finalized evidence hash."
+    ],
+    "updatedAt": "2026-06-20T18:25:20.336Z"
+  }
+}

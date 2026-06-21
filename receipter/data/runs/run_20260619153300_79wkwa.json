@@ -1,0 +1,991 @@
+{
+  "runId": "run_20260619153300_79wkwa",
+  "mode": "sui-dev",
+  "status": "anchored",
+  "createdAt": "2026-06-19T15:33:00.404Z",
+  "updatedAt": "2026-06-19T15:33:00.856Z",
+  "taskTitle": "Find Sui ecosystem builder opportunities",
+  "sanitizedTask": "Task: Find Sui ecosystem builder opportunities\nMax payment: 0.050 SUI\nChecker pack: research\n\nInstructions:\nSearch public sources for Sui ecosystem grants, hackathons, and builder programs. Return the strongest opportunities with links and recommendations.\n\nAcceptance criteria:\n- Return at least 5 public-source opportunities with links.\n- Flag deadline and funding when visible.\n- End with a ranked recommendation.\n\nDo not request buyer-private material.",
+  "privacy": {
+    "requestedDataLabel": "public",
+    "privateNotesProvided": false,
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders."
+  },
+  "maxPayment": {
+    "amount": "0.050",
+    "currency": "SUI"
+  },
+  "workerBidBoard": {
+    "buyerMaxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "requestedDataLabel": "public",
+    "selectedBidId": "public_scout_standard",
+    "bids": [
+      {
+        "bidId": "public_scout_standard",
+        "workerAgentId": "sui_opportunity_scout",
+        "priceSui": "0.035",
+        "sla": "24h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_expedited",
+        "workerAgentId": "opportunity_scout.public.expedited",
+        "priceSui": "0.075",
+        "sla": "4h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "premium_price",
+          "over_budget"
+        ],
+        "verdict": "blocked",
+        "reason": "Price 0.075 SUI exceeds buyer max 0.05 SUI."
+      },
+      {
+        "bidId": "context_scout_private",
+        "workerAgentId": "opportunity_scout.context.private",
+        "priceSui": "0.025",
+        "sla": "12h",
+        "requestedDataLabel": "buyer_private",
+        "riskFlags": [
+          "requests_buyer_private_data",
+          "unsafe_data_request"
+        ],
+        "verdict": "blocked",
+        "reason": "Bid requests buyer-private data, which is outside the worker boundary."
+      },
+      {
+        "bidId": "public_scout_lite",
+        "workerAgentId": "opportunity_scout.public.lite",
+        "priceSui": "0.020",
+        "sla": "36h",
+        "requestedDataLabel": "public",
+        "riskFlags": [
+          "budget_tier"
+        ],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      },
+      {
+        "bidId": "public_scout_deep",
+        "workerAgentId": "opportunity_scout.public.deep",
+        "priceSui": "0.045",
+        "sla": "48h",
+        "requestedDataLabel": "public",
+        "riskFlags": [],
+        "verdict": "available",
+        "reason": "Bid is within the SUI budget and only asks for public worker data."
+      }
+    ]
+  },
+  "hirerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "sui_hirer.governed.buyer",
+    "role": "hirer",
+    "displayName": "Sui Hirer Agent",
+    "responsibilities": [
+      "Define the job, acceptance criteria, private notes, and SUI payment cap.",
+      "Publish only the sanitized worker-facing packet.",
+      "Approve payment and receipt anchoring only after proof gates pass."
+    ],
+    "controls": [
+      "Private notes never enter the worker packet.",
+      "Worker bids must fit the SUI cap and public data boundary.",
+      "Reputation updates only after Walrus evidence and Sui receipt anchoring."
+    ],
+    "budgetSui": "0.050",
+    "requestedDataLabel": "public"
+  },
+  "workerAgent": {
+    "objectType": "receipter.market_agent.v1",
+    "agentId": "sui_opportunity_scout",
+    "role": "worker",
+    "displayName": "Opportunity Scout Worker",
+    "responsibilities": [
+      "Bid on the sanitized task packet.",
+      "Use public sources to produce delivery evidence.",
+      "Return source receipts that can be stored on Walrus and anchored to Sui."
+    ],
+    "controls": [
+      "Receives only the sanitized task packet.",
+      "Cannot request buyer-private or secret data.",
+      "Payment and reputation are bound to the selected bid and receipt plan."
+    ],
+    "priceSui": "0.035",
+    "requestedDataLabel": "public"
+  },
+  "agentHandoff": {
+    "objectType": "receipter.agent_handoff.v1",
+    "handoffId": "handoff_ee1005c81be8a4ce",
+    "hirerAgentId": "sui_hirer.governed.buyer",
+    "workerAgentId": "sui_opportunity_scout",
+    "selectedBidId": "public_scout_standard",
+    "safePacketHash": "sha256:ee1005c81be8a4ce4d6a4ae63ca2f96ee0c946f2a0b0e1135537abc233389946",
+    "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b",
+    "paymentIntentId": "payment_intent_run_20260619153300_79wkwa",
+    "status": "anchored"
+  },
+  "trustDecision": {
+    "workerAgentId": "sui_opportunity_scout",
+    "score": 85,
+    "tier": "A",
+    "verdict": "allow",
+    "pricedMultiplier": 1.5,
+    "reasons": [
+      "No secret-looking lines were found in the public worker packet.",
+      "Requested payment is close to the configured cap.",
+      "Buyer-defined acceptance criteria were anchored before dispatch.",
+      "3 worker bid(s) are available and 2 risky bid(s) were blocked.",
+      "Worker Walrus memory passport has 1 prior record(s), 1 Walrus-backed, and 1 Sui-anchored.",
+      "Prior memory average claim support is 100/100.",
+      "Worker route is pinned to sui_opportunity_scout."
+    ],
+    "controls": [
+      "Private notes are never included in the worker packet.",
+      "Secret-looking task lines are removed before worker dispatch.",
+      "Sui payment approval is bound to the exact work order before delivery.",
+      "Payment is capped at 0.050 SUI by config.",
+      "Final evidence must produce a Walrus blob id before Sui anchoring.",
+      "Receipts exclude SDK keys, private notes, wallet secrets, and .env values.",
+      "Worker execution can only proceed with an available bid that stays inside the buyer SUI cap and public data boundary.",
+      "Worker routing uses the worker Walrus memory passport before dispatch."
+    ]
+  },
+  "verificationManifest": {
+    "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b",
+    "checkerPack": "research",
+    "acceptanceCriteria": [
+      "Return at least 5 public-source opportunities with links.",
+      "Flag deadline and funding when visible.",
+      "End with a ranked recommendation.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requiredChecks": [
+      {
+        "id": "safe_packet",
+        "label": "Safe worker packet",
+        "status": "passed",
+        "detail": "No forbidden secret pattern remains in the worker packet."
+      },
+      {
+        "id": "payment_cap",
+        "label": "Payment cap",
+        "status": "passed",
+        "detail": "0.050 SUI is within the 0.050 SUI configured cap."
+      },
+      {
+        "id": "order_bound_approval",
+        "label": "Sui work-order approval",
+        "status": "passed",
+        "detail": "Sui work order sui_work_order_run_20260619153300_79wkwa was bound before payment approval."
+      },
+      {
+        "id": "delivery_evidence",
+        "label": "Delivery evidence",
+        "status": "passed",
+        "detail": "Delivery evidence hash sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17."
+      },
+      {
+        "id": "walrus_evidence",
+        "label": "Walrus evidence storage",
+        "status": "passed",
+        "detail": "Walrus evidence bundle walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d is bound to the receipt."
+      },
+      {
+        "id": "criteria_coverage",
+        "label": "Acceptance criteria coverage",
+        "status": "passed",
+        "detail": "Built-in checker accepted the delivery because source-backed claims are present and bound to observations."
+      },
+      {
+        "id": "public_sources",
+        "label": "Public source evidence",
+        "status": "passed",
+        "detail": "Source receipt contains 2 observation(s) and 2 supported claim(s)."
+      },
+      {
+        "id": "reputation_signal",
+        "label": "Reputation signal",
+        "status": "passed",
+        "detail": "WorkerReputationUpdated ready for sui_opportunity_scout: 2 anchored run(s), 2 Walrus proof(s), 3 source observation(s)."
+      }
+    ],
+    "summary": {
+      "objectType": "receipter.verification_summary.v1",
+      "admissibility": "admissible",
+      "evidenceStrength": "sui_anchored",
+      "passed": 8,
+      "pending": 0,
+      "requiresReview": 0,
+      "blockerIds": [],
+      "settlementEligible": true,
+      "reputationEligible": true
+    },
+    "settlementRule": "Release payment only after safe packet creation, Sui work order creation, explicit operator approval, delivery receipt, Walrus evidence upload, and Sui anchor readiness.",
+    "reputationWriteback": "Emit WorkerReputationUpdated only after the Sui receipt anchor records the Walrus evidence and payment-bound receipt.",
+    "workerMemory": {
+      "workerAgentId": "sui_opportunity_scout",
+      "memoryCount": 1,
+      "walrusMemoryCount": 1,
+      "anchoredMemoryCount": 1,
+      "averageClaimSupport": 100,
+      "latestMemoryId": "memory_12673640a8cf4271"
+    },
+    "evidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+    "claimResults": [
+      {
+        "objectType": "receipter.claim_verification.v1",
+        "claimId": "claim_1_source_abfa9a54e8d998ed",
+        "sourceObservationId": "source_abfa9a54e8d998ed",
+        "verdict": "supported",
+        "supportScore": 100,
+        "reasons": [
+          "Claim URL matches source observation URL.",
+          "Claim title is supported by source observation title.",
+          "Claim statement is grounded in the source record.",
+          "Source observation record hash is present."
+        ],
+        "sourceUrl": "https://github.com/Mosss-OS/webscout",
+        "sourceTitle": "Mosss-OS/webscout",
+        "observedAt": "2026-06-19T15:33:00.414Z",
+        "publishedAt": "2026-05-31T15:56:34Z"
+      },
+      {
+        "objectType": "receipter.claim_verification.v1",
+        "claimId": "claim_2_source_c294fe32469b3ae8",
+        "sourceObservationId": "source_c294fe32469b3ae8",
+        "verdict": "supported",
+        "supportScore": 100,
+        "reasons": [
+          "Claim URL matches source observation URL.",
+          "Claim title is supported by source observation title.",
+          "Claim statement is grounded in the source record.",
+          "Source observation record hash is present."
+        ],
+        "sourceUrl": "https://github.com/umutergul74/earnradar-turkey",
+        "sourceTitle": "umutergul74/earnradar-turkey",
+        "observedAt": "2026-06-19T15:33:00.414Z",
+        "publishedAt": "2026-05-02T16:51:23Z"
+      }
+    ]
+  },
+  "paymentIntentPlan": {
+    "objectType": "receipter.payment_intent_plan.v1",
+    "intentId": "payment_intent_run_20260619153300_79wkwa",
+    "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+    "settlementNonce": "set_a33a089fbacda94d72470e981197ee00",
+    "amountMist": "35000000",
+    "amountSui": "0.035",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+    "operatorAddress": "<SUI_OPERATOR_ADDRESS>",
+    "selectedBid": {
+      "bidId": "public_scout_standard",
+      "workerAgentId": "sui_opportunity_scout",
+      "priceSui": "0.035",
+      "sla": "24h",
+      "requestedDataLabel": "public"
+    },
+    "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_ba108c425cfc3831906edb419c5337de&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_ba108c425cfc3831906edb419c5337de&settlementNonce=set_a33a089fbacda94d72470e981197ee00&network=testnet&runId=run_20260619153300_79wkwa&intentId=payment_intent_run_20260619153300_79wkwa&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h",
+    "paymentKitMode": "sui_pay_uri_metadata_only",
+    "paymentKitCompatibility": "sui:pay-uri-v1",
+    "expiresAt": "2026-06-20T15:33:00.404Z",
+    "createdAt": "2026-06-19T15:33:00.404Z"
+  },
+  "receiptPlan": {
+    "objectType": "receipter.receipt_plan.v1",
+    "intentId": "payment_intent_run_20260619153300_79wkwa",
+    "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+    "settlementNonce": "set_a33a089fbacda94d72470e981197ee00",
+    "duplicatePreventionKey": "testnet:payment_intent_run_20260619153300_79wkwa:pay_ba108c425cfc3831906edb419c5337de:set_a33a089fbacda94d72470e981197ee00",
+    "amountMist": "35000000",
+    "amountSui": "0.035",
+    "coinType": "0x2::sui::SUI",
+    "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+    "operatorAddress": "<SUI_OPERATOR_ADDRESS>",
+    "selectedBidId": "public_scout_standard",
+    "workerAgentId": "sui_opportunity_scout",
+    "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b",
+    "expectedNetwork": "testnet",
+    "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_ba108c425cfc3831906edb419c5337de&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_ba108c425cfc3831906edb419c5337de&settlementNonce=set_a33a089fbacda94d72470e981197ee00&network=testnet&runId=run_20260619153300_79wkwa&intentId=payment_intent_run_20260619153300_79wkwa&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h",
+    "paymentKitMode": "sui_pay_uri_metadata_only",
+    "paymentKitCompatibility": "sui:pay-uri-v1",
+    "updatedAt": "2026-06-19T15:33:00.856Z",
+    "paymentDigest": "sui_dev_payment_run_20260619153300_79wkwa",
+    "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+    "walrusBlobObjectId": "0x2e4736ac05ba315c40ae7297aa7f074df195e9a98ca2c861d9924ff7426054ca",
+    "walrusCertifiedEpoch": 0,
+    "walrusEndEpoch": 2,
+    "walrusReadUrl": "walrus-dev://2e4736ac05ba315c40ae7297aa7f074d",
+    "anchorDigest": "sui_dev_anchor_run_20260619153300_79wkwa"
+  },
+  "reputationSnapshot": {
+    "objectType": "receipter.worker_reputation_passport.v1",
+    "workerAgentId": "sui_opportunity_scout",
+    "generatedAt": "2026-06-19T15:33:00.856Z",
+    "anchoredRunCount": 2,
+    "walrusEvidenceCount": 2,
+    "sourceEvidenceCount": 3,
+    "memoryCount": 2,
+    "averageClaimSupport": 100,
+    "averageTrustScore": 83.5,
+    "tierCounts": {
+      "AAA": 0,
+      "AA": 0,
+      "A": 2,
+      "B": 0,
+      "C": 0
+    },
+    "totalMistEarned": "70000000",
+    "totalSuiEarned": "0.07",
+    "lastAnchoredRunId": "run_20260619153300_79wkwa",
+    "lastAnchoredAt": "2026-06-19T15:33:00.856Z",
+    "lastWalrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+    "lastMemoryId": "memory_63c46f8b2465451e",
+    "lastEvidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+    "lastAnchorDigest": "sui_dev_anchor_run_20260619153300_79wkwa"
+  },
+  "workerAgentId": "sui_opportunity_scout",
+  "workOrderId": "sui_work_order_run_20260619153300_79wkwa",
+  "suiNetwork": "testnet",
+  "suiWorkOrderObjectId": "0x776f726b5f6f726465723a72756e5f32303236303631393135333330305f3739",
+  "suiEscrowObjectId": "0x657363726f773a72756e5f32303236303631393135333330305f3739776b7761",
+  "events": [
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "run_created",
+      "message": "Sui-bound task created."
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "task_sanitized",
+      "message": "Private notes were not sent to the worker."
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "worker_bid_board_evaluated",
+      "message": "Worker bids were evaluated against SUI budget and privacy label.",
+      "data": {
+        "selectedBidId": "public_scout_standard",
+        "availableBids": 3,
+        "blockedBids": 2
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "trust_evaluated",
+      "message": "Trust gate returned allow at 85/100.",
+      "data": {
+        "score": 85,
+        "tier": "A",
+        "verdict": "allow"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "sui",
+      "type": "sui_work_order_created",
+      "message": "Nonce-bound Sui payment intent prepared. Payment approval is required.",
+      "data": {
+        "workOrderId": "sui_work_order_run_20260619153300_79wkwa",
+        "intentId": "payment_intent_run_20260619153300_79wkwa",
+        "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+        "settlementNonce": "set_a33a089fbacda94d72470e981197ee00",
+        "amountMist": "35000000",
+        "coinType": "0x2::sui::SUI",
+        "receiverAddress": "<SUI_OPERATOR_ADDRESS>",
+        "network": "testnet",
+        "paymentUri": "sui:pay?recipient=%3CSUI_OPERATOR_ADDRESS%3E&receiver=%3CSUI_OPERATOR_ADDRESS%3E&operator=%3CSUI_OPERATOR_ADDRESS%3E&amount=35000000&amountMist=35000000&coinType=0x2%3A%3Asui%3A%3ASUI&nonce=pay_ba108c425cfc3831906edb419c5337de&label=Receipter+Market&message=Receipter+Market+agent+memory+payment&paymentNonce=pay_ba108c425cfc3831906edb419c5337de&settlementNonce=set_a33a089fbacda94d72470e981197ee00&network=testnet&runId=run_20260619153300_79wkwa&intentId=payment_intent_run_20260619153300_79wkwa&selectedBidId=public_scout_standard&workerAgentId=sui_opportunity_scout&bidPriceSui=0.035&sla=24h",
+        "paymentKitMode": "sui_pay_uri_metadata_only"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "worker_reputation_snapshot_attached",
+      "message": "Pre-run worker reputation passport attached from anchored public receipts.",
+      "data": {
+        "workerAgentId": "sui_opportunity_scout",
+        "anchoredRunCount": 1,
+        "walrusEvidenceCount": 1,
+        "memoryCount": 1,
+        "averageClaimSupport": 100,
+        "lastMemoryId": "memory_12673640a8cf4271",
+        "averageTrustScore": 82
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "app",
+      "type": "agent_handoff_created",
+      "message": "Hirer agent awarded the sanitized Sui work order to the selected worker agent.",
+      "data": {
+        "hirerAgentId": "sui_hirer.governed.buyer",
+        "workerAgentId": "sui_opportunity_scout",
+        "selectedBidId": "public_scout_standard",
+        "safePacketHash": "sha256:ee1005c81be8a4ce4d6a4ae63ca2f96ee0c946f2a0b0e1135537abc233389946"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.404Z",
+      "source": "sui",
+      "type": "verification_manifest_created",
+      "message": "Verification manifest is ready for Sui anchoring.",
+      "data": {
+        "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.407Z",
+      "source": "app",
+      "type": "payment_approved",
+      "message": "Sui payment approval was recorded for this work order."
+    },
+    {
+      "at": "2026-06-19T15:33:00.407Z",
+      "source": "sui",
+      "type": "sui_dev_payment_recorded",
+      "message": "Sui payment digest recorded and bound to the receipt plan.",
+      "data": {
+        "digest": "sui_dev_payment_run_20260619153300_79wkwa",
+        "intentId": "payment_intent_run_20260619153300_79wkwa",
+        "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+        "settlementNonce": "set_a33a089fbacda94d72470e981197ee00",
+        "amountMist": "35000000",
+        "coinType": "0x2::sui::SUI",
+        "receiverAddress": "<SUI_OPERATOR_ADDRESS>"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.407Z",
+      "source": "worker",
+      "type": "worker_task_available",
+      "message": "Selected worker agent can now submit delivery for the paid work order.",
+      "data": {
+        "workerAgentId": "sui_opportunity_scout",
+        "selectedBidId": "public_scout_standard",
+        "handoffId": "handoff_ee1005c81be8a4ce"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.414Z",
+      "source": "worker",
+      "type": "delivery_sent",
+      "message": "Worker agent submitted delivery for the paid work order.",
+      "data": {
+        "workerAgentId": "sui_opportunity_scout",
+        "handoffId": "handoff_ee1005c81be8a4ce",
+        "sourceEvidenceHash": "sha256:61b0750aac7bc292bf26cad4074cb2d257e3e46477f6cc9119ba46e0e29edb2e"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.414Z",
+      "source": "walrus",
+      "type": "walrus_upload_pending",
+      "message": "Full receipt and evidence should be uploaded to Walrus before Sui anchoring."
+    },
+    {
+      "at": "2026-06-19T15:33:00.851Z",
+      "source": "walrus",
+      "type": "walrus_dev_blob_recorded",
+      "message": "Evidence bundle stored for Sui receipt anchoring.",
+      "data": {
+        "blobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+        "blobObjectId": "0x2e4736ac05ba315c40ae7297aa7f074df195e9a98ca2c861d9924ff7426054ca",
+        "endEpoch": 2,
+        "readUrl": "walrus-dev://2e4736ac05ba315c40ae7297aa7f074d",
+        "memoryId": "memory_75f84063a5676de2",
+        "memoryHash": "sha256:75f84063a5676de21c4277452c184a64b1e5f20570727a3f23a72e025db7d44f",
+        "intentId": "payment_intent_run_20260619153300_79wkwa",
+        "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+        "settlementNonce": "set_a33a089fbacda94d72470e981197ee00"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.851Z",
+      "source": "sui",
+      "type": "sui_anchor_ready",
+      "message": "Walrus evidence id is ready to be committed to the Sui receipt registry.",
+      "data": {}
+    },
+    {
+      "at": "2026-06-19T15:33:00.856Z",
+      "source": "sui",
+      "type": "sui_dev_receipt_anchored",
+      "message": "Final receipt committed to the Sui receipt registry.",
+      "data": {
+        "digest": "sui_dev_anchor_run_20260619153300_79wkwa",
+        "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+        "evidenceHash": "sha256:06ddac649a213536acb10e06006b458ba53dbd206cf3f081e0a2e7544e0dd691",
+        "intentId": "payment_intent_run_20260619153300_79wkwa",
+        "paymentNonce": "pay_ba108c425cfc3831906edb419c5337de",
+        "settlementNonce": "set_a33a089fbacda94d72470e981197ee00"
+      }
+    },
+    {
+      "at": "2026-06-19T15:33:00.856Z",
+      "source": "sui",
+      "type": "worker_reputation_updated",
+      "message": "Worker reputation passport updated from the anchored Sui receipt.",
+      "data": {
+        "eventName": "WorkerReputationUpdated",
+        "workerAgentId": "sui_opportunity_scout",
+        "anchoredRunCount": 2,
+        "walrusEvidenceCount": 2,
+        "sourceEvidenceCount": 3,
+        "averageTrustScore": 83.5,
+        "totalMistEarned": "70000000",
+        "lastWalrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+        "lastEvidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+        "memoryId": "memory_63c46f8b2465451e"
+      }
+    }
+  ],
+  "obligationObject": {
+    "objectType": "receipter.obligation.v1",
+    "obligationId": "obligation_run_20260619153300_79wkwa",
+    "taskTitle": "Find Sui ecosystem builder opportunities",
+    "sanitizedTaskHash": "sha256:d06181a9ea863667b56e3b3e7e49ca4ba1f6dfc4a9543910480337a04bb9e725",
+    "specHash": "sha256:b10a94b7fc89a3977a11224d9237a942264b033bf829446ed5ee45719b045d8b",
+    "selectedBid": {
+      "bidId": "public_scout_standard",
+      "workerAgentId": "sui_opportunity_scout",
+      "priceSui": "0.035",
+      "sla": "24h",
+      "requestedDataLabel": "public"
+    },
+    "acceptanceCriteria": [
+      "Return at least 5 public-source opportunities with links.",
+      "Flag deadline and funding when visible.",
+      "End with a ranked recommendation.",
+      "Worker must only receive the sanitized task packet.",
+      "Worker output must answer the task using public-source evidence where possible.",
+      "Payment requires a Sui work order id and explicit operator approval.",
+      "Final receipt must include status, Sui work order id, Sui payment digest when available, delivery, Walrus blob id when uploaded, and event timeline.",
+      "Receipt must not contain private notes, SDK keys, wallet secrets, or .env values."
+    ],
+    "requestedDataLabel": "public",
+    "maxPayment": {
+      "amount": "0.050",
+      "currency": "SUI"
+    },
+    "workerDataBoundary": "Only public task instructions and acceptance criteria may be sent to worker bidders.",
+    "workOrderId": "sui_work_order_run_20260619153300_79wkwa",
+    "suiWorkOrderObjectId": "0x776f726b5f6f726465723a72756e5f32303236303631393135333330305f3739",
+    "createdAt": "2026-06-19T15:33:00.404Z",
+    "updatedAt": "2026-06-19T15:33:00.858Z"
+  },
+  "evidenceEnvelope": {
+    "objectType": "receipter.evidence_envelope.v1",
+    "envelopeId": "evidence_run_20260619153300_79wkwa",
+    "obligationId": "obligation_run_20260619153300_79wkwa",
+    "evidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+    "deliveryPresent": true,
+    "requestedDataLabel": "public",
+    "walrusReady": true,
+    "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+    "walrusBlobObjectId": "0x2e4736ac05ba315c40ae7297aa7f074df195e9a98ca2c861d9924ff7426054ca",
+    "walrusCertifiedEpoch": 0,
+    "walrusEndEpoch": 2,
+    "walrusReadUrl": "walrus-dev://2e4736ac05ba315c40ae7297aa7f074d",
+    "updatedAt": "2026-06-19T15:33:00.858Z"
+  },
+  "clearingDecision": {
+    "objectType": "receipter.clearing_decision.v1",
+    "decisionId": "clearing_run_20260619153300_79wkwa",
+    "obligationId": "obligation_run_20260619153300_79wkwa",
+    "verdict": "anchored",
+    "reasons": [
+      "Selected bid public_scout_standard is bound to the obligation.",
+      "Acceptance criteria count: 8.",
+      "Task data label: public.",
+      "Verification admissibility: admissible.",
+      "Evidence strength: sui_anchored.",
+      "Delivery is present with evidence hash sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17.",
+      "Walrus evidence walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d is ready for Sui anchoring.",
+      "Sui anchor digest sui_dev_anchor_run_20260619153300_79wkwa records final settlement proof."
+    ],
+    "trustVerdict": "allow",
+    "evidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+    "walrusReady": true,
+    "verificationStatus": {
+      "passed": 8,
+      "pending": 0,
+      "requiresReview": 0
+    },
+    "verificationAdmissibility": "admissible",
+    "evidenceStrength": "sui_anchored",
+    "blockerIds": [],
+    "decidedAt": "2026-06-19T15:33:00.858Z"
+  },
+  "settlementInstruction": {
+    "objectType": "receipter.settlement_instruction.v1",
+    "instructionId": "settlement_run_20260619153300_79wkwa",
+    "obligationId": "obligation_run_20260619153300_79wkwa",
+    "action": "record_settlement",
+    "workerAgentId": "sui_opportunity_scout",
+    "selectedBidId": "public_scout_standard",
+    "amount": {
+      "amount": "0.035",
+      "currency": "SUI"
+    },
+    "preconditions": [
+      "Settlement proof has been recorded on Sui."
+    ],
+    "suiEscrowObjectId": "0x657363726f773a72756e5f32303236303631393135333330305f3739776b7761",
+    "suiPaymentDigest": "sui_dev_payment_run_20260619153300_79wkwa",
+    "suiAnchorDigest": "sui_dev_anchor_run_20260619153300_79wkwa",
+    "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+    "updatedAt": "2026-06-19T15:33:00.858Z"
+  },
+  "suiPaymentDigest": "sui_dev_payment_run_20260619153300_79wkwa",
+  "deliveryText": "Receipter worker completed: Find Sui ecosystem builder opportunities\n\nWhat I did:\n- Received only the Sui-bound safe task text.\n- Did not receive private notes or secrets.\n- Produced evidence for a Walrus memory blob and Sui receipt anchor.\n- Searched public sources for real links related to the task.\n\nOpportunity Scout Report\nGenerated: 2026-06-19T15:33:00.414Z\nSearch: ecosystem builder opportunities grants\n\nFound links:\n1. Mosss-OS/webscout\n   Source: GitHub - score 1\n   Link: https://github.com/Mosss-OS/webscout\n   Why it matters: WebScout is a Telegram-first autonomous AI agent for Web3 builders worldwide. It discovers, evaluates, ranks, and helps apply for high-quality opportunities like grants, bounties, hackathons, and freelance gigs across EVM, Starknet, and Polkadot ecosystems.\n2. umutergul74/earnradar-turkey\n   Source: GitHub - score 0\n   Link: https://github.com/umutergul74/earnradar-turkey\n   Why it matters: Open-source Telegram bot and dashboard helping Turkish Solana builders discover relevant grants, bounties, and ecosystem opportunities.",
+  "workerEvidence": {
+    "schema": "receipter.scout_evidence.v1",
+    "generatedAt": "2026-06-19T15:33:00.414Z",
+    "query": "ecosystem builder opportunities grants",
+    "sourceReceipt": {
+      "schema": "receipter.source_receipt.v1",
+      "generatedAt": "2026-06-19T15:33:00.414Z",
+      "query": "ecosystem builder opportunities grants",
+      "observations": [
+        {
+          "source": "github",
+          "sourceLabel": "GitHub",
+          "endpoint": "https://api.github.com/search/repositories?q=ecosystem%20builder%20opportunities%20grants&sort=updated&order=desc&per_page=5",
+          "query": "ecosystem builder opportunities grants",
+          "observedAt": "2026-06-19T15:33:00.414Z",
+          "title": "Mosss-OS/webscout",
+          "url": "https://github.com/Mosss-OS/webscout",
+          "score": 1,
+          "publishedAt": "2026-05-31T15:56:34Z",
+          "record": {
+            "id": 1233774190,
+            "node_id": "R_kgDOSYnmbg",
+            "name": "webscout",
+            "full_name": "Mosss-OS/webscout",
+            "private": false,
+            "owner": {
+              "login": "Mosss-OS",
+              "id": 274020804,
+              "node_id": "U_kgDOEFU5xA",
+              "avatar_url": "https://avatars.githubusercontent.com/u/274020804?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/Mosss-OS",
+              "html_url": "https://github.com/Mosss-OS",
+              "followers_url": "https://api.github.com/users/Mosss-OS/followers",
+              "following_url": "https://api.github.com/users/Mosss-OS/following{/other_user}",
+              "gists_url": "https://api.github.com/users/Mosss-OS/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/Mosss-OS/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/Mosss-OS/subscriptions",
+              "organizations_url": "https://api.github.com/users/Mosss-OS/orgs",
+              "repos_url": "https://api.github.com/users/Mosss-OS/repos",
+              "events_url": "https://api.github.com/users/Mosss-OS/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/Mosss-OS/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "html_url": "https://github.com/Mosss-OS/webscout",
+            "description": "WebScout is a Telegram-first autonomous AI agent for Web3 builders worldwide. It discovers, evaluates, ranks, and helps apply for high-quality opportunities like grants, bounties, hackathons, and freelance gigs across EVM, Starknet, and Polkadot ecosystems.",
+            "fork": false,
+            "url": "https://api.github.com/repos/Mosss-OS/webscout",
+            "forks_url": "https://api.github.com/repos/Mosss-OS/webscout/forks",
+            "keys_url": "https://api.github.com/repos/Mosss-OS/webscout/keys{/key_id}",
+            "collaborators_url": "https://api.github.com/repos/Mosss-OS/webscout/collaborators{/collaborator}",
+            "teams_url": "https://api.github.com/repos/Mosss-OS/webscout/teams",
+            "hooks_url": "https://api.github.com/repos/Mosss-OS/webscout/hooks",
+            "issue_events_url": "https://api.github.com/repos/Mosss-OS/webscout/issues/events{/number}",
+            "events_url": "https://api.github.com/repos/Mosss-OS/webscout/events",
+            "assignees_url": "https://api.github.com/repos/Mosss-OS/webscout/assignees{/user}",
+            "branches_url": "https://api.github.com/repos/Mosss-OS/webscout/branches{/branch}",
+            "tags_url": "https://api.github.com/repos/Mosss-OS/webscout/tags",
+            "blobs_url": "https://api.github.com/repos/Mosss-OS/webscout/git/blobs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/Mosss-OS/webscout/git/tags{/sha}",
+            "git_refs_url": "https://api.github.com/repos/Mosss-OS/webscout/git/refs{/sha}",
+            "trees_url": "https://api.github.com/repos/Mosss-OS/webscout/git/trees{/sha}",
+            "statuses_url": "https://api.github.com/repos/Mosss-OS/webscout/statuses/{sha}",
+            "languages_url": "https://api.github.com/repos/Mosss-OS/webscout/languages",
+            "stargazers_url": "https://api.github.com/repos/Mosss-OS/webscout/stargazers",
+            "contributors_url": "https://api.github.com/repos/Mosss-OS/webscout/contributors",
+            "subscribers_url": "https://api.github.com/repos/Mosss-OS/webscout/subscribers",
+            "subscription_url": "https://api.github.com/repos/Mosss-OS/webscout/subscription",
+            "commits_url": "https://api.github.com/repos/Mosss-OS/webscout/commits{/sha}",
+            "git_commits_url": "https://api.github.com/repos/Mosss-OS/webscout/git/commits{/sha}",
+            "comments_url": "https://api.github.com/repos/Mosss-OS/webscout/comments{/number}",
+            "issue_comment_url": "https://api.github.com/repos/Mosss-OS/webscout/issues/comments{/number}",
+            "contents_url": "https://api.github.com/repos/Mosss-OS/webscout/contents/{+path}",
+            "compare_url": "https://api.github.com/repos/Mosss-OS/webscout/compare/{base}...{head}",
+            "merges_url": "https://api.github.com/repos/Mosss-OS/webscout/merges",
+            "archive_url": "https://api.github.com/repos/Mosss-OS/webscout/{archive_format}{/ref}",
+            "downloads_url": "https://api.github.com/repos/Mosss-OS/webscout/downloads",
+            "issues_url": "https://api.github.com/repos/Mosss-OS/webscout/issues{/number}",
+            "pulls_url": "https://api.github.com/repos/Mosss-OS/webscout/pulls{/number}",
+            "milestones_url": "https://api.github.com/repos/Mosss-OS/webscout/milestones{/number}",
+            "notifications_url": "https://api.github.com/repos/Mosss-OS/webscout/notifications{?since,all,participating}",
+            "labels_url": "https://api.github.com/repos/Mosss-OS/webscout/labels{/name}",
+            "releases_url": "https://api.github.com/repos/Mosss-OS/webscout/releases{/id}",
+            "deployments_url": "https://api.github.com/repos/Mosss-OS/webscout/deployments",
+            "created_at": "2026-05-09T10:43:36Z",
+            "updated_at": "2026-05-31T15:56:34Z",
+            "pushed_at": "2026-05-31T15:56:30Z",
+            "git_url": "git://github.com/Mosss-OS/webscout.git",
+            "ssh_url": "git@github.com:Mosss-OS/webscout.git",
+            "clone_url": "https://github.com/Mosss-OS/webscout.git",
+            "svn_url": "https://github.com/Mosss-OS/webscout",
+            "homepage": "https://t.me/globescoutbot",
+            "size": 548,
+            "stargazers_count": 1,
+            "watchers_count": 1,
+            "language": "TypeScript",
+            "has_issues": true,
+            "has_projects": true,
+            "has_downloads": true,
+            "has_wiki": false,
+            "has_pages": false,
+            "has_discussions": false,
+            "forks_count": 0,
+            "mirror_url": null,
+            "archived": false,
+            "disabled": false,
+            "open_issues_count": 6,
+            "license": null,
+            "allow_forking": true,
+            "is_template": false,
+            "web_commit_signoff_required": false,
+            "has_pull_requests": true,
+            "pull_request_creation_policy": "all",
+            "topics": [
+              "apify",
+              "autonomous-agents",
+              "deno",
+              "ipfs",
+              "openai",
+              "starknet",
+              "supabase",
+              "telegram-bot",
+              "web3-ai-agent"
+            ],
+            "visibility": "public",
+            "forks": 0,
+            "open_issues": 6,
+            "watchers": 1,
+            "default_branch": "main",
+            "score": 1
+          },
+          "observationId": "source_abfa9a54e8d998ed",
+          "recordHash": "sha256:1cb08b3113527d42abd54239c4c73f02352b2fa7a291b21785f4c21d119ac672"
+        },
+        {
+          "source": "github",
+          "sourceLabel": "GitHub",
+          "endpoint": "https://api.github.com/search/repositories?q=ecosystem%20builder%20opportunities%20grants&sort=updated&order=desc&per_page=5",
+          "query": "ecosystem builder opportunities grants",
+          "observedAt": "2026-06-19T15:33:00.414Z",
+          "title": "umutergul74/earnradar-turkey",
+          "url": "https://github.com/umutergul74/earnradar-turkey",
+          "score": 0,
+          "publishedAt": "2026-05-02T16:51:23Z",
+          "record": {
+            "id": 1227330031,
+            "node_id": "R_kgDOSSeR7w",
+            "name": "earnradar-turkey",
+            "full_name": "umutergul74/earnradar-turkey",
+            "private": false,
+            "owner": {
+              "login": "umutergul74",
+              "id": 234167829,
+              "node_id": "U_kgDODfUeFQ",
+              "avatar_url": "https://avatars.githubusercontent.com/u/234167829?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/umutergul74",
+              "html_url": "https://github.com/umutergul74",
+              "followers_url": "https://api.github.com/users/umutergul74/followers",
+              "following_url": "https://api.github.com/users/umutergul74/following{/other_user}",
+              "gists_url": "https://api.github.com/users/umutergul74/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/umutergul74/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/umutergul74/subscriptions",
+              "organizations_url": "https://api.github.com/users/umutergul74/orgs",
+              "repos_url": "https://api.github.com/users/umutergul74/repos",
+              "events_url": "https://api.github.com/users/umutergul74/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/umutergul74/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "html_url": "https://github.com/umutergul74/earnradar-turkey",
+            "description": "Open-source Telegram bot and dashboard helping Turkish Solana builders discover relevant grants, bounties, and ecosystem opportunities.",
+            "fork": false,
+            "url": "https://api.github.com/repos/umutergul74/earnradar-turkey",
+            "forks_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/forks",
+            "keys_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/keys{/key_id}",
+            "collaborators_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/collaborators{/collaborator}",
+            "teams_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/teams",
+            "hooks_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/hooks",
+            "issue_events_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/issues/events{/number}",
+            "events_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/events",
+            "assignees_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/assignees{/user}",
+            "branches_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/branches{/branch}",
+            "tags_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/tags",
+            "blobs_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/git/blobs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/git/tags{/sha}",
+            "git_refs_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/git/refs{/sha}",
+            "trees_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/git/trees{/sha}",
+            "statuses_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/statuses/{sha}",
+            "languages_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/languages",
+            "stargazers_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/stargazers",
+            "contributors_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/contributors",
+            "subscribers_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/subscribers",
+            "subscription_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/subscription",
+            "commits_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/commits{/sha}",
+            "git_commits_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/git/commits{/sha}",
+            "comments_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/comments{/number}",
+            "issue_comment_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/issues/comments{/number}",
+            "contents_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/contents/{+path}",
+            "compare_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/compare/{base}...{head}",
+            "merges_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/merges",
+            "archive_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/{archive_format}{/ref}",
+            "downloads_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/downloads",
+            "issues_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/issues{/number}",
+            "pulls_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/pulls{/number}",
+            "milestones_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/milestones{/number}",
+            "notifications_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/notifications{?since,all,participating}",
+            "labels_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/labels{/name}",
+            "releases_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/releases{/id}",
+            "deployments_url": "https://api.github.com/repos/umutergul74/earnradar-turkey/deployments",
+            "created_at": "2026-05-02T14:33:09Z",
+            "updated_at": "2026-05-02T16:51:23Z",
+            "pushed_at": "2026-05-02T16:51:19Z",
+            "git_url": "git://github.com/umutergul74/earnradar-turkey.git",
+            "ssh_url": "git@github.com:umutergul74/earnradar-turkey.git",
+            "clone_url": "https://github.com/umutergul74/earnradar-turkey.git",
+            "svn_url": "https://github.com/umutergul74/earnradar-turkey",
+            "homepage": null,
+            "size": 13767,
+            "stargazers_count": 0,
+            "watchers_count": 0,
+            "language": "TypeScript",
+            "has_issues": true,
+            "has_projects": true,
+            "has_downloads": true,
+            "has_wiki": true,
+            "has_pages": false,
+            "has_discussions": false,
+            "forks_count": 0,
+            "mirror_url": null,
+            "archived": false,
+            "disabled": false,
+            "open_issues_count": 0,
+            "license": {
+              "key": "mit",
+              "name": "MIT License",
+              "spdx_id": "MIT",
+              "url": "https://api.github.com/licenses/mit",
+              "node_id": "MDc6TGljZW5zZTEz"
+            },
+            "allow_forking": true,
+            "is_template": false,
+            "web_commit_signoff_required": false,
+            "has_pull_requests": true,
+            "pull_request_creation_policy": "all",
+            "topics": [],
+            "visibility": "public",
+            "forks": 0,
+            "open_issues": 0,
+            "watchers": 0,
+            "default_branch": "main",
+            "score": 1
+          },
+          "observationId": "source_c294fe32469b3ae8",
+          "recordHash": "sha256:5f71157e13a64d84ddc6c5c154343d26d86b68f461dcdf0d56aaf6db5039556b"
+        }
+      ],
+      "warnings": [],
+      "receiptId": "source_receipt_cd46ee4e3c8a38fd",
+      "receiptHash": "sha256:cd46ee4e3c8a38fdadfdeabcdf6dccf8de67f133274150b7e788519be9387897"
+    },
+    "claims": [
+      {
+        "claimId": "claim_1_source_abfa9a54e8d998ed",
+        "resultIndex": 1,
+        "title": "Mosss-OS/webscout",
+        "url": "https://github.com/Mosss-OS/webscout",
+        "sourceObservationId": "source_abfa9a54e8d998ed",
+        "statement": "GitHub result \"Mosss-OS/webscout\" was used in the rendered Opportunity Scout report."
+      },
+      {
+        "claimId": "claim_2_source_c294fe32469b3ae8",
+        "resultIndex": 2,
+        "title": "umutergul74/earnradar-turkey",
+        "url": "https://github.com/umutergul74/earnradar-turkey",
+        "sourceObservationId": "source_c294fe32469b3ae8",
+        "statement": "GitHub result \"umutergul74/earnradar-turkey\" was used in the rendered Opportunity Scout report."
+      }
+    ],
+    "evidenceHash": "sha256:61b0750aac7bc292bf26cad4074cb2d257e3e46477f6cc9119ba46e0e29edb2e"
+  },
+  "memoryRecord": {
+    "objectType": "receipter.agent_memory_record.v1",
+    "memoryId": "memory_63c46f8b2465451e",
+    "workerAgentId": "sui_opportunity_scout",
+    "runId": "run_20260619153300_79wkwa",
+    "taskTitle": "Find Sui ecosystem builder opportunities",
+    "workOrderId": "sui_work_order_run_20260619153300_79wkwa",
+    "paymentIntentId": "payment_intent_run_20260619153300_79wkwa",
+    "selectedBidId": "public_scout_standard",
+    "amountMist": "35000000",
+    "amountSui": "0.035",
+    "createdAt": "2026-06-19T15:33:00.404Z",
+    "updatedAt": "2026-06-19T15:33:00.858Z",
+    "status": "anchored",
+    "summary": "Find Sui ecosystem builder opportunities: admissible verification, 2 supported claim(s), 0 failed claim(s).",
+    "tags": [
+      "research",
+      "admissible",
+      "sui_anchored",
+      "record_settlement"
+    ],
+    "sourceObservationCount": 2,
+    "claimCount": 2,
+    "supportedClaimCount": 2,
+    "failedClaimCount": 0,
+    "averageClaimSupport": 100,
+    "verificationAdmissibility": "admissible",
+    "evidenceStrength": "sui_anchored",
+    "settlementAction": "record_settlement",
+    "paymentDigest": "sui_dev_payment_run_20260619153300_79wkwa",
+    "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+    "walrusReadUrl": "walrus-dev://2e4736ac05ba315c40ae7297aa7f074d",
+    "suiAnchorDigest": "sui_dev_anchor_run_20260619153300_79wkwa",
+    "evidenceHash": "sha256:3854e899552efa87f01f4d2f47d949bc8217adf77d3a4db59fd5feb3b017cc17",
+    "marketplaceProof": {
+      "paymentBound": true,
+      "workerSelected": true,
+      "sourceVerified": true,
+      "walrusStored": true,
+      "suiAnchored": true
+    },
+    "memoryHash": "sha256:63c46f8b2465451ee7d772166915367773a882a8f19612f9042c41f2236107b1"
+  },
+  "walrusBlobId": "walrus_dev_blob_2e4736ac05ba315c40ae7297aa7f074d",
+  "walrusBlobObjectId": "0x2e4736ac05ba315c40ae7297aa7f074df195e9a98ca2c861d9924ff7426054ca",
+  "walrusCertifiedEpoch": 0,
+  "walrusEndEpoch": 2,
+  "walrusReadUrl": "walrus-dev://2e4736ac05ba315c40ae7297aa7f074d",
+  "suiAnchorDigest": "sui_dev_anchor_run_20260619153300_79wkwa"
+}
